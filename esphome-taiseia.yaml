@@ -1,0 +1,92 @@
+substitutions:
+  devicename: esphome-taiseia
+  upper_devicename: "ESPHome TaiSeia"
+
+esphome:
+  name: $devicename
+  comment: $upper_devicename
+  name_add_mac_suffix: true
+
+external_components:
+  - source:
+      type: local
+      path: custom_components
+
+esp8266:
+  board: esp01_1m
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+#  reboot_timeout: 0s
+  ap:
+    password: "admin1234"
+    ap_timeout: 30s
+
+# Enable logging
+logger:
+  baud_rate: 0
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+uart:
+  id: uart_taixia
+  tx_pin: TX
+  rx_pin: RX
+  baud_rate: 9600
+
+binary_sensor:
+  - platform: status
+    name: "${upper_devicename} Status"
+  - platform: taixia
+    power:
+      name: "${upper_devicename} Power"
+
+button:
+  - platform: restart
+    name: "${upper_devicename} Restart"
+
+
+number:
+  - platform: taixia
+    type: electricfan
+    off_timer:
+      name: "${upper_devicename} Off Timer"
+
+sensor:
+  - platform: wifi_signal
+    name: "${upper_devicename} WiFi Signal"
+    update_interval: 60s
+  - platform: uptime
+    name: "${upper_devicename} Uptime"
+    filters:
+      - lambda: return x / 3600;
+    unit_of_measurement: "h"
+    accuracy_decimals: 1
+
+switch:
+  - platform: taixia
+    type: electricfan
+    power:
+      name: "${upper_devicename} Power Switch"
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "${upper_devicename} IP Address"
+  - platform: taixia
+    sa_id:
+      name: "${upper_devicename} SA ID"
+    brand:
+      name: "${upper_devicename} SA Brand"
+    model:
+      name: "${upper_devicename} SA Model"
+    version:
+      name: "${upper_devicename} SA Version"
+    services:
+      name: "${upper_devicename} SA Services"
+
+taixia:
