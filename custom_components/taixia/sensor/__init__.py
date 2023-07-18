@@ -36,6 +36,7 @@ from .. import (
     TaiXia,
     CONF_TAIXIA_ID,
     CONF_AIR_CONDITIONER,
+    CONF_AIRPURIFIER,
     CONF_DEHUMIDIFIER,
     CONF_WASHING_MACHINE,
     CONF_ELECTRIC_FAN,
@@ -47,6 +48,7 @@ CODEOWNERS = ["@tsunglung"]
 Air_Conditioner = taixia_ns.class_("AirConditionerSensor", cg.PollingComponent)
 Dehumidifier = taixia_ns.class_("DehumidifierSensor", cg.PollingComponent)
 Washing_Machine = taixia_ns.class_("WashingMachineSensor", cg.PollingComponent)
+AirPurifier = taixia_ns.class_("AirPurifierSensor", cg.PollingComponent)
 ElectricFan = taixia_ns.class_("ElectricFanSensor", cg.PollingComponent)
 TaiXiaCustom = taixia_ns.class_("TaiXiaCustomSensor", cg.PollingComponent)
 TaiXiaCustomSub = taixia_ns.class_("TaiXiaCustomSubSensor", cg.PollingComponent)
@@ -76,6 +78,9 @@ CONF_WATER_FULL = "water_full"
 CONF_FILITER_CLEAN = "filiter_clean"
 CONF_SIDE_AIR_VENT = "side_air_vent"
 CONF_DEFROST = "defrost"
+
+CONF_AIR_QUALITY = "air_quality"
+ICON_THOUGHT_BUBBLE = "mdi:thought-bubble"
 
 CONFIG_SCHEMA = cv.typed_schema(
     {
@@ -144,60 +149,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                     icon=ICON_TIMER,
                     accuracy_decimals=0,
                     device_class=DEVICE_CLASS_DURATION,
-                    state_class=STATE_CLASS_MEASUREMENT,
-                ),
-            }
-        ).extend(cv.polling_component_schema('60s')),
-        CONF_DEHUMIDIFIER: cv.COMPONENT_SCHEMA.extend(
-            {
-                cv.GenerateID(): cv.declare_id(Dehumidifier),
-                cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
-                cv.Optional(CONF_WATER_FULL): sensor.sensor_schema(
-                    icon=ICON_WATER_PERCENT,
-                    device_class=DEVICE_CLASS_EMPTY,
-                    entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-                ),
-                cv.Optional(CONF_FILITER_CLEAN): sensor.sensor_schema(
-                    icon=ICON_CHIP,
-                    device_class=DEVICE_CLASS_EMPTY,
-                    entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-                ),
-                cv.Optional(CONF_SIDE_AIR_VENT): sensor.sensor_schema(
-                    icon=ICON_CHIP,
-                    device_class=DEVICE_CLASS_EMPTY,
-                    entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-                ),
-                cv.Optional(CONF_DEFROST): sensor.sensor_schema(
-                    icon=ICON_CHIP,
-                    device_class=DEVICE_CLASS_EMPTY,
-                    entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-                ),
-                cv.Optional(CONF_OPERATING_CURRENT): sensor.sensor_schema(
-                    unit_of_measurement=UNIT_PERCENT,
-                    icon=ICON_CURRENT_AC,
-                    accuracy_decimals=0,
-                    device_class=DEVICE_CLASS_POWER,
-                    state_class=STATE_CLASS_MEASUREMENT,
-                ),
-                cv.Optional(CONF_OPERATING_VOLTAGE): sensor.sensor_schema(
-                    unit_of_measurement=UNIT_VOLT,
-                    icon=ICON_FLASH,
-                    accuracy_decimals=0,
-                    device_class=DEVICE_CLASS_POWER,
-                    state_class=STATE_CLASS_MEASUREMENT,
-                ),
-                cv.Optional(CONF_OPERATING_WATT): sensor.sensor_schema(
-                    unit_of_measurement=UNIT_WATT,
-                    icon=ICON_CURRENT_AC,
-                    accuracy_decimals=0,
-                    device_class=DEVICE_CLASS_POWER,
-                    state_class=STATE_CLASS_MEASUREMENT,
-                ),
-                cv.Optional(CONF_ENERGY_CONSUMPTON): sensor.sensor_schema(
-                    unit_of_measurement=UNIT_KILOWATT_HOURS,
-                    icon=ICON_CURRENT_AC,
-                    accuracy_decimals=0,
-                    device_class=DEVICE_CLASS_ENERGY,
                     state_class=STATE_CLASS_MEASUREMENT,
                 ),
             }
@@ -297,6 +248,99 @@ CONFIG_SCHEMA = cv.typed_schema(
                 ),
             }
         ).extend(cv.polling_component_schema('60s')),
+        CONF_DEHUMIDIFIER: cv.COMPONENT_SCHEMA.extend(
+            {
+                cv.GenerateID(): cv.declare_id(Dehumidifier),
+                cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
+                cv.Optional(CONF_WATER_FULL): sensor.sensor_schema(
+                    icon=ICON_WATER_PERCENT,
+                    device_class=DEVICE_CLASS_EMPTY,
+                    entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+                ),
+                cv.Optional(CONF_FILITER_CLEAN): sensor.sensor_schema(
+                    icon=ICON_CHIP,
+                    device_class=DEVICE_CLASS_EMPTY,
+                    entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+                ),
+                cv.Optional(CONF_SIDE_AIR_VENT): sensor.sensor_schema(
+                    icon=ICON_CHIP,
+                    device_class=DEVICE_CLASS_EMPTY,
+                    entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+                ),
+                cv.Optional(CONF_DEFROST): sensor.sensor_schema(
+                    icon=ICON_CHIP,
+                    device_class=DEVICE_CLASS_EMPTY,
+                    entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+                ),
+                cv.Optional(CONF_OPERATING_CURRENT): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_PERCENT,
+                    icon=ICON_CURRENT_AC,
+                    accuracy_decimals=0,
+                    device_class=DEVICE_CLASS_POWER,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+                cv.Optional(CONF_OPERATING_VOLTAGE): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_VOLT,
+                    icon=ICON_FLASH,
+                    accuracy_decimals=0,
+                    device_class=DEVICE_CLASS_POWER,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+                cv.Optional(CONF_OPERATING_WATT): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_WATT,
+                    icon=ICON_CURRENT_AC,
+                    accuracy_decimals=0,
+                    device_class=DEVICE_CLASS_POWER,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+                cv.Optional(CONF_ENERGY_CONSUMPTON): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_KILOWATT_HOURS,
+                    icon=ICON_CURRENT_AC,
+                    accuracy_decimals=0,
+                    device_class=DEVICE_CLASS_ENERGY,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+            }
+        ).extend(cv.polling_component_schema('60s')),
+        CONF_AIRPURIFIER: cv.COMPONENT_SCHEMA.extend(
+            {
+                cv.GenerateID(): cv.declare_id(AirPurifier),
+                cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
+                cv.Optional(CONF_AIR_QUALITY): sensor.sensor_schema(
+                    icon=ICON_THOUGHT_BUBBLE,
+                    device_class=DEVICE_CLASS_EMPTY,
+                    entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+                ),
+                cv.Optional(CONF_OPERATING_CURRENT): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_PERCENT,
+                    icon=ICON_CURRENT_AC,
+                    accuracy_decimals=0,
+                    device_class=DEVICE_CLASS_POWER,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+                cv.Optional(CONF_OPERATING_VOLTAGE): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_VOLT,
+                    icon=ICON_FLASH,
+                    accuracy_decimals=0,
+                    device_class=DEVICE_CLASS_POWER,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+                cv.Optional(CONF_OPERATING_WATT): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_WATT,
+                    icon=ICON_CURRENT_AC,
+                    accuracy_decimals=0,
+                    device_class=DEVICE_CLASS_POWER,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+                cv.Optional(CONF_ENERGY_CONSUMPTON): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_KILOWATT_HOURS,
+                    icon=ICON_CURRENT_AC,
+                    accuracy_decimals=0,
+                    device_class=DEVICE_CLASS_ENERGY,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+            }
+        ).extend(cv.polling_component_schema('60s')),
         CONF_ELECTRIC_FAN: cv.COMPONENT_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(ElectricFan),
@@ -313,6 +357,34 @@ CONFIG_SCHEMA = cv.typed_schema(
                     icon=ICON_THERMOMETER,
                     accuracy_decimals=1,
                     device_class=DEVICE_CLASS_TEMPERATURE,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+                cv.Optional(CONF_OPERATING_CURRENT): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_PERCENT,
+                    icon=ICON_CURRENT_AC,
+                    accuracy_decimals=0,
+                    device_class=DEVICE_CLASS_POWER,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+                cv.Optional(CONF_OPERATING_VOLTAGE): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_VOLT,
+                    icon=ICON_FLASH,
+                    accuracy_decimals=0,
+                    device_class=DEVICE_CLASS_POWER,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+                cv.Optional(CONF_OPERATING_WATT): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_WATT,
+                    icon=ICON_CURRENT_AC,
+                    accuracy_decimals=0,
+                    device_class=DEVICE_CLASS_POWER,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+                cv.Optional(CONF_ENERGY_CONSUMPTON): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_KILOWATT_HOURS,
+                    icon=ICON_CURRENT_AC,
+                    accuracy_decimals=0,
+                    device_class=DEVICE_CLASS_ENERGY,
                     state_class=STATE_CLASS_MEASUREMENT,
                 ),
             }
@@ -376,33 +448,6 @@ async def to_code(config):
             sens = await sensor.new_sensor(config[CONF_OPERATING_HOURS])
             cg.add(var.set_operating_hours_sensor(sens))
 
-    elif config[CONF_TYPE] == CONF_DEHUMIDIFIER:
-        cg.add(var.set_sa_id(0x04))
-        if CONF_WATER_FULL in config:
-            sens = await sensor.new_sensor(config[CONF_WATER_FULL])
-            cg.add(var.set_appoint_left_hours_sensor(sens))
-        if CONF_FILITER_CLEAN in config:
-            sens = await sensor.new_sensor(config[CONF_FILITER_CLEAN])
-            cg.add(var.set_filiter_clean_sensor(sens))
-        if CONF_SIDE_AIR_VENT in config:
-            sens = await sensor.new_sensor(config[CONF_SIDE_AIR_VENT])
-            cg.add(var.set_side_air_vent_sensor(sens))
-        if CONF_DEFROST in config:
-            sens = await sensor.new_sensor(config[CONF_DEFROST])
-            cg.add(var.set_defrost_sensor(sens))
-        if CONF_OPERATING_CURRENT in config:
-            sens = await sensor.new_sensor(config[CONF_OPERATING_CURRENT])
-            cg.add(var.set_operating_current_sensor(sens))
-        if CONF_OPERATING_VOLTAGE in config:
-            sens = await sensor.new_sensor(config[CONF_OPERATING_VOLTAGE])
-            cg.add(var.set_operating_voltage_sensor(sens))
-        if CONF_OPERATING_WATT in config:
-            sens = await sensor.new_sensor(config[CONF_OPERATING_WATT])
-            cg.add(var.set_operating_watt_sensor(sens))
-        if CONF_ENERGY_CONSUMPTON in config:
-            sens = await sensor.new_sensor(config[CONF_ENERGY_CONSUMPTON])
-            cg.add(var.set_energy_consumption_sensor(sens))
-
     elif config[CONF_TYPE] == CONF_WASHING_MACHINE:
         cg.add(var.set_sa_id(0x03))
         if CONF_WASH_LEFT_COUNT in config:
@@ -445,6 +490,51 @@ async def to_code(config):
             sens = await sensor.new_sensor(config[CONF_ENERGY_CONSUMPTON])
             cg.add(var.set_energy_consumption_sensor(sens))
 
+    elif config[CONF_TYPE] == CONF_DEHUMIDIFIER:
+        cg.add(var.set_sa_id(0x04))
+        if CONF_WATER_FULL in config:
+            sens = await sensor.new_sensor(config[CONF_WATER_FULL])
+            cg.add(var.set_appoint_left_hours_sensor(sens))
+        if CONF_FILITER_CLEAN in config:
+            sens = await sensor.new_sensor(config[CONF_FILITER_CLEAN])
+            cg.add(var.set_filiter_clean_sensor(sens))
+        if CONF_SIDE_AIR_VENT in config:
+            sens = await sensor.new_sensor(config[CONF_SIDE_AIR_VENT])
+            cg.add(var.set_side_air_vent_sensor(sens))
+        if CONF_DEFROST in config:
+            sens = await sensor.new_sensor(config[CONF_DEFROST])
+            cg.add(var.set_defrost_sensor(sens))
+        if CONF_OPERATING_CURRENT in config:
+            sens = await sensor.new_sensor(config[CONF_OPERATING_CURRENT])
+            cg.add(var.set_operating_current_sensor(sens))
+        if CONF_OPERATING_VOLTAGE in config:
+            sens = await sensor.new_sensor(config[CONF_OPERATING_VOLTAGE])
+            cg.add(var.set_operating_voltage_sensor(sens))
+        if CONF_OPERATING_WATT in config:
+            sens = await sensor.new_sensor(config[CONF_OPERATING_WATT])
+            cg.add(var.set_operating_watt_sensor(sens))
+        if CONF_ENERGY_CONSUMPTON in config:
+            sens = await sensor.new_sensor(config[CONF_ENERGY_CONSUMPTON])
+            cg.add(var.set_energy_consumption_sensor(sens))
+
+    if config[CONF_TYPE] == CONF_AIRPURIFIER:
+        cg.add(var.set_sa_id(0x08))
+        if CONF_AIR_QUALITY in config:
+            sens = await sensor.new_sensor(config[CONF_AIR_QUALITY])
+            cg.add(var.set_air_quality_sensor(sens))
+        if CONF_OPERATING_CURRENT in config:
+            sens = await sensor.new_sensor(config[CONF_OPERATING_CURRENT])
+            cg.add(var.set_operating_current_sensor(sens))
+        if CONF_OPERATING_VOLTAGE in config:
+            sens = await sensor.new_sensor(config[CONF_OPERATING_VOLTAGE])
+            cg.add(var.set_operating_voltage_sensor(sens))
+        if CONF_OPERATING_WATT in config:
+            sens = await sensor.new_sensor(config[CONF_OPERATING_WATT])
+            cg.add(var.set_operating_watt_sensor(sens))
+        if CONF_ENERGY_CONSUMPTON in config:
+            sens = await sensor.new_sensor(config[CONF_ENERGY_CONSUMPTON])
+            cg.add(var.set_energy_consumption_sensor(sens))
+
     if config[CONF_TYPE] == CONF_ELECTRIC_FAN:
         cg.add(var.set_sa_id(0x0F))
         if CONF_HUMIDITY in config:
@@ -453,6 +543,18 @@ async def to_code(config):
         if CONF_TEMPERATURE in config:
             sens = await sensor.new_sensor(config[CONF_TEMPERATURE])
             cg.add(var.set_temperature_sensor(sens))
+        if CONF_OPERATING_CURRENT in config:
+            sens = await sensor.new_sensor(config[CONF_OPERATING_CURRENT])
+            cg.add(var.set_operating_current_sensor(sens))
+        if CONF_OPERATING_VOLTAGE in config:
+            sens = await sensor.new_sensor(config[CONF_OPERATING_VOLTAGE])
+            cg.add(var.set_operating_voltage_sensor(sens))
+        if CONF_OPERATING_WATT in config:
+            sens = await sensor.new_sensor(config[CONF_OPERATING_WATT])
+            cg.add(var.set_operating_watt_sensor(sens))
+        if CONF_ENERGY_CONSUMPTON in config:
+            sens = await sensor.new_sensor(config[CONF_ENERGY_CONSUMPTON])
+            cg.add(var.set_energy_consumption_sensor(sens))
 
     elif config[CONF_TYPE] == CONF_CUSTOM:
         if CONF_COMMAND in config:

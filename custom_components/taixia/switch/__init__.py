@@ -12,7 +12,9 @@ from .. import (
     CONF_TAIXIA_ID,
     TaiXia,
     CONF_AIR_CONDITIONER,
+    CONF_AIRPURIFIER,
     CONF_ELECTRIC_FAN,
+    CONF_DEHUMIDIFIER,
     CONF_SUPPORTED_SA
 )
 
@@ -22,7 +24,7 @@ ICON_TOGGLE_SWITCH = "mdi:toggle-switch-variant"
 
 CONF_IONS = "ions"
 CONF_SLEEPY = "sleepy"
-CONF_AIR_PURFIFER = "air_purifier"
+CONF_AIR_PURIFIER = "air_purifier"
 CONF_AIR_FLOW_HORIZONTAL = "air_flow_horizontal"
 CONF_AIR_FLOW_VERTICAL = "air_flow_vertical"
 CONF_AIR_FLOW_AUTO = "air_flow_auto"
@@ -38,7 +40,7 @@ CONF_SAA_NOTIFIY = "saa_notify"
 
 CLIMATE_TYPES = {
     CONF_SLEEPY: 0x05,
-    CONF_AIR_PURFIFER: 0x08,
+    CONF_AIR_PURIFIER: 0x08,
     CONF_AIR_FLOW_VERTICAL: 0x0E,
     CONF_AIR_FLOW_HORIZONTAL: 0x10,
     CONF_FILTER_NOTIFY: 0x12,
@@ -58,6 +60,11 @@ DEHUMIDIFIER_TYPES = {
     CONF_HUMIDITY_NOTIFY: 0x14,
     CONF_LOCK: 0x16,
     CONF_SAA_NOTIFIY: 0x18
+}
+
+AIRPURIFIER_TYPES = {
+    CONF_IONS: 0x07,
+    CONF_LOCK: 0x08
 }
 
 FAN_TYPES = {
@@ -111,9 +118,14 @@ async def to_code(config):
         for sa_type, service_id in CLIMATE_TYPES.items():
             await add_switch(config, sa_type, service_id, sa_id)
 
-    if config[CONF_TYPE] == DEHUMIDIFIER_TYPES:
+    if config[CONF_TYPE] == CONF_DEHUMIDIFIER:
         sa_id = 4
         for sa_type, service_id in DEHUMIDIFIER_TYPES.items():
+            await add_switch(config, sa_type, service_id, sa_id)
+
+    if config[CONF_TYPE] == CONF_AIRPURIFIER:
+        sa_id = 8
+        for sa_type, service_id in AIRPURIFIER_TYPES.items():
             await add_switch(config, sa_type, service_id, sa_id)
 
     if config[CONF_TYPE] == CONF_ELECTRIC_FAN:

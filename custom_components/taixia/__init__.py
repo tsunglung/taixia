@@ -14,6 +14,7 @@ TaiXia = taixia_ns.class_("TaiXia", uart.UARTDevice, cg.Component)
 
 CONF_TAIXIA_ID = "taixia_id"
 CONF_AIR_CONDITIONER = "airconditioner"
+CONF_AIRPURIFIER = "airpurifier"
 CONF_DEHUMIDIFIER = "dehumidifier"
 CONF_WASHING_MACHINE = "washingmachine"
 CONF_ELECTRIC_FAN = "electricfan"

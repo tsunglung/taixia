@@ -87,6 +87,28 @@ class DehumidifierSelect : public select::Select, public TaiXiaListener, public 
   void handle_response(std::vector<uint8_t> &response) override;
 };
 
+class AirPurifierSelect : public select::Select, public TaiXiaListener, public Component {
+ public:
+  void dump_config() override;
+
+  void set_operating_program_select(select::Select *select) { this->operating_program_select_ = select; }
+  void set_service_id(uint8_t service_id) { this->service_id_ = service_id; }
+  void set_select_mappings(std::vector<uint8_t> mappings) { this->mappings_ = std::move(mappings); }
+
+  void set_taixia_parent(TaiXia *parent) { this->parent_ = parent; }
+
+ protected:
+  void control(const std::string &value) override;
+
+  TaiXia *parent_;
+  uint8_t service_id_;
+  std::vector<uint8_t> mappings_;
+
+  select::Select *operating_program_select_{nullptr};
+
+  void handle_response(std::vector<uint8_t> &response) override;
+};
+
 class ElectricFanSelect : public select::Select, public TaiXiaListener, public Component {
  public:
   void dump_config() override;

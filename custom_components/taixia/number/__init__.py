@@ -12,6 +12,7 @@ from .. import (
     TaiXia,
     CONF_AIR_CONDITIONER,
     CONF_ELECTRIC_FAN,
+    CONF_AIRPURIFIER,
     CONF_SUPPORTED_SA
 )
 
@@ -32,12 +33,17 @@ CLIMATE_TYPES = {
     CONF_HORIZONTAL_FAN_SPEED: (0x11, 0, 15, 1),
 }
 
+AIRPURIFIER_TYPES = {
+    CONF_ON_TIMER: (0x02, 0, 24, 1),
+    CONF_OFF_TIMER: (0x03, 0, 24, 1),
+}
+
 FAN_TYPES = {
     CONF_ON_TIMER: (0x0B, 0, 1440, 1),
     CONF_OFF_TIMER: (0x0C, 0, 1440, 1),
 }
 
-TYPES = FAN_TYPES | CLIMATE_TYPES
+TYPES = FAN_TYPES | CLIMATE_TYPES | AIRPURIFIER_TYPES
 
 TaiXiaNumber = taixia_ns.class_("TaiXiaNumber", number.Number, cg.Component)
 
@@ -85,6 +91,10 @@ async def to_code(config):
     if config[CONF_TYPE] == CONF_AIR_CONDITIONER:
         for type, (service_id, min, max, step) in CLIMATE_TYPES.items():
             await add_number(config, type, service_id, 1, max, min, step)
+
+    if config[CONF_TYPE] == CONF_AIRPURIFIER:
+        for type, (service_id, min, max, step) in AIRPURIFIER_TYPES.items():
+            await add_number(config, type, service_id, 8, max, min, step)
 
     if config[CONF_TYPE] == CONF_ELECTRIC_FAN:
         for type, (service_id, min, max, step) in FAN_TYPES.items():

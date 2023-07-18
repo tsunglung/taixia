@@ -112,6 +112,30 @@ class WashingMachineSensor : public TaiXiaListener, public PollingComponent {
   void handle_response(std::vector<uint8_t> &response) override;
 };
 
+class AirPurifierSensor : public TaiXiaListener, public PollingComponent {
+ public:
+  void dump_config() override;
+  void update() override;
+  void set_air_quality_sensor(sensor::Sensor *sensor) { this->air_quality_sensor_ = sensor; }
+  void set_operating_current_sensor(sensor::Sensor *sensor) { this->operating_current_sensor_ = sensor; }
+  void set_operating_voltage_sensor(sensor::Sensor *sensor) { this->operating_voltage_sensor_ = sensor; }
+  void set_operating_power_sensor(sensor::Sensor *sensor) { this->operating_power_sensor_ = sensor; }
+  void set_energy_consumption_sensor(sensor::Sensor *sensor) { this->energy_consumption_sensor_ = sensor; }
+
+  void set_taixia_parent(TaiXia *parent) { this->parent_ = parent; }
+
+ protected:
+  TaiXia *parent_;
+
+  sensor::Sensor *air_quality_sensor_{nullptr};
+  sensor::Sensor *operating_current_sensor_{nullptr};
+  sensor::Sensor *operating_voltage_sensor_{nullptr};
+  sensor::Sensor *operating_power_sensor_{nullptr};
+  sensor::Sensor *energy_consumption_sensor_{nullptr};
+
+  void handle_response(std::vector<uint8_t> &response) override;
+};
+
 class ElectricFanSensor : public TaiXiaListener, public PollingComponent {
  public:
   void dump_config() override;

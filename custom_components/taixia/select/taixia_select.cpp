@@ -223,6 +223,55 @@ static const char *const TAG = "taixia.select";
     ESP_LOGW(TAG, "Invalid value %s", value.c_str());
   }
 
+  void AirPurifierSelect::dump_config() {
+    ESP_LOGCONFIG(TAG, "TaiXIA Air Purifier Select:");
+    if (this->operating_program_select_ != nullptr)
+      LOG_SELECT("  ", "   Operating Program", this->operating_program_select_);
+  }
+
+  void AirPurifierSelect::handle_response(std::vector<uint8_t> &response) {
+    uint8_t i;
+    size_t mapping_idx = -1;
+    select::Select *slt;
+
+    ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
+        response[0], response[1], response[2], response[3], \
+        response[4], response[5], response[6], response[7], response[8]);
+
+    for (i = 3; i < response[0] - 3; i+=3) {
+      switch (response[i]) {
+        case SERVICE_ID_PURIFIER_MODE:
+          if (this->operating_program_select_ != nullptr) {
+            mapping_idx = get_mapping_idx(response, i + 1, this->mappings_);
+            slt = this->operating_program_select_;
+          }
+        break;
+      }
+      if (mapping_idx != -1) {
+        auto value = this->at(mapping_idx);
+        slt->publish_state(value.value());
+      }
+    }
+  }
+
+  void AirPurifierSelect::control(const std::string &value) {
+    uint8_t command[6] = {0x06, SA_ID_AIR_PURIFIER, 0x00, 0x00, 0x00, 0x00};
+    uint8_t buffer[6];
+    auto idx = this->index_of(value);
+
+    if (idx.has_value()) {
+      uint8_t mapping = this->mappings_.at(idx.value());
+      ESP_LOGV(TAG, "Setting value to %u:%s", mapping, value.c_str());
+      command[2] = WRITE | this->service_id_;
+      command[4] = mapping;
+      command[5] = this->parent_->checksum(command, 5);
+      this->parent_->send_cmd(command, buffer, 6);
+      return;
+    }
+
+    ESP_LOGW(TAG, "Invalid value %s", value.c_str());
+  }
+
   void ElectricFanSelect::dump_config() {
     ESP_LOGCONFIG(TAG, "TaiXIA Fan Select:");
     if (this->operating_program_select_ != nullptr)

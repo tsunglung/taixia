@@ -11,6 +11,7 @@ from .. import (
     TaiXia,
     CONF_TAIXIA_ID,
     CONF_AIR_CONDITIONER,
+    CONF_AIRPURIFIER,
     CONF_DEHUMIDIFIER,
     CONF_WASHING_MACHINE,
     CONF_ELECTRIC_FAN,
@@ -23,6 +24,7 @@ CODEOWNERS = ["@tsunglung"]
 AirConditionerSelect = taixia_ns.class_("AirConditionerSelect", select.Select, cg.Component)
 DehumidifierSelect = taixia_ns.class_("DehumidifierSelect", select.Select, cg.Component)
 WashingMachineSelect = taixia_ns.class_("WashingMachineSelect", select.Select, cg.Component)
+AirPurifierSelect = taixia_ns.class_("AirPurifierSelect", select.Select, cg.Component)
 ElectricFanSelect = taixia_ns.class_("ElectricFanSelect", select.Select, cg.Component)
 
 CONF_FUZZY_MODE = "fuzzy_mode"
@@ -30,7 +32,7 @@ CONF_DISPLAY_MODE = "display_mode"
 CONF_MOTION_DETECT = "motion_detect"
 
 CONF_OPERATING_PROGRAM = "operating_program"
-CONF_AIR_PURFIFIER = "air_purifier"
+CONF_AIR_PURIFIER = "air_purifier"
 
 CONF_WASH_PROGRAM = "wash_program"
 CONF_WASH_OTHER_FUNCTION = "wash_other_function"
@@ -136,6 +138,15 @@ OPTIONS_FAN_OPERATING_PROGRAM = {
     "Mode 5": 4
 }
 
+OPTIONS_PURIFIER_OPERATING_PROGRAM = {
+    "Auot": 0,
+    "Mute": 1,
+    "Low": 2,
+    "Standard": 3,
+    "High": 4,
+    "Super": 5
+}
+
 CONFIG_SCHEMA = cv.typed_schema(
     {
         CONF_AIR_CONDITIONER: cv.COMPONENT_SCHEMA.extend(
@@ -153,15 +164,24 @@ CONFIG_SCHEMA = cv.typed_schema(
                 ),
             }
         ),
+        CONF_AIRPURIFIER: cv.COMPONENT_SCHEMA.extend(
+            {
+                cv.GenerateID(): cv.declare_id(AirPurifierSelect),
+                cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
+                cv.Optional(CONF_OPERATING_PROGRAM): select.select_schema(
+                    AirPurifierSelect
+                ),
+            }
+        ),
         CONF_DEHUMIDIFIER: cv.COMPONENT_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(DehumidifierSelect),
                 cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
                 cv.Optional(CONF_OPERATING_PROGRAM): select.select_schema(
-                   AirConditionerSelect
+                   DehumidifierSelect
                 ),
-                cv.Optional(CONF_AIR_PURFIFIER): select.select_schema(
-                    AirConditionerSelect
+                cv.Optional(CONF_AIR_PURIFIER): select.select_schema(
+                    DehumidifierSelect
                 ),
             }
         ),
@@ -170,19 +190,19 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.GenerateID(): cv.declare_id(WashingMachineSelect),
                 cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
                 cv.Optional(CONF_WASH_PROGRAM): select.select_schema(
-                    AirConditionerSelect,
+                    WashingMachineSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                 ),
                 cv.Optional(CONF_WASH_OTHER_FUNCTION): select.select_schema(
-                    AirConditionerSelect,
+                    WashingMachineSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                 ),
                 cv.Optional(CONF_WASH_MODE): select.select_schema(
-                    AirConditionerSelect,
+                    WashingMachineSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                 ),
                 cv.Optional(CONF_WARM_WATER_PROGRAM): select.select_schema(
-                    AirConditionerSelect,
+                    WashingMachineSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                 ),
             }
@@ -192,7 +212,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.GenerateID(): cv.declare_id(ElectricFanSelect),
                 cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
                 cv.Optional(CONF_OPERATING_PROGRAM): select.select_schema(
-                    AirConditionerSelect,
+                    ElectricFanSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                 ),
             }
@@ -292,13 +312,25 @@ async def to_code(config):
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
             cg.add(sel.set_taixia_parent(taixia))
-        if CONF_AIR_PURFIFIER in config:
+        if CONF_AIR_PURIFIER in config:
             options_map = OPTIONS_AIR_PURFIFIER
-            sel = await select.new_select(config[CONF_AIR_PURFIFIER],
+            sel = await select.new_select(config[CONF_AIR_PURIFIER],
                     options=list(options_map.keys()))
             cg.add(var.set_air_purfifier_select(sel))
             cg.add(sel.set_service_id(0x0D))
             cg.add(sel.set_select_mappings(list(options_map.values())))
+
+    elif config[CONF_TYPE] == CONF_AIRPURIFIER:
+        cg.add(var.set_sa_id(0x08))
+        if CONF_OPERATING_PROGRAM in config:
+            options_map = OPTIONS_PURIFIER_OPERATING_PROGRAM
+            sel = await select.new_select(config[CONF_OPERATING_PROGRAM],
+                    options=list(options_map.keys()))
+            cg.add(var.set_operating_program_select(sel))
+            cg.add(sel.set_service_id(0x01))
+            cg.add(sel.set_select_mappings(list(options_map.values())))
+            cg.add(taixia.register_listener(sel))
+            cg.add(sel.set_taixia_parent(taixia))
 
     if config[CONF_TYPE] == CONF_ELECTRIC_FAN:
         cg.add(var.set_sa_id(0x0F))

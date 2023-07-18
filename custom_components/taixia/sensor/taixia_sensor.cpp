@@ -121,7 +121,7 @@ void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
 
 void AirConditionerSensor::update() {
   ESP_LOGCONFIG(TAG, "checking status");
-  this->parent_->send(6, 0, SA_TYPE_ID_AIR_CONDITIONER, 0x0, 0xffff);
+  this->parent_->send(6, 0, SA_ID_CLIMATE, 0x0, 0xffff);
 }
 
 void DehumidifierSensor::dump_config() {
@@ -301,6 +301,63 @@ void WashingMachineSensor::handle_response(std::vector<uint8_t> &response) {
     }
   }
 }
+
+void AirPurifierSensor::dump_config() {
+  ESP_LOGCONFIG(TAG, "TaiXIA Air Purifier Sensor:");
+  if (this->air_quality_sensor_ != nullptr)
+    LOG_SENSOR(TAG, "Air Quality", this->air_quality_sensor_);
+  if (this->operating_current_sensor_ != nullptr)
+    LOG_SENSOR("  ", "Operating Current", this->operating_current_sensor_);
+  if (this->operating_voltage_sensor_ != nullptr)
+    LOG_SENSOR("  ", "Operating Voltage", this->operating_voltage_sensor_);
+  if (this->operating_power_sensor_ != nullptr)
+    LOG_SENSOR("  ", "Operating power", this->operating_power_sensor_);
+  if (this->energy_consumption_sensor_ != nullptr)
+    LOG_SENSOR("  ", "Energy Consumption", this->energy_consumption_sensor_);
+}
+
+void AirPurifierSensor::handle_response(std::vector<uint8_t> &response) {
+  uint8_t i;
+
+  ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
+      response[0], response[1], response[2], response[3], \
+      response[4], response[5], response[6], response[7], response[8]);
+
+  for (i = 3; i < response[0] - 3; i+=3) {
+    switch (response[i]) {
+      case SERVICE_ID_PURIFIER_AIR_QUALITY:
+        if (this->air_quality_sensor_ != nullptr) {
+          publish_i16(response, i + 1, this->air_quality_sensor_);
+        }
+      break;
+      case SERVICE_ID_PURIFIER_CURRENT:
+        if (this->operating_current_sensor_ != nullptr) {
+          publish_u16_div_10(response, i + 1, this->operating_current_sensor_);
+        }
+      break;
+      case SERVICE_ID_PURIFIER_VOLTAGE:
+        if (this->operating_voltage_sensor_ != nullptr) {
+          publish_u16(response, i + 1, this->operating_voltage_sensor_);
+        }
+      break;
+      case SERVICE_ID_PURIFIER_POWER:
+        if (this->operating_power_sensor_ != nullptr) {
+          publish_u16(response, i + 1, this->operating_power_sensor_);
+        }
+      break;
+      case SERVICE_ID_PURIFIER_ENERGY:
+        if (this->energy_consumption_sensor_ != nullptr) {
+          publish_u16_div_10(response, i + 1, this->energy_consumption_sensor_);
+        }
+      break;
+    }
+  }
+}
+
+void AirPurifierSensor::update() {
+  this->parent_->send(6, 0, SA_ID_AIR_PURIFIER, SERVICE_ID_READ_STATUS, 0xFFFF);
+}
+
 
 void ElectricFanSensor::dump_config() {
   ESP_LOGCONFIG(TAG, "TaiXIA Fan Sensor:");
