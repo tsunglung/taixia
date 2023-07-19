@@ -9,6 +9,10 @@ namespace taixia {
 
 static const char *const TAG = "taixia.fan";
 
+  static inline uint16_t get_u16(std::vector<uint8_t> &response, int start) {
+    return (response[start] << 8) + response[start + 1];
+  }
+
   void TaiXiaFan::setup() {
     auto restore = this->restore_state_();
     if (restore.has_value()) {
@@ -55,16 +59,33 @@ static const char *const TAG = "taixia.fan";
     if ((buffer[3] == 0xFF) && (buffer[4] == 0xFF))
       ESP_LOGV(TAG, "Invaild value");
     else
-      this->speed_ = buffer[4];
+      this->speed = buffer[4];
 
     this->publish_state();
   }
 
   void TaiXiaFan::handle_response(std::vector<uint8_t> &response) {
+    uint8_t i;
+
+    ESP_LOGE(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
+      response[0], response[1], response[2], response[3], \
+      response[4], response[5], response[6], response[7], response[8]);
+
     if (response[1] == 0x00 && response[2] == SERVICE_ID_READ_STATUS) {
-        this->state = response[5];
-        // this->speed = response[9];
-        // this->oscillating = response[10];
+        for (i = 3; i < response[0] - 3; i+=3) {
+          switch (response[i]) {
+            case SERVICE_ID_FAN_STATUS:
+              this->state = get_u16(response, i + 1);
+              this->parent_->power_switch(this->state);
+            break;
+            case SERVICE_ID_FAN_SPEED:
+              this->speed = get_u16(response, i + 1);
+            break;
+            case SERVICE_ID_FAN_OSCILLATE:
+              this->oscillating = get_u16(response, i + 1);
+            break;
+          }
+        }
         this->publish_state();
     }
   }

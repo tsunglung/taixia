@@ -8,7 +8,7 @@ namespace taixia {
 static const char *const TAG = "taixia.select";
 
   static inline uint16_t get_u16(std::vector<uint8_t> &response, int start) {
-    return (response[start + 1] << 8) + response[start];
+    return (response[start] << 8) + response[start + 1];
   }
 
   static inline size_t get_mapping_idx(std::vector<uint8_t> &response, int start, std::vector<uint8_t> mappings) {

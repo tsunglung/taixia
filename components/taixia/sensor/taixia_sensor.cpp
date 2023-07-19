@@ -8,11 +8,11 @@ namespace taixia {
 static const char *const TAG = "taixia.sensor";
 
 static inline uint16_t get_u16(std::vector<uint8_t> &response, int start) {
-  return (response[start + 1] << 8) + response[start];
+  return (response[start] << 8) + response[start + 1];
 }
 
 static inline int16_t get_i16(std::vector<uint8_t> &response, int start) {
-  return (int16_t) ((response[start + 1] << 8) + response[start]);
+  return (int16_t) ((response[start] << 8) + response[start + 1]);
 }
 
 static inline void publish_i16(std::vector<uint8_t> &response, int start, sensor::Sensor *sensor) {
