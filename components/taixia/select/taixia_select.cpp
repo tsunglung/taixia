@@ -51,19 +51,19 @@ static const char *const TAG = "taixia.select";
       switch (response[i]) {
         case SERVICE_ID_CLIMATE_FUZZY_MODE:
           if (this->fuzzy_mode_select_ != nullptr) {
-            mapping_idx = get_mapping_idx(response, i + 1, this->mappings_);
+            mapping_idx = get_mapping_idx(response, i, this->mappings_);
             slt = this->fuzzy_mode_select_;
           }
         break;
         case SERVICE_ID_CLIMATE_DISPLAY_MODE:
           if (this->display_mode_select_ != nullptr) {
-            mapping_idx = get_mapping_idx(response, i + 1, this->mappings_);
+            mapping_idx = get_mapping_idx(response, i, this->mappings_);
             slt = this->display_mode_select_;
           }
         break;
         case SERVICE_ID_CLIMATE_ACTIVITY:
           if (this->motion_detect_select_ != nullptr) {
-            mapping_idx = get_mapping_idx(response, i + 1, this->mappings_);
+            mapping_idx = get_mapping_idx(response, i, this->mappings_);
             slt = this->motion_detect_select_;
           }
         break;
@@ -118,25 +118,25 @@ static const char *const TAG = "taixia.select";
       switch (response[i]) {
         case SERVICE_ID_WASHER_WASH_PROGRAM:
           if (this->wash_program_select_ != nullptr) {
-            mapping_idx = get_mapping_idx(response, i + 1, this->mappings_);
+            mapping_idx = get_mapping_idx(response, i, this->mappings_);
             slt = this->wash_program_select_;
           }
         break;
         case SERVICE_ID_WASHER_OTHER_FUNCTION:
           if (this->wash_other_function_select_ != nullptr) {
-            mapping_idx = get_mapping_idx(response, i + 1, this->mappings_);
+            mapping_idx = get_mapping_idx(response, i, this->mappings_);
             slt = this->wash_other_function_select_;
           }
         break;
         case SERVICE_ID_WASHER_WASH_MODE:
           if (this->wash_mode_select_ != nullptr) {
-            mapping_idx = get_mapping_idx(response, i + 1, this->mappings_);
+            mapping_idx = get_mapping_idx(response, i, this->mappings_);
             slt = this->wash_mode_select_;
           }
         break;
         case SERVICE_ID_WASHER_WARM_WATER_PROGRAM:
           if (this->warm_water_program_select_ != nullptr) {
-            mapping_idx = get_mapping_idx(response, i + 1, this->mappings_);
+            mapping_idx = get_mapping_idx(response, i, this->mappings_);
             slt = this->warm_water_program_select_;
           }
         break;
@@ -187,13 +187,13 @@ static const char *const TAG = "taixia.select";
       switch (response[i]) {
         case SERVICE_ID_DEHUMIDTFIER_MODE:
           if (this->operating_program_select_ != nullptr) {
-            mapping_idx = get_mapping_idx(response, i + 1, this->mappings_);
+            mapping_idx = get_mapping_idx(response, i, this->mappings_);
             slt = this->operating_program_select_;
           }
         break;
         case SERVICE_ID_DEHUMIDTFIER_AIR_PURFIFIER:
           if (this->air_purfifier_select_ != nullptr) {
-            mapping_idx = get_mapping_idx(response, i + 1, this->mappings_);
+            mapping_idx = get_mapping_idx(response, i, this->mappings_);
             slt = this->air_purfifier_select_;
           }
         break;
@@ -242,7 +242,7 @@ static const char *const TAG = "taixia.select";
       switch (response[i]) {
         case SERVICE_ID_PURIFIER_MODE:
           if (this->operating_program_select_ != nullptr) {
-            mapping_idx = get_mapping_idx(response, i + 1, this->mappings_);
+            mapping_idx = get_mapping_idx(response, i, this->mappings_);
             slt = this->operating_program_select_;
           }
         break;
@@ -291,7 +291,7 @@ static const char *const TAG = "taixia.select";
       switch (response[i]) {
         case SERVICE_ID_FAN_MODE:
           if (this->operating_program_select_ != nullptr) {
-            mapping_idx = get_mapping_idx(response, i + 1, this->mappings_);
+            mapping_idx = get_mapping_idx(response, i, this->mappings_);
             slt = this->operating_program_select_;
           }
         break;

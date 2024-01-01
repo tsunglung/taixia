@@ -157,6 +157,7 @@ class TaiXia : public uart::UARTDevice, public Component {
   void setup() override;
   float get_setup_priority() const override { return setup_priority::DATA; }
 
+  void set_sa_id(uint8_t id) { this->sa_id_ = id; }
   void set_max_length(uint8_t len) { this->max_length_ = len; }
   void register_listener(TaiXiaListener *listener) { this->listeners_.push_back(listener); }
 

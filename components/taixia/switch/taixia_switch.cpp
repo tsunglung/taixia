@@ -18,7 +18,7 @@ static const char *const TAG = "taixia.switch";
     if ((buffer[3] == 0xFF) && (buffer[4] == 0xFF))
       ESP_LOGV(TAG, "Invaild value");
     else
-      this->state = buffer[4];
+      this->state = bool(buffer[4]);
   }
 
   void TaiXiaSwitch::write_state(bool state) {

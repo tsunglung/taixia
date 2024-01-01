@@ -90,8 +90,9 @@ static const uint8_t RESPONSE_LENGTH = 255;
         version = format_hex_pretty(this->buffer_[3]) + "." + format_hex_pretty(this->buffer_[4]);
         this->version_textsensor_->publish_state(version);
       }
-
-      this->sa_id_ = this->buffer_[6] << 8 | this->buffer_[7];
+      // if not preset sa_id
+      if (this->sa_id_ == 0xffff)
+        this->sa_id_ = this->buffer_[6] << 8 | this->buffer_[7];
     }
   }
 

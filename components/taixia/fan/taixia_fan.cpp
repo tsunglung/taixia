@@ -67,7 +67,7 @@ static const char *const TAG = "taixia.fan";
   void TaiXiaFan::handle_response(std::vector<uint8_t> &response) {
     uint8_t i;
 
-    ESP_LOGE(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
+    ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
       response[0], response[1], response[2], response[3], \
       response[4], response[5], response[6], response[7], response[8]);
 
