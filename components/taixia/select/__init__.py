@@ -178,7 +178,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.GenerateID(): cv.declare_id(DehumidifierSelect),
                 cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
                 cv.Optional(CONF_OPERATING_PROGRAM): select.select_schema(
-                   DehumidifierSelect
+                    DehumidifierSelect
                 ),
                 cv.Optional(CONF_AIR_PURIFIER): select.select_schema(
                     DehumidifierSelect
@@ -229,8 +229,7 @@ async def to_code(config):
     await cg.register_component(var, config)
 
     if config[CONF_TYPE] not in CONF_SUPPORTED_SA:
-        raise ("SA TYPE is not supported yet")
-
+        raise (f"SA TYPE {config[CONF_TYPE]} is not supported yet")
     taixia = await cg.get_variable(config[CONF_TAIXIA_ID])
 
     if config[CONF_TYPE] == CONF_AIR_CONDITIONER:
@@ -244,19 +243,21 @@ async def to_code(config):
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
             cg.add(sel.set_taixia_parent(taixia))
+
         if CONF_DISPLAY_MODE in config:
             options_map = OPTIONS_DISPLAY_MODE
             sel = await select.new_select(config[CONF_DISPLAY_MODE],
-                     options=list(options_map.keys()))
+                    options=list(options_map.keys()))
             cg.add(var.set_display_mode_select(sel))
             cg.add(sel.set_service_id(0x1F))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
             cg.add(sel.set_taixia_parent(taixia))
+
         if CONF_MOTION_DETECT in config:
             options_map = OPTIONS_MOTION_DETECT
             sel = await select.new_select(config[CONF_MOTION_DETECT],
-                     options=list(options_map.keys()))
+                    options=list(options_map.keys()))
             cg.add(var.set_motion_detect_select(sel))
             cg.add(sel.set_service_id(0x19))
             cg.add(sel.set_select_mappings(list(options_map.values())))
@@ -274,6 +275,7 @@ async def to_code(config):
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
             cg.add(sel.set_taixia_parent(taixia))
+
         if CONF_WASH_OTHER_FUNCTION in config:
             options_map = OPTIONS_WASH_OTHER_FUNCTION
             sel = await select.new_select(config[CONF_WASH_OTHER_FUNCTION],
@@ -283,6 +285,7 @@ async def to_code(config):
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
             cg.add(sel.set_taixia_parent(taixia))
+
         if CONF_WASH_MODE in config:
             options_map = OPTIONS_WASH_MODE
             sel = await select.new_select(config[CONF_WASH_MODE],
@@ -291,6 +294,7 @@ async def to_code(config):
             cg.add(sel.set_wash_mode_select(sel))
             cg.add(taixia.register_listener(sel))
             cg.add(sel.set_taixia_parent(taixia))
+
         if CONF_WARM_WATER_PROGRAM in config:
             options_map = OPTIONS_WARM_WATER_PROGRAM
             sel = await select.new_select(config[CONF_WARM_WATER_PROGRAM],
@@ -312,6 +316,7 @@ async def to_code(config):
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
             cg.add(sel.set_taixia_parent(taixia))
+
         if CONF_AIR_PURIFIER in config:
             options_map = OPTIONS_AIR_PURFIFIER
             sel = await select.new_select(config[CONF_AIR_PURIFIER],
@@ -319,6 +324,8 @@ async def to_code(config):
             cg.add(var.set_air_purfifier_select(sel))
             cg.add(sel.set_service_id(0x0D))
             cg.add(sel.set_select_mappings(list(options_map.values())))
+            cg.add(taixia.register_listener(sel))
+            cg.add(sel.set_taixia_parent(taixia))
 
     elif config[CONF_TYPE] == CONF_AIRPURIFIER:
         cg.add(var.set_sa_id(0x08))

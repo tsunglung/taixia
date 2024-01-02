@@ -226,8 +226,8 @@ using namespace esphome::climate;
   }
 
   bool TaiXiaClimate::update_status_() {
-
-    this->parent_->send(6, 0, 0, 0x8, 0xffff);
+  
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
     return true;
   }
 

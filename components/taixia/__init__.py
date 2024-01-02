@@ -28,6 +28,8 @@ CONF_SUPPORTED_SA = [
     CONF_ELECTRIC_FAN
 ]
 
+CONF_SUPPORTED_SA_ID = [1, 3, 4, 15]
+
 CONFIG_SCHEMA = uart.UART_DEVICE_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(TaiXia),
@@ -44,6 +46,8 @@ async def to_code(config):
     await uart.register_uart_device(var, config)
 
     if CONF_SA_ID in config:
+        if config[CONF_SA_ID] not in CONF_SUPPORTED_SA_ID:
+            raise ValueError(f"Not support SA ID {config[CONF_SA_ID]}")
         cg.add(var.set_sa_id(config[CONF_SA_ID]))
 
     if CONF_MAX_LENGTH in config:

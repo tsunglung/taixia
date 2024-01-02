@@ -2,6 +2,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/binary_sensor/binary_sensor.h"
+#include "esphome/components/button/button.h"
 #include "esphome/components/number/number.h"
 #include "esphome/components/switch/switch.h"
 #include "esphome/components/text_sensor/text_sensor.h"
@@ -49,7 +50,9 @@ namespace taixia {
 #define SERVICE_ID_CLIMATE_FACTOR 0x26
 #define SERVICE_ID_CLIMATE_POWER 0x27
 #define SERVICE_ID_CLIMATE_ENERGY 0x28
-#define SERVICE_ID_CLIMATE_OPERATING_HOURS 0x30
+#define SERVICE_ID_CLIMATE_ERROR_CODR 0x29
+#define SERVICE_ID_CLIMATE_OPERATING_HOURS 0x2f
+#define SERVICE_ID_CLIMATE_FILITER_CLEAN_HOURS 0x30
 
 #define SA_ID_WASHER 0x03
 #define SERVICE_ID_WASHER_STATUS 0x00
@@ -130,6 +133,7 @@ namespace taixia {
   }
 
 #define TAIXIA_BINARY_SENSOR(name) TAIXIA_ENTITY_(binary_sensor::BinarySensor, name)
+#define TAIXIA_BUTTON(name) TAIXIA_ENTITY_(button::Button, name)
 #define TAIXIA_NUMBER(name) TAIXIA_ENTITY_(number::Number, name)
 #define TAIXIA_SWITCH(name) TAIXIA_ENTITY_(switch_::Switch, name)
 #define TAIXIA_TEXT_SENSOR(name) TAIXIA_ENTITY_(text_sensor::TextSensor, name)
@@ -162,7 +166,7 @@ class TaiXia : public uart::UARTDevice, public Component {
   void register_listener(TaiXiaListener *listener) { this->listeners_.push_back(listener); }
 
   uint8_t checksum(const uint8_t *data, uint8_t len);
-  void readline(void);
+  void readline(bool handle_response);
   bool send(uint8_t packet_length, uint8_t date_type, uint8_t sa_id, uint8_t service_id, uint16_t data);
   bool send_cmd(const uint8_t *command, uint8_t *response, uint8_t len) {
     return write_command_(command, response, len, len);
@@ -170,10 +174,13 @@ class TaiXia : public uart::UARTDevice, public Component {
   void switch_command(uint8_t sa_id, uint8_t service_id, bool onoff);
   void set_number(uint8_t sa_id, uint8_t service_id, float value);
   void get_number(uint8_t sa_id, uint8_t service_id, uint8_t *buffer);
+  void button_command(uint8_t sa_id, uint8_t service_id);
+
   void power_switch(bool state) { this->power_switch_->publish_state(state); }
 
   // TaiXIA
   TAIXIA_BINARY_SENSOR(power_binary_sensor)
+  TAIXIA_BUTTON(get_info_button)
   TAIXIA_TEXT_SENSOR(sa_id_textsensor)
   TAIXIA_TEXT_SENSOR(brand_textsensor)
   TAIXIA_TEXT_SENSOR(model_textsensor)

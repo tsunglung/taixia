@@ -39,11 +39,91 @@ static const uint8_t RESPONSE_LENGTH = 255;
     return ret;
   }
 
+  void TaiXia::get_info_() {
+    uint8_t i;
+    this->buffer_.clear();
+
+    this->send(6, 0, 0x00, SERVICE_ID_READ_VERSION, 0xFFFF);
+    this->readline(false);
+
+    if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_VERSION)) {
+      if (this->version_textsensor_ != nullptr) {
+        std::string version;
+        version = format_hex_pretty(this->buffer_[3]) + "." + format_hex_pretty(this->buffer_[4]);
+        this->version_textsensor_->publish_state(version);
+      }
+    }
+    this->buffer_.clear();
+
+    this->send(6, 0, 0x00, SERVICE_ID_READ_SA_ID, 0xFFFF);
+    this->readline(false);
+
+    if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_SA_ID)) {
+      if (this->sa_id_textsensor_ != nullptr) {
+        std::string sa_id;
+        sa_id = format_hex_pretty(this->buffer_[3]) + format_hex_pretty(this->buffer_[4]);
+        this->sa_id_textsensor_->publish_state(sa_id);
+      }
+    }
+    this->buffer_.clear();
+
+    this->send(6, 0, 0x00, SERVICE_ID_READ_BRAND, 0xFFFF);
+    this->readline(false);
+
+    if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_BRAND)) {
+      std::string brand;
+      for (i = 3; i < this->buffer_[0]; i++) {
+        if (this->buffer_[i] != 0x0) {
+          brand = brand + str_sprintf("%c", this->buffer_[i]);
+        } else {
+          break;
+        }
+      }
+      if (this->brand_textsensor_ != nullptr) {
+        this->brand_textsensor_->publish_state(brand);
+      }
+    }
+    this->buffer_.clear();
+
+    this->send(6, 0, 0x00, SERVICE_ID_READ_MODEL, 0xFFFF);
+    this->readline(false);
+
+    if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_MODEL)) {
+      std::string model;
+      for (i = 3; i < this->buffer_[0]; i++) {
+        if (this->buffer_[i] != 0x0) {
+          model = model + str_sprintf("%c", this->buffer_[i]);
+        } else {
+          break;
+        }
+      }
+      if (this->model_textsensor_ != nullptr) {
+        this->model_textsensor_->publish_state(model);
+      }
+    }
+    this->buffer_.clear();
+
+    this->send(6, 0, 0x00, SERVICE_ID_READ_SERVICES, 0xFFFF);
+    this->readline(false);
+
+    if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_SERVICES)) {
+      std::string services;
+      for (i = 3; i < this->buffer_[0]; i++) {
+        services = services + format_hex_pretty(this->buffer_[i]) + " ";
+      }
+      if (this->services_textsensor_ != nullptr) {
+        this->services_textsensor_->publish_state(services);
+      }
+    }
+    this->buffer_.clear();
+  }
+
   void TaiXia::setup() {
     uint8_t i, j, k;
 
     this->send(6, 0, 0x00, SERVICE_ID_REGISTER, 0xFFFF);
-    this->readline();
+    this->readline(false);
+
 //    uint8_t crc = this->checksum(this->buffer_, this->buffer_[0] - 1);
     if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_REGISTER)) {
 
@@ -73,7 +153,6 @@ static const uint8_t RESPONSE_LENGTH = 255;
       if (this->sa_id_textsensor_ != nullptr) {
         std::string sa_id;
         sa_id = format_hex_pretty(this->buffer_[6]) + format_hex_pretty(this->buffer_[7]);
-  //      sa_id = str_sprintf("%x%x", response[6], response[7]);
         this->sa_id_textsensor_->publish_state(sa_id);
       }
       if (this->brand_textsensor_ != nullptr) {
@@ -90,14 +169,17 @@ static const uint8_t RESPONSE_LENGTH = 255;
         version = format_hex_pretty(this->buffer_[3]) + "." + format_hex_pretty(this->buffer_[4]);
         this->version_textsensor_->publish_state(version);
       }
+
       // if not preset sa_id
       if (this->sa_id_ == 0xffff)
         this->sa_id_ = this->buffer_[6] << 8 | this->buffer_[7];
+    } else {
+      this->get_info_();
     }
   }
 
   void TaiXia::switch_command(uint8_t sa_id, uint8_t service_id, bool onoff) {
-    ESP_LOGV(TAG, "got command: %d %d %d %x", this->sa_id_, sa_id, service_id, onoff);
+    ESP_LOGV(TAG, "switch command: %d %d %d %x", this->sa_id_, sa_id, service_id, onoff);
     if (this->sa_id_ != sa_id)
       return;
 
@@ -113,7 +195,7 @@ static const uint8_t RESPONSE_LENGTH = 255;
   }
 
   void TaiXia::set_number(uint8_t sa_id, uint8_t service_id, float value) {
-    ESP_LOGV(TAG, "got command: %d %d %f", sa_id, service_id, value);
+    ESP_LOGV(TAG, "set number: %d %d %f", sa_id, service_id, value);
     if (this->sa_id_ != sa_id)
       return;
 
@@ -127,17 +209,22 @@ static const uint8_t RESPONSE_LENGTH = 255;
   }
 
   void TaiXia::get_number(uint8_t sa_id, uint8_t service_id, uint8_t *response) {
-    ESP_LOGV(TAG, "got command: %x %x %x", this->sa_id_ , sa_id, service_id);
+    ESP_LOGV(TAG, "get number: %x %x %x", this->sa_id_ , sa_id, service_id);
     if (this->sa_id_ != sa_id)
       return;
 
     uint8_t cmd[6] = {0x06, sa_id, service_id, 0xFF, 0xFF, 0x00};
     cmd[5] = this->checksum(cmd, 5);
 
-    this->write_command_(cmd, response, 6, 6);
+    uint8_t ret = this->write_command_(cmd, response, 6, 6);
   }
 
-  void TaiXia::readline(void) {
+  void TaiXia::button_command(uint8_t sa_id, uint8_t service_id) {
+    if (service_id == 0x00)
+      this->get_info_();
+  }
+
+  void TaiXia::readline(bool handle_response) {
       uint8_t c, len;
       uint8_t response[255];
       read_byte(&c);
@@ -156,10 +243,11 @@ static const uint8_t RESPONSE_LENGTH = 255;
         this->buffer_.push_back(response[i]);
       }
 
-      for (auto &listener : this->listeners_)
-        listener->on_response(this->sa_id_, this->buffer_);
-      this->state_ = 0;
-      this->buffer_.clear();
+      if (handle_response) {
+        for (auto &listener : this->listeners_)
+          listener->on_response(this->sa_id_, this->buffer_);
+        this->buffer_.clear();
+      }
   }
 
   void TaiXia::loop() {
@@ -167,7 +255,7 @@ static const uint8_t RESPONSE_LENGTH = 255;
       return;
 
     while (available()) {
-      readline();
+      readline(true);
     }
   }
 

@@ -59,6 +59,10 @@ void AirConditionerSensor::dump_config() {
     LOG_SENSOR("  ", "Energy Consumption", this->energy_consumption_sensor_);
   if (this->operating_hours_sensor_ != nullptr)
     LOG_SENSOR("  ", "Operating Hours", this->operating_hours_sensor_);
+  if (this->error_code_sensor_ != nullptr)
+    LOG_SENSOR("  ", "Error Code", this->error_code_sensor_);
+  if (this->filiter_clean_hours_sensor_ != nullptr)
+    LOG_SENSOR("  ", "Filiter Clean Hours", this->filiter_clean_hours_sensor_);
 }
 
 void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
@@ -113,6 +117,16 @@ void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
       case SERVICE_ID_CLIMATE_OPERATING_HOURS:
         if (this->operating_hours_sensor_ != nullptr) {
           publish_u16(response, i, this->operating_hours_sensor_);
+        }
+      break;
+      case SERVICE_ID_CLIMATE_ERROR_CODR:
+        if (this->error_code_sensor_ != nullptr) {
+          publish_u16(response, i, this->error_code_sensor_);
+        }
+      break;
+      case SERVICE_ID_CLIMATE_FILITER_CLEAN_HOURS:
+        if (this->filiter_clean_hours_sensor_ != nullptr) {
+          publish_u16(response, i + 1, this->filiter_clean_hours_sensor_);
         }
       break;
     }

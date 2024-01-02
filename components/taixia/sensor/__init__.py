@@ -63,6 +63,8 @@ CONF_OPERATING_VOLTAGE = "operating_voltage"
 CONF_OPERATING_WATT = "operating_watt"
 CONF_ENERGY_CONSUMPTON = "energy_consumption"
 CONF_OPERATING_HOURS = "operating_hours"
+CONF_ERROR_CODE = "error_code"
+CONF_FILITER_CLEAN_HOURS = "filiter_clean_hours"
 
 CONF_WASH_LEFT_COUNT = "wash_left_count"
 CONF_WASH_LEFT_HOURS = "wash_left_hours"
@@ -151,6 +153,18 @@ CONFIG_SCHEMA = cv.typed_schema(
                     device_class=DEVICE_CLASS_DURATION,
                     state_class=STATE_CLASS_MEASUREMENT,
                 ),
+                cv.Optional(CONF_ERROR_CODE): sensor.sensor_schema(
+                    icon=ICON_CHIP,
+                    device_class=DEVICE_CLASS_EMPTY,
+                    entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+                ),
+                cv.Optional(CONF_FILITER_CLEAN_HOURS): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_HOUR,
+                    icon=ICON_TIMER,
+                    accuracy_decimals=0,
+                    device_class=DEVICE_CLASS_DURATION,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                )
             }
         ).extend(cv.polling_component_schema('60s')),
         CONF_WASHING_MACHINE: cv.COMPONENT_SCHEMA.extend(

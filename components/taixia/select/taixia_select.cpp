@@ -41,36 +41,28 @@ static const char *const TAG = "taixia.select";
   void AirConditionerSelect::handle_response(std::vector<uint8_t> &response) {
     uint8_t i;
     size_t mapping_idx = -1;
-    select::Select *slt;
 
-    ESP_LOGE(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
+    ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
         response[0], response[1], response[2], response[3], \
         response[4], response[5], response[6], response[7], response[8]);
 
     for (i = 3; i < response[0] - 3; i+=3) {
       switch (response[i]) {
         case SERVICE_ID_CLIMATE_FUZZY_MODE:
-          if (this->fuzzy_mode_select_ != nullptr) {
             mapping_idx = get_mapping_idx(response, i, this->mappings_);
-            slt = this->fuzzy_mode_select_;
-          }
         break;
         case SERVICE_ID_CLIMATE_DISPLAY_MODE:
-          if (this->display_mode_select_ != nullptr) {
             mapping_idx = get_mapping_idx(response, i, this->mappings_);
-            slt = this->display_mode_select_;
-          }
         break;
         case SERVICE_ID_CLIMATE_ACTIVITY:
-          if (this->motion_detect_select_ != nullptr) {
             mapping_idx = get_mapping_idx(response, i, this->mappings_);
-            slt = this->motion_detect_select_;
-          }
         break;
       }
-      if (mapping_idx != -1) {
+
+      if ((mapping_idx != -1) && (this->service_id_ == response[i])) {
         auto value = this->at(mapping_idx);
-        slt->publish_state(value.value());
+        this->publish_state(value.value());
+        return;
       }
     }
   }
@@ -108,7 +100,6 @@ static const char *const TAG = "taixia.select";
   void WashingMachineSelect::handle_response(std::vector<uint8_t> &response) {
     uint8_t i;
     size_t mapping_idx = -1;
-    select::Select *slt;
 
     ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
         response[0], response[1], response[2], response[3], \
@@ -117,33 +108,22 @@ static const char *const TAG = "taixia.select";
     for (i = 3; i < response[0] - 3; i+=3) {
       switch (response[i]) {
         case SERVICE_ID_WASHER_WASH_PROGRAM:
-          if (this->wash_program_select_ != nullptr) {
-            mapping_idx = get_mapping_idx(response, i, this->mappings_);
-            slt = this->wash_program_select_;
-          }
+          mapping_idx = get_mapping_idx(response, i, this->mappings_);
         break;
         case SERVICE_ID_WASHER_OTHER_FUNCTION:
-          if (this->wash_other_function_select_ != nullptr) {
-            mapping_idx = get_mapping_idx(response, i, this->mappings_);
-            slt = this->wash_other_function_select_;
-          }
+          mapping_idx = get_mapping_idx(response, i, this->mappings_);
         break;
         case SERVICE_ID_WASHER_WASH_MODE:
-          if (this->wash_mode_select_ != nullptr) {
-            mapping_idx = get_mapping_idx(response, i, this->mappings_);
-            slt = this->wash_mode_select_;
-          }
+          mapping_idx = get_mapping_idx(response, i, this->mappings_);
         break;
         case SERVICE_ID_WASHER_WARM_WATER_PROGRAM:
-          if (this->warm_water_program_select_ != nullptr) {
             mapping_idx = get_mapping_idx(response, i, this->mappings_);
-            slt = this->warm_water_program_select_;
-          }
         break;
       }
-      if (mapping_idx != -1) {
+      if ((mapping_idx != -1) && (this->service_id_ == response[i])) {
         auto value = this->at(mapping_idx);
-        slt->publish_state(value.value());
+        this->publish_state(value.value());
+        return;
       }
     }
   }
@@ -177,7 +157,6 @@ static const char *const TAG = "taixia.select";
   void DehumidifierSelect::handle_response(std::vector<uint8_t> &response) {
     uint8_t i;
     size_t mapping_idx = -1;
-    select::Select *slt;
 
     ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
         response[0], response[1], response[2], response[3], \
@@ -186,21 +165,16 @@ static const char *const TAG = "taixia.select";
     for (i = 3; i < response[0] - 3; i+=3) {
       switch (response[i]) {
         case SERVICE_ID_DEHUMIDTFIER_MODE:
-          if (this->operating_program_select_ != nullptr) {
             mapping_idx = get_mapping_idx(response, i, this->mappings_);
-            slt = this->operating_program_select_;
-          }
         break;
         case SERVICE_ID_DEHUMIDTFIER_AIR_PURFIFIER:
-          if (this->air_purfifier_select_ != nullptr) {
             mapping_idx = get_mapping_idx(response, i, this->mappings_);
-            slt = this->air_purfifier_select_;
-          }
         break;
       }
-      if (mapping_idx != -1) {
+      if ((mapping_idx != -1) && (this->service_id_ == response[i])) {
         auto value = this->at(mapping_idx);
-        slt->publish_state(value.value());
+        this->publish_state(value.value());
+        return;
       }
     }
   }
@@ -232,7 +206,6 @@ static const char *const TAG = "taixia.select";
   void AirPurifierSelect::handle_response(std::vector<uint8_t> &response) {
     uint8_t i;
     size_t mapping_idx = -1;
-    select::Select *slt;
 
     ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
         response[0], response[1], response[2], response[3], \
@@ -241,15 +214,13 @@ static const char *const TAG = "taixia.select";
     for (i = 3; i < response[0] - 3; i+=3) {
       switch (response[i]) {
         case SERVICE_ID_PURIFIER_MODE:
-          if (this->operating_program_select_ != nullptr) {
             mapping_idx = get_mapping_idx(response, i, this->mappings_);
-            slt = this->operating_program_select_;
-          }
         break;
       }
-      if (mapping_idx != -1) {
+      if ((mapping_idx != -1) && (this->service_id_ == response[i])) {
         auto value = this->at(mapping_idx);
-        slt->publish_state(value.value());
+        this->publish_state(value.value());
+        return;
       }
     }
   }
@@ -281,7 +252,6 @@ static const char *const TAG = "taixia.select";
   void ElectricFanSelect::handle_response(std::vector<uint8_t> &response) {
     uint8_t i;
     size_t mapping_idx = -1;
-    select::Select *slt;
 
     ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
         response[0], response[1], response[2], response[3], \
@@ -290,15 +260,13 @@ static const char *const TAG = "taixia.select";
     for (i = 3; i < response[0] - 3; i+=3) {
       switch (response[i]) {
         case SERVICE_ID_FAN_MODE:
-          if (this->operating_program_select_ != nullptr) {
             mapping_idx = get_mapping_idx(response, i, this->mappings_);
-            slt = this->operating_program_select_;
-          }
         break;
       }
-      if (mapping_idx != -1) {
+      if ((mapping_idx != -1) && (this->service_id_ == response[i])) {
         auto value = this->at(mapping_idx);
-        slt->publish_state(value.value());
+        this->publish_state(value.value());
+        return;
       }
     }
   }

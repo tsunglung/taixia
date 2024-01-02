@@ -96,7 +96,7 @@ CONFIG_SCHEMA = cv.All(
                 cv.enum(SUPPORTED_CLIMATE_PRESET_OPTIONS, upper=True)
             ),
         }
-    ).extend(cv.polling_component_schema("60s"))
+    ).extend(cv.polling_component_schema("30s"))
 )
 
 async def to_code(config):
