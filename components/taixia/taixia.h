@@ -222,7 +222,7 @@ class TaiXia : public uart::UARTDevice, public Component {
 
  protected:
   void readline(int readch, char *buffer, int len);
-  int state_{0};
+
   std::vector<uint8_t> buffer_;
   uint8_t protocol_;
   uint8_t sa_id_;

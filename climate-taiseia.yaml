@@ -1,18 +1,22 @@
 substitutions:
-  devicename: esphome-taiseia
-  upper_devicename: "ESPHome TaiSeia"
+  devicename: climate-taiseia
+  upper_devicename: "Climate TaiSeia"
 
 esphome:
   name: $devicename
+  friendly_name: ${upper_devicename}
   comment: $upper_devicename
   name_add_mac_suffix: true
+  project:
+    name: TaiSEIA.climate
+    version: "1.0"
 
 external_components:
   - source: github://tsunglung/taixia@master
     components: [ taixia ]
 
-esp8266:
-  board: esp01_1m
+esp32:
+  board: esp32dev
 
 wifi:
   ssid: !secret wifi_ssid
@@ -40,9 +44,6 @@ uart:
 binary_sensor:
   - platform: status
     name: "${upper_devicename} Status"
-  - platform: taixia
-    power:
-      name: "${upper_devicename} Power"
 
 button:
   - platform: restart
@@ -51,7 +52,7 @@ button:
 
 number:
   - platform: taixia
-    type: electricfan
+    type: airconditioner
     off_timer:
       name: "${upper_devicename} Off Timer"
 
@@ -59,6 +60,7 @@ sensor:
   - platform: wifi_signal
     name: "${upper_devicename} WiFi Signal"
     update_interval: 60s
+
   - platform: uptime
     name: "${upper_devicename} Uptime"
     filters:
@@ -66,11 +68,26 @@ sensor:
     unit_of_measurement: "h"
     accuracy_decimals: 1
 
+  - platform: taixia
+    type: airconditioner
+    temperature_indoor:
+      name: "${upper_devicename} Temperature Indoor"
+    humidity_indoor:
+      name: "${upper_devicename} Humidity Indoor"
+    temperature_outdoor:
+      name: "${upper_devicename} Temperature Outdoor"
+    energy_consumption:
+      name: "${upper_devicename} Energy"
+    operating_hours:
+      name: "${upper_devicename} Operating Hours"
+
 switch:
   - platform: taixia
-    type: electricfan
+    type: airconditioner
     power:
       name: "${upper_devicename} Power Switch"
+    beeper:
+      name: "${upper_devicename} Buzzer"
 
 text_sensor:
   - platform: wifi_info
@@ -89,3 +106,8 @@ text_sensor:
       name: "${upper_devicename} SA Services"
 
 taixia:
+  sa_id: 1
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time

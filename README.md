@@ -1,31 +1,28 @@
 ESPHome TaiXia Custom Component
 
 
+## Special Thank
+  ### Thanks for Andrew Wang provide the related hardware and spec.
+  ### Thanks for Seven Hong provide Air Conditioner for test.
+  ### Thanks for Mr. Wang and Mr Huang donate $230 and $200.
+
 ## Hardware
 
-### Daikin S21 Port
-
-**NOTE:** The Daikin S21 port provides >5V, so if you intend to power your
-board on this pin, be sure to test its output and regulate voltage accordingly.
-
-On my Daikin units, the S21 port has the following pins:
+### UART Port
 
 |Pin|Meaning|
 |---|-------|
 |1|5V|
-|2|Tx from aircon - 5V logic|
-|3|Rx to aircon - 5V logic but most models accept 3.3V|
-|4|12V, or 14V, or some such|
-|5|GND|
-
-The S21 plug is JST `EHR-5` and related header `B5B-EH-A(LF)(SN)`, though the
-plug pins are at standard pin header widths.
+|2|Tx from aircon or Fan- 5V logic|
+|3|Rx to aircon or Fan - 5V logic|
+|4|GND|
 
 ## Installation
 Set wifi_ssid and wifi_password in your esphome's secrets.yaml first
 
-1. Place the folder 'taixia' into the custom_components of your esphome configuration folder
+1. Place the folder 'taixia' into the components of your esphome configuration folder
 2. Create new device with the yaml in this repository
+3. Or you can check the example "climate-taiseia.yaml" or "fan-taiseia.yaml"
 
 
 ## Configuration Example

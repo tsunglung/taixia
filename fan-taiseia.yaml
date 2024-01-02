@@ -1,18 +1,22 @@
 substitutions:
-  devicename: esphome-taiseia
-  upper_devicename: "ESPHome TaiSeia"
+  devicename: fan-taiseia
+  upper_devicename: "Fan TaiSeia"
 
 esphome:
   name: $devicename
+  friendly_name: ${upper_devicename}
   comment: $upper_devicename
   name_add_mac_suffix: true
+  project:
+    name: TaiSEIA.climate
+    version: "1.0"
 
 external_components:
   - source: github://tsunglung/taixia@master
     components: [ taixia ]
 
-esp8266:
-  board: esp01_1m
+esp32:
+  board: esp32dev
 
 wifi:
   ssid: !secret wifi_ssid
@@ -40,14 +44,16 @@ uart:
 binary_sensor:
   - platform: status
     name: "${upper_devicename} Status"
-  - platform: taixia
-    power:
-      name: "${upper_devicename} Power"
 
 button:
   - platform: restart
     name: "${upper_devicename} Restart"
 
+fan:
+  - platform: taixia
+    name: ${upper_devicename}
+    speed: true
+    speed_count: 2
 
 number:
   - platform: taixia
@@ -59,6 +65,7 @@ sensor:
   - platform: wifi_signal
     name: "${upper_devicename} WiFi Signal"
     update_interval: 60s
+
   - platform: uptime
     name: "${upper_devicename} Uptime"
     filters:
@@ -89,3 +96,8 @@ text_sensor:
       name: "${upper_devicename} SA Services"
 
 taixia:
+  sa_id: 15
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
