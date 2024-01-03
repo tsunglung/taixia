@@ -343,8 +343,10 @@ using namespace esphome::climate;
   void TaiXiaClimate::handle_response(std::vector<uint8_t> &response) {
     uint8_t i;
     auto mode = CLIMATE_MODE_AUTO;
+    uint8_t swing_vertical = 0;
+    uint8_t swing_horizontal = 0;
 
-    ESP_LOGD(TAG, "climate handle_response %x %x %x %x %x %x %x %x %x", \
+    ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
         response[0], response[1], response[2], response[3], \
         response[4], response[5], response[6], response[7], response[8]);
 
@@ -378,6 +380,7 @@ using namespace esphome::climate;
                 this->mode = CLIMATE_MODE_AUTO;
                 break;
             }
+
             if (mode == CLIMATE_MODE_OFF)
               this->mode = CLIMATE_MODE_OFF;
           }
@@ -432,8 +435,50 @@ using namespace esphome::climate;
               this->current_temperature = get_i16(response, i + 1);
           }
           break;
+        case SERVICE_ID_CLIMATE_SWING_VERTICAL:
+          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
+              swing_vertical = get_u16(response, i + 1);
+          }
+          break;
+        case SERVICE_ID_CLIMATE_SWING_HORIZONTAL:
+          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
+              swing_horizontal = get_u16(response, i + 1);
+          }
+        case SERVICE_ID_CLIMATE_SLEEP:
+          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
+              if (get_u16(response, i + 1) == 1)
+                this->preset = climate::CLIMATE_PRESET_SLEEP;
+          }
+        case SERVICE_ID_CLIMATE_ACTIVITY:
+          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
+              if (get_u16(response, i + 1) == 1)
+                this->preset = climate::CLIMATE_PRESET_ACTIVITY;
+          }
+        case SERVICE_ID_CLIMATE_BOOST:
+          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
+              if (get_u16(response, i + 1) == 1)
+                this->preset = climate::CLIMATE_PRESET_BOOST;
+          }
+        case SERVICE_ID_CLIMATE_ECO:
+          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
+              if (get_u16(response, i + 1) == 1)
+                this->preset = climate::CLIMATE_PRESET_ECO;
+          }
+        case SERVICE_ID_CLIMATE_COMFORT:
+          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
+              if (get_u16(response, i + 1) == 1)
+                this->preset = climate::CLIMATE_PRESET_COMFORT;
+          }
+          break;
       }
     }
+    if ((swing_vertical == 1) && (swing_horizontal == 1))
+      this->swing_mode = climate::CLIMATE_SWING_BOTH;
+    else if ((swing_vertical == 0) && (swing_horizontal == 1))
+      this->swing_mode = climate::CLIMATE_SWING_VERTICAL;
+    else if ((swing_vertical == 1) && (swing_horizontal == 0))
+      this->swing_mode = climate::CLIMATE_SWING_HORIZONTAL;
+
     this->publish_state();
   }
 

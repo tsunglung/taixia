@@ -221,7 +221,8 @@ class TaiXia : public uart::UARTDevice, public Component {
   TAIXIA_NUMBER(on_timer_number)
 
  protected:
-  void readline(int readch, char *buffer, int len);
+  void readline_(int readch, char *buffer, int len);
+  void get_info_(void);
 
   std::vector<uint8_t> buffer_;
   uint8_t protocol_;

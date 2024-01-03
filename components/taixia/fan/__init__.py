@@ -11,7 +11,7 @@ DEPENDENCIES = ["taixia"]
 
 CONF_OSCILLATIONT = "oscillation"
 
-TaiXiaFan = taixia_ns.class_("TaiXiaFan", cg.Component, fan.Fan)
+TaiXiaFan = taixia_ns.class_("TaiXiaFan", cg.PollingComponent, fan.Fan)
 
 CONFIG_SCHEMA = cv.All(
     fan.FAN_SCHEMA.extend(
@@ -23,7 +23,7 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_MODE, default=5): cv.int_range(min=0, max=5),
             cv.Optional(CONF_SPEED_COUNT, default=5): cv.int_range(min=1, max=16),
         }
-    ).extend(cv.COMPONENT_SCHEMA),
+    ).extend(cv.COMPONENT_SCHEMA).extend(cv.polling_component_schema("30s")),
     cv.has_at_least_one_key(CONF_SPEED, CONF_MODE),
 )
 

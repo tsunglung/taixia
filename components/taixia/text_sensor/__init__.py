@@ -20,6 +20,8 @@ AUTO_LOAD = ["text_sensor"]
 
 CONF_SA_ID = "sa_id"
 CONF_BRAND = "brand"
+ICON_MODEL = "mdi:globe-model"
+ICON_BRAND = "mdi:watermark"
 
 TaiXiaTextSensor = taixia_ns.class_("TaiXiaTextSensor", cg.Component)
 
@@ -30,9 +32,9 @@ CONFIG_SCHEMA = cv.Schema({
     cv.Optional(CONF_SA_ID): text_sensor.text_sensor_schema(
         icon=ICON_CHIP),
     cv.Optional(CONF_MODEL): text_sensor.text_sensor_schema(
-        icon=ICON_CHIP),
+        icon=ICON_MODEL),
     cv.Optional(CONF_BRAND): text_sensor.text_sensor_schema(
-        icon=ICON_CHIP),
+        icon=ICON_BRAND),
     cv.Optional(CONF_VERSION): text_sensor.text_sensor_schema(
         icon=ICON_NEW_BOX),
     cv.Optional(CONF_SERVICES): text_sensor.text_sensor_schema(

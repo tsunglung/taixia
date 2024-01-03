@@ -44,6 +44,7 @@ class AirConditionerSensor : public TaiXiaListener, public PollingComponent {
 class DehumidifierSensor : public TaiXiaListener, public PollingComponent {
  public:
   void dump_config() override;
+  void update() override;
   void set_temperature_indoor_sensor(sensor::Sensor *sensor) { this->temperature_indoor_sensor_ = sensor; }
   void set_humidity_indoor_sensor(sensor::Sensor *sensor) { this->humidity_indoor_sensor_ = sensor; }
   void set_water_full_sensor(sensor::Sensor *sensor) { this->water_full_sensor_ = sensor; }
@@ -79,6 +80,7 @@ class DehumidifierSensor : public TaiXiaListener, public PollingComponent {
 class WashingMachineSensor : public TaiXiaListener, public PollingComponent {
  public:
   void dump_config() override;
+  void update() override;
   void set_wash_current_status_sensor(sensor::Sensor *sensor) { this->wash_current_status_sensor_ = sensor; }
   void set_wash_left_count_sensor(sensor::Sensor *sensor) { this->wash_left_count_sensor_ = sensor; }
   void set_wash_left_hours_sensor(sensor::Sensor *sensor) { this->wash_left_hours_sensor_ = sensor; }

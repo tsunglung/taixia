@@ -64,6 +64,9 @@ static const uint8_t RESPONSE_LENGTH = 255;
         sa_id = format_hex_pretty(this->buffer_[3]) + format_hex_pretty(this->buffer_[4]);
         this->sa_id_textsensor_->publish_state(sa_id);
       }
+      // if not preset sa_id
+      if (this->sa_id_ == 0xffff)
+        this->sa_id_ = this->buffer_[3] << 8 | this->buffer_[4];
     }
     this->buffer_.clear();
 
@@ -244,8 +247,11 @@ static const uint8_t RESPONSE_LENGTH = 255;
       }
 
       if (handle_response) {
-        for (auto &listener : this->listeners_)
-          listener->on_response(this->sa_id_, this->buffer_);
+        auto crc = this->checksum(response, len - 1) ^ (len + 1);
+        if (crc == response[len - 1]) {
+          for (auto &listener : this->listeners_)
+            listener->on_response(this->sa_id_, this->buffer_);
+        }
         this->buffer_.clear();
       }
   }

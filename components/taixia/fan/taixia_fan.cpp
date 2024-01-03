@@ -64,6 +64,10 @@ static const char *const TAG = "taixia.fan";
     this->publish_state();
   }
 
+  void TaiXiaFan::update() {
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+  }
+
   void TaiXiaFan::handle_response(std::vector<uint8_t> &response) {
     uint8_t i;
 

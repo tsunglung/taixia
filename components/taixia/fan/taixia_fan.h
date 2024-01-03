@@ -7,10 +7,11 @@
 namespace esphome {
 namespace taixia {
 
-class TaiXiaFan : public TaiXiaListener, public Component, public fan::Fan {
+class TaiXiaFan : public TaiXiaListener, public PollingComponent, public fan::Fan {
  public:
   TaiXiaFan(TaiXia *parent, int speed_count) : parent_(parent), speed_count_(speed_count) {}
   void setup() override;
+  void update() override;
   void dump_config() override;
   void set_speed(uint8_t speed) { this->speed_ = speed; }
   void set_speeds(uint8_t speeds) { this->speed_count_ = speeds; }

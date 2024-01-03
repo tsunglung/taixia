@@ -433,31 +433,7 @@ void ElectricFanSensor::handle_response(std::vector<uint8_t> &response) {
 }
 
 void ElectricFanSensor::update() {
-  uint8_t buffer[6];
-  uint8_t command[6] = {0x06, SA_ID_FAN, 0x00, 0xFF, 0xFF, 0x00};
-/*
-  if (this->temperature_sensor_ != nullptr) {
-    command[2] = SERVICE_ID_FAN_TEMPERATURE;
-    command[5] = this->parent_->checksum(command, 5);
-    this->parent_->send_cmd(command, buffer, 6);
-    if ((buffer[3] != 0xFF) && (buffer[4] != 0xFF)) {
-      this->temperature_sensor_->publish_state(0.0f);
-    } else {
-      this->temperature_sensor_->publish_state(int(buffer[3] << 8 | buffer[4] - 127) * 0.0f);
-    }
-  }
-  if (this->humidity_sensor_ != nullptr) {
-    command[2] = SERVICE_ID_FAN_HUMIDITY;
-    command[5] = this->parent_->checksum(command, 5);
-    this->parent_->send_cmd(command, buffer, 6);
-    if ((buffer[3] != 0xFF) && (buffer[4] != 0xFF)) {
-      this->humidity_sensor_->publish_state(0.0f);
-    } else {
-      this->humidity_sensor_->publish_state(int(buffer[3] << 8 | buffer[4]) * 0.0f);
-    }
-  }
-*/
-  this->parent_->send(6, 0, SA_ID_ALL, SERVICE_ID_READ_STATUS, 0xFFFF);
+  this->parent_->send(6, 0, SA_ID_FAN, 0x0, 0xffff);
 }
 
 void TaiXiaCustomSensor::dump_config() {
