@@ -110,3 +110,5 @@ text_sensor:
 
 
 ```
+The climate example exported to Home Assistant
+<img src="https://github.com/tsunglung/taixia/raw/master/pictures/climate.png">
