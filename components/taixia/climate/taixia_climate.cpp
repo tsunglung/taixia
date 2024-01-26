@@ -330,8 +330,8 @@ using namespace esphome::climate;
           this->traits_.add_supported_custom_preset("Body Motion");
       }
 
-      this->traits_.set_visual_min_temperature(this->max_temp_);
-      this->traits_.set_visual_max_temperature(this->min_temp_);
+      this->traits_.set_visual_min_temperature(this->min_temp_);
+      this->traits_.set_visual_max_temperature(this->max_temp_);
       this->traits_.set_visual_temperature_step(this->temp_step_);
       this->traits_.set_visual_target_temperature_step(this->temp_step_);
       this->traits_.set_visual_current_temperature_step(this->temp_step_);
