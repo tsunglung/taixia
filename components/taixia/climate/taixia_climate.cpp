@@ -223,6 +223,7 @@ using namespace esphome::climate;
       command[5] = this->parent_->checksum(command, 5);
       this->parent_->send_cmd(command, buffer, 6);
     }
+    this->publish_state();
   }
 
   bool TaiXiaClimate::update_status_() {
@@ -336,6 +337,8 @@ using namespace esphome::climate;
       this->traits_.set_visual_target_temperature_step(this->temp_step_);
       this->traits_.set_visual_current_temperature_step(this->temp_step_);
       this->traits_.set_supports_two_point_target_temperature(false);
+      if (this->supported_humidity_)
+          this->traits_.set_supports_current_humidity(true);
 
       return this->traits_;
   }
@@ -427,7 +430,7 @@ using namespace esphome::climate;
         break;
         case SERVICE_ID_CLIMATE_TARGET_TEMPERATURE:
           if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
-              this->target_temperature = get_i16(response, i + 1);
+              this->target_temperature = (float)get_u16(response, i + 1);
           }
           break;
         case SERVICE_ID_CLIMATE_TEMPERATURE_INDOOR:
@@ -468,6 +471,11 @@ using namespace esphome::climate;
           if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
               if (get_u16(response, i + 1) == 1)
                 this->preset = climate::CLIMATE_PRESET_COMFORT;
+          }
+          break;
+        case SERVICE_ID_CLIMATE_HUMIDITY_INDOOR:
+          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
+            this->current_humidity = get_i16(response, i + 1);
           }
           break;
       }

@@ -33,6 +33,7 @@ class TaiXiaClimate : public climate::Climate, public TaiXiaListener, public Pol
   void set_supported_fan_modes(const std::set<esphome::climate::ClimateFanMode> &modes);
   void set_supported_swing_modes(const std::set<esphome::climate::ClimateSwingMode> &modes);
   void set_supported_preset_modes(const std::set<esphome::climate::ClimatePreset> &modes);
+  void set_supported_humidity(bool feature) { this->supported_humidity_ = feature; }
 
   void set_taixia_parent(TaiXia *parent) { this->parent_ = parent; }
 
@@ -44,6 +45,7 @@ class TaiXiaClimate : public climate::Climate, public TaiXiaListener, public Pol
   bool supports_heat_{true};
   bool supports_dry_{false};
   bool supports_fan_only_{false};
+  bool supported_humidity_{false};
   uint8_t preset_modes_;
   uint16_t fan_modes_;
   uint8_t swing_modes_;

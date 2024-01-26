@@ -20,8 +20,9 @@ from esphome.components.climate import (
 from .. import taixia_ns, CONF_TAIXIA_ID, TaiXia
 
 DEFAULT_MIN_TEMPERATURE = 16.0
-DEFAULT_MAX_TEMPERATURE = 30.0
+DEFAULT_MAX_TEMPERATURE = 35.0
 DEFAULT_TEMPERATURE_STEP = 1.0
+CONF_SUPPORTED_HUMIDITY = "supported_humidity"
 
 CODEOWNERS = ["@tsunglung"]
 
@@ -95,6 +96,7 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_SUPPORTED_PRESETS): cv.ensure_list(
                 cv.enum(SUPPORTED_CLIMATE_PRESET_OPTIONS, upper=True)
             ),
+            cv.Optional(CONF_SUPPORTED_HUMIDITY, default=False): bool
         }
     ).extend(cv.polling_component_schema("30s"))
 )
@@ -120,6 +122,8 @@ async def to_code(config):
         cg.add(var.set_supported_swing_modes(config[CONF_SUPPORTED_SWING_MODES]))
     if CONF_SUPPORTED_PRESETS in config:
         cg.add(var.set_supported_preset_modes(config[CONF_SUPPORTED_PRESETS]))
+    if CONF_SUPPORTED_HUMIDITY in config:
+        cg.add(var.set_supported_humidity(config[CONF_SUPPORTED_HUMIDITY]))
 
     cg.add(taixia.register_listener(var))
     cg.add(var.set_taixia_parent(taixia))
