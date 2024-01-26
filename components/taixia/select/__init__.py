@@ -33,6 +33,7 @@ CONF_MOTION_DETECT = "motion_detect"
 
 CONF_OPERATING_PROGRAM = "operating_program"
 CONF_AIR_PURIFIER = "air_purifier"
+CONF_SOUND = "sound"
 
 CONF_WASH_PROGRAM = "wash_program"
 CONF_WASH_OTHER_FUNCTION = "wash_other_function"
@@ -130,6 +131,12 @@ OPTIONS_AIR_PURFIFIER = {
     "15": 15
 }
 
+OPTIONS_SOUND = {
+    "Off": 0,
+    "Key Sound": 1,
+    "Full and Key sounds": 2
+}
+
 OPTIONS_FAN_OPERATING_PROGRAM = {
     "Mode 1": 0,
     "Mode 2": 1,
@@ -183,6 +190,9 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.Optional(CONF_AIR_PURIFIER): select.select_schema(
                     DehumidifierSelect
                 ),
+                cv.Optional(CONF_SOUND): select.select_schema(
+                    DehumidifierSelect
+                )
             }
         ),
         CONF_WASHING_MACHINE: cv.COMPONENT_SCHEMA.extend(
@@ -232,6 +242,7 @@ async def to_code(config):
         raise (f"SA TYPE {config[CONF_TYPE]} is not supported yet")
     taixia = await cg.get_variable(config[CONF_TAIXIA_ID])
 
+    sel = None
     if config[CONF_TYPE] == CONF_AIR_CONDITIONER:
         cg.add(var.set_sa_id(0x01))
         if CONF_FUZZY_MODE in config:

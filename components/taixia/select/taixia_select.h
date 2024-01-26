@@ -69,6 +69,7 @@ class DehumidifierSelect : public select::Select, public TaiXiaListener, public 
 
   void set_operating_program_select(select::Select *select) { this->operating_program_select_ = select; }
   void set_air_purfifier_select(select::Select *select) { this->air_purfifier_select_ = select; }
+  void set_sound_select(select::Select *select) { this->sound_select_ = select; }
   void set_service_id(uint8_t service_id) { this->service_id_ = service_id; }
   void set_select_mappings(std::vector<uint8_t> mappings) { this->mappings_ = std::move(mappings); }
 
@@ -83,6 +84,7 @@ class DehumidifierSelect : public select::Select, public TaiXiaListener, public 
 
   select::Select *operating_program_select_{nullptr};
   select::Select *air_purfifier_select_{nullptr};
+  select::Select *sound_select_{nullptr};
 
   void handle_response(std::vector<uint8_t> &response) override;
 };
