@@ -25,10 +25,18 @@ static const uint8_t RESPONSE_LENGTH = 255;
 
   bool TaiXia::write_command_(const uint8_t *command, uint8_t *response, uint8_t len, uint8_t rlen) {
     ESP_LOGV(TAG, "command %x %x %x %x %x %x", command[0], command[1], command[2], command[3], command[4], command[5]);
-    this->write_array(command, len);
+    uint32_t timeout = 6000;
 
     if (response == nullptr)
       return true;
+
+    this->flush();
+  
+    this->write_array(command, len);
+    while (!available() && timeout > 0) {
+      timeout--;
+    }
+    this->flush();
 
     // wait for data
     bool ret = this->read_array(response, rlen);

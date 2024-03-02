@@ -36,7 +36,24 @@ CONF_POWER_SAVING = "power_saving"
 CONF_BEEPER = "beeper"
 CONF_HUMIDITY_NOTIFY = "humidity_notify"
 CONF_LOCK = "lock"
-CONF_SOUND = "sound"
+
+DEFAULT_ICON = "mdi:toggle-switch-variant"
+ICONS = {
+    CONF_IONS: "mdi:atom-variant",
+    CONF_SLEEPY: "mdi:power-sleep",
+    CONF_AIR_PURIFIER: "mdi:air-purifier",
+    CONF_AIR_FLOW_HORIZONTAL: "mdi:waves",
+    CONF_AIR_FLOW_VERTICAL: "mdi:heat-wave",
+    CONF_AIR_FLOW_AUTO: "mdi:waves",
+    CONF_FILTER_NOTIFY: "mdi:air-filter",
+    CONF_AIR_DETECT: "mdi:hvac",
+    CONF_MILDEW_PROOF: "mdi:weather-dust",
+    CONF_SUPER_MODE: "mdi:lightning-bolt",
+    CONF_POWER_SAVING: "mdi:flash",
+    CONF_BEEPER: "mdi:volume-high",
+    CONF_HUMIDITY_NOTIFY: "mdi:water-percent",
+    CONF_LOCK: "mdi:lock"
+}
 
 CLIMATE_TYPES = {
     CONF_SLEEPY: 0x05,
@@ -55,7 +72,7 @@ DEHUMIDIFIER_TYPES = {
     CONF_AIR_FLOW_AUTO: 0x08,
     CONF_FILTER_NOTIFY: 0x0B,
     CONF_LIGHT: 0x0C,
-    CONF_SOUND: 0x10,
+    CONF_AIR_PURIFIER: 0x0D,
     CONF_MILDEW_PROOF: 0x13,
     CONF_HUMIDITY_NOTIFY: 0x14,
     CONF_LOCK: 0x16,
@@ -101,12 +118,14 @@ async def add_switch(config, sa_type, service_id, sa_id):
     taixia = await cg.get_variable(config[CONF_TAIXIA_ID])
     if sa_type in config:
         conf = config[sa_type]
+        conf['icon'] = ICONS.get(sa_type, DEFAULT_ICON)
         var = await switch.new_switch(conf)
         await cg.register_component(var, conf)
         cg.add(getattr(taixia, f"set_{sa_type}_switch")(var))
         cg.add(var.set_parent(taixia))
         cg.add(var.set_service_id(service_id))
         cg.add(var.set_sa_id(sa_id))
+        cg.add(taixia.register_listener(var))
 
 async def to_code(config):
 

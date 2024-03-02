@@ -7,7 +7,7 @@
 namespace esphome {
 namespace taixia {
 class TaiXia;
-class TaiXiaNumber : public number::Number, public Component {
+class TaiXiaNumber : public number::Number, public TaiXiaListener, public Component {
  public:
   void set_parent(TaiXia *parent) { this->parent_ = parent; };
   void set_service_id(uint8_t service_id) { this->service_id_ = service_id; };
@@ -20,6 +20,8 @@ class TaiXiaNumber : public number::Number, public Component {
   uint8_t sa_id_;
 
   TaiXia *parent_;
+
+  void handle_response(std::vector<uint8_t> &response) override;
 };
 
 }  // namespace taixia

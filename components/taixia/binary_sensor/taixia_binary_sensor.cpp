@@ -6,42 +6,55 @@ namespace taixia {
 
 static const char *const TAG = "taixia.binary_sensor";
 
-  uint32_t lastPeriodicMillis = millis();
-
   void TaiXiaBinarySensor::dump_config() {
-    ESP_LOGCONFIG(TAG, "TaiXIA Binary Sensor:");
-    ESP_LOGCONFIG(TAG, "  Power Status");
+    LOG_BINARY_SENSOR("", "TaiXIA Binary Sensor", this);
+    if (!this->parent_->have_sensors())
+      this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
   }
-
-  void TaiXiaBinarySensor::update() {
-
-    /*
-      Reduce data update rate to prevent uart bus busy
-    */
-    uint32_t currentMillis = millis();
-    if (currentMillis - lastPeriodicMillis < 6000)
-      return;
-    lastPeriodicMillis = currentMillis;
-
-    this->parent_->send(6, 0, SA_ID_ALL, SERVICE_ID_READ_STATUS, 0xFFFF);
-  }
-
-  void TaiXiaBinarySensor::setup() { this->publish_initial_state(false); }
 
   void TaiXiaBinarySensor::handle_response(std::vector<uint8_t> &response) {
     uint8_t i;
-    ESP_LOGV(TAG, "handle_response");
 
-    if ((response[1] == SA_ID_ALL) && (response[2] == SERVICE_ID_READ_STATUS)) {
-      for (i = 3; i < response[0] - 3; i+=3) {
+    ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
+        response[0], response[1], response[2], response[3], \
+        response[4], response[5], response[6], response[7], response[8]);
+
+    for (i = 3; i < response[0] - 3; i+=3) {
+      if (this->service_id_ == 0x00) {
+        this->state = bool(response[4]);
+        goto done;
+      }
+      if (this->sa_id_ == SA_ID_DEHUMIDIFIER) {
         switch (response[i]) {
-          case 0x00:
-            if (this->power_binary_sensor_ != nullptr)
-              this->power_binary_sensor_->publish_state(response[i + 1] << 8 | response[i + 2]);
+          case SERVICE_ID_DEHUMIDTFIER_WATER_FULL:
+            if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_WATER_FULL) {
+              this->state = bool(response[i + 2]);
+              goto done;
+            }
+          break;
+          case SERVICE_ID_DEHUMIDTFIER_AIR_PURFIFIER:
+            if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_AIR_PURFIFIER) {
+              this->state = bool(response[i + 2]);
+              goto done;
+            }
+          break;
+          case SERVICE_ID_DEHUMIDTFIER_SIDE_AIR_VENT:
+            if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_SIDE_AIR_VENT) {
+              this->state = bool(response[i + 2]);
+              goto done;
+            }
+          break;
+          case SERVICE_ID_DEHUMIDTFIER_DEFROST:
+            if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_DEFROST) {
+              this->state = bool(response[i + 2]);
+              goto done;
+            }
           break;
         }
       }
     }
+done:
+    this->publish_state(this->state);
   }
 
 }  // namespace taixia

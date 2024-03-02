@@ -1,13 +1,13 @@
 #pragma once
 
-#include "esphome/components/switch/switch.h"
 #include "esphome/core/component.h"
+#include "esphome/components/switch/switch.h"
 #include "../taixia.h"
 
 namespace esphome {
 namespace taixia {
 class TaiXia;
-class TaiXiaSwitch : public switch_::Switch, public Component {
+class TaiXiaSwitch : public switch_::Switch, public TaiXiaListener, public Component {
  public:
   void set_parent(TaiXia *parent) { this->parent_ = parent; };
   void set_service_id(uint8_t service_id) { this->service_id_ = service_id; };
@@ -20,6 +20,7 @@ class TaiXiaSwitch : public switch_::Switch, public Component {
   uint8_t sa_id_;
 
   TaiXia *parent_;
+  void handle_response(std::vector<uint8_t> &response) override;
 };
 
 }  // namespace taixia

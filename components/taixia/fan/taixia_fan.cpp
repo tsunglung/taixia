@@ -13,6 +13,67 @@ static const char *const TAG = "taixia.fan";
     return (response[start] << 8) + response[start + 1];
   }
 
+  static inline std::string get_preset_mode(uint16_t mode) {
+    switch (mode){
+      case 0:
+        return "auto";
+      break;
+      case 1:
+        return "config";
+      break;
+      case 2:
+        return "continuous";
+      break;
+      case 3:
+        return "dry";
+      break;
+      case 4:
+        return "air purifier";
+      break;
+      case 5:
+        return "defrost";
+      break;
+      case 6:
+        return "fan";
+      break;
+      case 7:
+        return "comfort";
+      break;
+      case 8:
+        return "low humidity";
+      break;
+      case 9:
+        return "power saving";
+      break;
+    }
+    return "unknown";
+  }
+
+  static inline uint16_t get_preset_mode_value(std::string mode) {
+      if (!mode.compare("auto"))
+        return 0;
+      if (!mode.compare("config"))
+        return 1;
+      if (!mode.compare("continuous"))
+        return 2;
+      if (!mode.compare("dry"))
+        return 3;
+      if (!mode.compare("air purifier"))
+        return 4;
+      if (!mode.compare("defrost"))
+        return 5;
+      if (!mode.compare("fan"))
+        return 6;
+      if (!mode.compare("comfort"))
+        return 7;
+      if (!mode.compare("low humidity"))
+        return 8;
+      if (!mode.compare("power saving"))
+        return 9;
+      ESP_LOGE(TAG, "unknow mode", mode.c_str());
+      return 0;
+  }
+
   void TaiXiaFan::setup() {
     auto restore = this->restore_state_();
     if (restore.has_value()) {
@@ -34,38 +95,57 @@ static const char *const TAG = "taixia.fan";
     }
     ESP_LOGCONFIG(TAG, "  Speed list: %u", this->speed_count_);
 
-    uint8_t command[6] = {0x06, SA_ID_FAN, 0x00, 0xFF, 0xFF, 0x00};
+    uint8_t command[6] = {0x06, this->sa_id_, 0x00, 0xFF, 0xFF, 0x00};
     uint8_t buffer[6];
 
-    command[2] = SERVICE_ID_FAN_STATUS;
-    command[5] = this->parent_->checksum(command, 5);
-    this->parent_->send_cmd(command, buffer, 6);
-    if ((buffer[3] == 0xFF) && (buffer[4] == 0xFF))
-      ESP_LOGV(TAG, "Invaild value");
-    else
-      this->state = buffer[4];
+    if (this->sa_id_ == SA_ID_FAN) {
+        command[2] = SERVICE_ID_FAN_STATUS;
+        command[5] = this->parent_->checksum(command, 5);
+        this->parent_->send_cmd(command, buffer, 6);
+        if ((buffer[3] == 0xFF) && (buffer[4] == 0xFF))
+          ESP_LOGV(TAG, "Invaild value");
+        else
+          this->state = buffer[4];
 
-    command[2] = SERVICE_ID_FAN_OSCILLATE;
-    command[5] = this->parent_->checksum(command, 5);
-    this->parent_->send_cmd(command, buffer, 6);
-    if ((buffer[3] == 0xFF) && (buffer[4] == 0xFF))
-      ESP_LOGV(TAG, "Invaild value");
-    else
-      this->oscillation_ = buffer[4];
+        command[2] = SERVICE_ID_FAN_OSCILLATE;
+        command[5] = this->parent_->checksum(command, 5);
+        this->parent_->send_cmd(command, buffer, 6);
+        if ((buffer[3] == 0xFF) && (buffer[4] == 0xFF))
+          ESP_LOGV(TAG, "Invaild value");
+        else
+          this->oscillation_ = buffer[4];
 
-    command[2] = SERVICE_ID_FAN_SPEED;
-    command[5] = this->parent_->checksum(command, 5);
-    this->parent_->send_cmd(command, buffer, 6);
-    if ((buffer[3] == 0xFF) && (buffer[4] == 0xFF))
-      ESP_LOGV(TAG, "Invaild value");
-    else
-      this->speed = buffer[4];
+        command[2] = SERVICE_ID_FAN_SPEED;
+        command[5] = this->parent_->checksum(command, 5);
+        this->parent_->send_cmd(command, buffer, 6);
+        if ((buffer[3] == 0xFF) && (buffer[4] == 0xFF))
+          ESP_LOGV(TAG, "Invaild value");
+        else
+          this->speed = buffer[4];
+    } else if (this->sa_id_ == SA_ID_DEHUMIDIFIER) {
+        command[2] = SERVICE_ID_DEHUMIDTFIER_STATUS;
+        command[5] = this->parent_->checksum(command, 5);
+        this->parent_->send_cmd(command, buffer, 6);
+        if ((buffer[3] == 0xFF) && (buffer[4] == 0xFF))
+          ESP_LOGV(TAG, "Invaild value");
+        else
+          this->state = buffer[4];
+
+        command[2] = SERVICE_ID_DEHUMIDTFIER_FAN_LEVEL;
+        command[5] = this->parent_->checksum(command, 5);
+        this->parent_->send_cmd(command, buffer, 6);
+        if ((buffer[3] == 0xFF) && (buffer[4] == 0xFF))
+          ESP_LOGV(TAG, "Invaild value");
+        else
+          this->speed = buffer[4];
+    }
 
     this->publish_state();
   }
 
   void TaiXiaFan::update() {
-    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+    if (!this->parent_->have_sensors())
+      this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
   }
 
   void TaiXiaFan::handle_response(std::vector<uint8_t> &response) {
@@ -77,86 +157,126 @@ static const char *const TAG = "taixia.fan";
 
     if (response[1] == 0x00 && response[2] == SERVICE_ID_READ_STATUS) {
         for (i = 3; i < response[0] - 3; i+=3) {
-          switch (response[i]) {
-            case SERVICE_ID_FAN_STATUS:
-              this->state = get_u16(response, i + 1);
-              this->parent_->power_switch(this->state);
-            break;
-            case SERVICE_ID_FAN_SPEED:
-              this->speed = get_u16(response, i + 1);
-            break;
-            case SERVICE_ID_FAN_OSCILLATE:
-              this->oscillating = get_u16(response, i + 1);
-            break;
-          }
+            if (this->sa_id_ == SA_ID_FAN) {
+                switch (response[i]) {
+                  case SERVICE_ID_FAN_STATUS:
+                    this->state = get_u16(response, i + 1);
+                    this->parent_->power_switch(this->state);
+                  break;
+                  case SERVICE_ID_FAN_SPEED:
+                    this->speed = get_u16(response, i + 1);
+                  break;
+                  case SERVICE_ID_FAN_OSCILLATE:
+                    this->oscillating = get_u16(response, i + 1);
+                  break;
+                }
+            } else if (this->sa_id_ == SA_ID_DEHUMIDIFIER) {
+                switch (response[i]) {
+                  case SERVICE_ID_DEHUMIDTFIER_STATUS:
+                    this->state = get_u16(response, i + 1);
+                    this->parent_->power_switch(this->state);
+                  break;
+                  case SERVICE_ID_DEHUMIDTFIER_FAN_LEVEL:
+                    this->speed = get_u16(response, i + 1);
+                  break;
+                  case SERVICE_ID_DEHUMIDTFIER_MODE:
+                    this->preset_mode = get_preset_mode(get_u16(response, i + 1));
+                  break;
+                }
+            }
         }
         this->publish_state();
     }
   }
 
   fan::FanTraits TaiXiaFan::get_traits() {
-    return fan::FanTraits(this->oscillation_.has_value(), this->speed_.has_value(), false,
+    fan::FanTraits traits = fan::FanTraits(this->oscillation_.has_value(), this->speed_.has_value(), false,
                           this->speed_count_);
+    traits.set_supported_preset_modes(this->preset_modes_);
+    return traits;
   }
 
   void TaiXiaFan::control(const fan::FanCall &call) {
-    LOG_FAN(TAG, "TaiXia Fan", this);
     bool set_speed = false;
-    uint8_t command[6] = {0x06, SA_ID_FAN, 0x00, 0x00, 0x00, 0x00};
+    uint8_t command[6] = {0x06, this->sa_id_, 0x00, 0x00, 0x00, 0x00};
     uint8_t buffer[6];
+    uint8_t status = 0;
+    uint8_t speed = 0;
+    uint8_t oscillate = 0;
+    uint8_t preset_mode = 0;
+
+    if (this->sa_id_ == SA_ID_DEHUMIDIFIER) {
+        status = SERVICE_ID_DEHUMIDTFIER_STATUS;
+        speed = SERVICE_ID_DEHUMIDTFIER_FAN_LEVEL;
+        oscillate = 0xff;
+        preset_mode = SERVICE_ID_DEHUMIDTFIER_MODE;
+    } else {
+        status = SERVICE_ID_FAN_STATUS;
+        speed = SERVICE_ID_FAN_SPEED;
+        oscillate = SERVICE_ID_FAN_OSCILLATE;
+        preset_mode = SERVICE_ID_FAN_MODE;
+    }
 
     if (call.get_speed().has_value()) {
-      this->speed = *call.get_speed();
-
-      if (this->speed == 0) {
-        command[2] = WRITE | SERVICE_ID_FAN_STATUS;
-        command[4] = 0x0;
-        command[5] = this->parent_->checksum(command, 5);
-        this->parent_->send_cmd(command, buffer, 6);
-      } else {
-        // this->state = *call.get_state();
-        if (this->state == 0) {
-          command[2] = WRITE | SERVICE_ID_FAN_STATUS;
-          command[4] = 0x1;
-          command[5] = this->parent_->checksum(command, 5);
-          this->parent_->send_cmd(command, buffer, 6);
+        this->speed = *call.get_speed();
+        if (this->speed == 0) {
+            command[2] = WRITE | status;
+            command[4] = 0x0;
+            command[5] = this->parent_->checksum(command, 5);
+            this->parent_->send_cmd(command, buffer, 6);
+        } else {
+            // this->state = *call.get_state();
+            if (this->state == 0) {
+              command[2] = WRITE | status;
+              command[4] = 0x1;
+              command[5] = this->parent_->checksum(command, 5);
+              this->parent_->send_cmd(command, buffer, 6);
+            }
+            command[2] = WRITE | speed;
+            command[4] = this->speed;
+            command[5] = this->parent_->checksum(command, 5);
+            this->parent_->send_cmd(command, buffer, 6);
         }
-        command[2] = WRITE | SERVICE_ID_FAN_SPEED;
-        command[4] = this->speed;
-        command[5] = this->parent_->checksum(command, 5);
-        this->parent_->send_cmd(command, buffer, 6);
-      }
-      set_speed = true;
+        set_speed = true;
     }
     if (call.get_state().has_value()) {
-      this->state = *call.get_state();
-      if (!set_speed) {
-        if (this->state == 0) {
-          command[2] = WRITE | SERVICE_ID_FAN_STATUS;
-          command[5] = this->parent_->checksum(command, 5);
-          this->parent_->send_cmd(command, buffer, 6);
-        } else {
-          command[2] = WRITE | SERVICE_ID_FAN_STATUS;
-          command[4] = 0x1;
-          command[5] = this->parent_->checksum(command, 5);
-          this->parent_->send_cmd(command, buffer, 6);
+        this->state = *call.get_state();
+        if (!set_speed) {
+            if (this->state == 0) {
+              command[2] = WRITE | status;
+              command[5] = this->parent_->checksum(command, 5);
+              this->parent_->send_cmd(command, buffer, 6);
+            } else {
+              command[2] = WRITE | status;
+              command[4] = 0x1;
+              command[5] = this->parent_->checksum(command, 5);
+              this->parent_->send_cmd(command, buffer, 6);
+            }
+          this->parent_->power_switch(state);
         }
-        this->parent_->power_switch(state);
-      }
     }
     if (call.get_oscillating().has_value()) {
-      this->oscillating = *call.get_oscillating();
-      if (this->oscillating == 1) {
-          command[2] = WRITE | SERVICE_ID_FAN_OSCILLATE;
-          command[4] = 0x1;
-          command[5] = this->parent_->checksum(command, 5);
-          this->parent_->send_cmd(command, buffer, 6);
-      } else {
-          command[2] = WRITE | SERVICE_ID_FAN_OSCILLATE;
-          command[4] = 0x0;
-          command[5] = this->parent_->checksum(command, 5);
-          this->parent_->send_cmd(command, buffer, 6);
-      }
+        this->oscillating = *call.get_oscillating();
+        if (this->oscillating == 1) {
+            command[2] = WRITE | oscillate;
+            command[4] = 0x1;
+            command[5] = this->parent_->checksum(command, 5);
+            this->parent_->send_cmd(command, buffer, 6);
+        } else {
+            command[2] = WRITE | oscillate;
+            command[4] = 0x0;
+            command[5] = this->parent_->checksum(command, 5);
+            this->parent_->send_cmd(command, buffer, 6);
+        }
+    }
+    if (!call.get_preset_mode().empty()) {
+      this->preset_mode = call.get_preset_mode();
+      uint8_t mode = get_preset_mode_value(this->preset_mode);
+
+      command[2] = WRITE | preset_mode;
+      command[4] = mode;
+      command[5] = this->parent_->checksum(command, 5);
+      this->parent_->send_cmd(command, buffer, 6);
     }
 
     this->publish_state();

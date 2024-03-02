@@ -180,7 +180,7 @@ static const char *const TAG = "taixia.select";
   }
 
   void DehumidifierSelect::control(const std::string &value) {
-    uint8_t command[6] = {0x06, SA_ID_DEHUMIDTFIER, 0x00, 0x00, 0x00, 0x00};
+    uint8_t command[6] = {0x06, SA_ID_DEHUMIDIFIER, 0x00, 0x00, 0x00, 0x00};
     uint8_t buffer[6];
     auto idx = this->index_of(value);
 

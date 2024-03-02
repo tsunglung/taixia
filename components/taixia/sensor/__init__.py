@@ -166,7 +166,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                     state_class=STATE_CLASS_MEASUREMENT,
                 )
             }
-        ).extend(cv.polling_component_schema('60s')),
+        ).extend(cv.polling_component_schema('30s')),
         CONF_WASHING_MACHINE: cv.COMPONENT_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(Washing_Machine),
@@ -261,11 +261,25 @@ CONFIG_SCHEMA = cv.typed_schema(
                     state_class=STATE_CLASS_MEASUREMENT,
                 ),
             }
-        ).extend(cv.polling_component_schema('60s')),
+        ).extend(cv.polling_component_schema('30s')),
         CONF_DEHUMIDIFIER: cv.COMPONENT_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(Dehumidifier),
                 cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
+                cv.Optional(CONF_HUMIDITY_INDOOR): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_PERCENT,
+                    icon=ICON_WATER_PERCENT,
+                    accuracy_decimals=1,
+                    device_class=DEVICE_CLASS_HUMIDITY,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+                cv.Optional(CONF_TEMPERATURE_INDOOR): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_CELSIUS,
+                    icon=ICON_THERMOMETER,
+                    accuracy_decimals=1,
+                    device_class=DEVICE_CLASS_TEMPERATURE,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
                 cv.Optional(CONF_WATER_FULL): sensor.sensor_schema(
                     icon=ICON_WATER_PERCENT,
                     device_class=DEVICE_CLASS_EMPTY,
@@ -281,7 +295,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                     device_class=DEVICE_CLASS_EMPTY,
                     entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
                 ),
-                cv.Optional(CONF_DEFROST): sensor.sensor_schema(
+                cv.Optional(CONF_ERROR_CODE): sensor.sensor_schema(
                     icon=ICON_CHIP,
                     device_class=DEVICE_CLASS_EMPTY,
                     entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
@@ -315,7 +329,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                     state_class=STATE_CLASS_MEASUREMENT,
                 ),
             }
-        ).extend(cv.polling_component_schema('60s')),
+        ).extend(cv.polling_component_schema('30s')),
         CONF_AIRPURIFIER: cv.COMPONENT_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(AirPurifier),
@@ -354,7 +368,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                     state_class=STATE_CLASS_MEASUREMENT,
                 ),
             }
-        ).extend(cv.polling_component_schema('60s')),
+        ).extend(cv.polling_component_schema('30s')),
         CONF_ELECTRIC_FAN: cv.COMPONENT_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(ElectricFan),
@@ -402,7 +416,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                     state_class=STATE_CLASS_MEASUREMENT,
                 ),
             }
-        ).extend(cv.polling_component_schema('60s')),
+        ).extend(cv.polling_component_schema('30s')),
         CONF_CUSTOM: cv.COMPONENT_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(TaiXiaCustom),
@@ -417,7 +431,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                     )
                 ),
             }
-        ).extend(cv.polling_component_schema('60s')),
+        ).extend(cv.polling_component_schema('30s')),
     },
     key=CONF_TYPE,
     lower=True,
@@ -506,6 +520,12 @@ async def to_code(config):
 
     elif config[CONF_TYPE] == CONF_DEHUMIDIFIER:
         cg.add(var.set_sa_id(0x04))
+        if CONF_HUMIDITY_INDOOR in config:
+            sens = await sensor.new_sensor(config[CONF_HUMIDITY_INDOOR])
+            cg.add(var.set_humidity_indoor_sensor(sens))
+        if CONF_TEMPERATURE_INDOOR in config:
+            sens = await sensor.new_sensor(config[CONF_TEMPERATURE_INDOOR])
+            cg.add(var.set_temperature_indoor_sensor(sens))
         if CONF_WATER_FULL in config:
             sens = await sensor.new_sensor(config[CONF_WATER_FULL])
             cg.add(var.set_appoint_left_hours_sensor(sens))
@@ -584,6 +604,7 @@ async def to_code(config):
             cg.add(sens.set_message_parser(lambda_))
             sensors.append(sens)
         cg.add(var.set_sensors(sensors))
+        cg.add(var.set_taixia_parent(taixia))
 
     taixia = await cg.get_variable(config[CONF_TAIXIA_ID])
     cg.add(taixia.register_listener(var))

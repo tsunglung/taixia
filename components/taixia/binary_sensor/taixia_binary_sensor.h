@@ -6,19 +6,20 @@
 
 namespace esphome {
 namespace taixia {
+class TaiXia;
+class TaiXiaBinarySensor : public binary_sensor::BinarySensor, public TaiXiaListener, public Component {
 
-class TaiXiaBinarySensor : public binary_sensor::BinarySensor, public TaiXiaListener, public PollingComponent {
  public:
-  void setup() override;
+  void set_parent(TaiXia *parent) { this->parent_ = parent; };
+  void set_service_id(uint8_t service_id) { this->service_id_ = service_id; };
+  void set_sa_id(uint8_t sa_id) { this->sa_id_ = sa_id; };
   void dump_config() override;
-  void update() override;
-  void set_power_sensor(binary_sensor::BinarySensor *binary_sensor) { power_binary_sensor_ = binary_sensor; }
-  void set_taixia_parent(TaiXia *parent) { this->parent_ = parent; }
 
  protected:
-  TaiXia *parent_;
+  uint8_t service_id_;
+  uint8_t sa_id_;
 
-  binary_sensor::BinarySensor *power_binary_sensor_{nullptr};
+  TaiXia *parent_;
 
   void handle_response(std::vector<uint8_t> &response) override;
 };

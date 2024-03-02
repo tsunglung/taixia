@@ -53,7 +53,7 @@ namespace taixia {
 #define SERVICE_ID_CLIMATE_ENERGY 0x28
 #define SERVICE_ID_CLIMATE_ERROR_CODR 0x29
 #define SERVICE_ID_CLIMATE_OPERATING_HOURS 0x2f
-#define SERVICE_ID_CLIMATE_FILITER_CLEAN_HOURS 0x30
+#define SERVICE_ID_CLIMATE_FILTER_CLEAN_HOURS 0x30
 
 #define SA_ID_WASHER 0x03
 #define SERVICE_ID_WASHER_STATUS 0x00
@@ -78,16 +78,18 @@ namespace taixia {
 #define SERVICE_ID_WASHER_POWER 0x1D
 #define SERVICE_ID_WASHER_ENERGY 0x1E
 
-#define SA_ID_DEHUMIDTFIER 0x04
+#define SA_ID_DEHUMIDIFIER 0x04
 #define SERVICE_ID_DEHUMIDTFIER_STATUS 0x00
 #define SERVICE_ID_DEHUMIDTFIER_MODE 0x01
 #define SERVICE_ID_DEHUMIDTFIER_TEMPERATURE_INDOOR 0x06
 #define SERVICE_ID_DEHUMIDTFIER_HUMIDITY_INDOOR 0x07
 #define SERVICE_ID_DEHUMIDTFIER_WATER_FULL 0x0A
-#define SERVICE_ID_DEHUMIDTFIER_FILITER_CLEAN 0x0B
+#define SERVICE_ID_DEHUMIDTFIER_FILTER_CLEAN 0x0B
 #define SERVICE_ID_DEHUMIDTFIER_AIR_PURFIFIER 0x0D
+#define SERVICE_ID_DEHUMIDTFIER_FAN_LEVEL 0x0E
 #define SERVICE_ID_DEHUMIDTFIER_SIDE_AIR_VENT 0x0F
 #define SERVICE_ID_DEHUMIDTFIER_DEFROST 0x11
+#define SERVICE_ID_DEHUMIDTFIER_ERROR_CODR 0x12
 #define SERVICE_ID_DEHUMIDTFIER_BEEPER 0x18
 #define SERVICE_ID_DEHUMIDTFIER_CURRENT 0x19
 #define SERVICE_ID_DEHUMIDTFIER_VOLTAGE 0x1A
@@ -177,6 +179,8 @@ class TaiXia : public uart::UARTDevice, public Component {
   void set_number(uint8_t sa_id, uint8_t service_id, float value);
   void get_number(uint8_t sa_id, uint8_t service_id, uint8_t *buffer);
   void button_command(uint8_t sa_id, uint8_t service_id);
+  bool have_sensors() { return this->have_sensors_; }
+  void set_have_sensors(bool have_sensors) { this->have_sensors_ = have_sensors; }
 
   void power_switch(bool state) { this->power_switch_->publish_state(state); }
 
@@ -205,7 +209,20 @@ class TaiXia : public uart::UARTDevice, public Component {
   TAIXIA_NUMBER(horizontal_fan_speed_number)
 
   // Dehumiditier 0x04
-  TAIXIA_SWITCH(bair_flow_autor_switch)
+  TAIXIA_BINARY_SENSOR(water_full_binary_sensor)
+  TAIXIA_BINARY_SENSOR(filter_notify_binary_sensor)
+  TAIXIA_BINARY_SENSOR(side_air_flow_binary_sensor)
+  TAIXIA_BINARY_SENSOR(defrost_binary_sensor)
+  TAIXIA_SWITCH(air_flow_auto_switch)
+  TAIXIA_NUMBER(operating_time_number)
+  TAIXIA_NUMBER(relative_humidity_number)
+  TAIXIA_NUMBER(dehumidifier_level_number)
+  TAIXIA_NUMBER(dry_level_number)
+  TAIXIA_NUMBER(fan_angle_number)
+  TAIXIA_NUMBER(air_purifier_number)
+  TAIXIA_NUMBER(fan_level_number)
+  TAIXIA_NUMBER(sound_mode_number)
+  TAIXIA_NUMBER(high_humidity_level_number)
 /*
   TAIXIA_SWITCH(filter_notify_switch)
   TAIXIA_SWITCH(light_switch)
@@ -231,6 +248,7 @@ class TaiXia : public uart::UARTDevice, public Component {
   uint8_t sa_id_;
   uint8_t len_;
   uint8_t max_length_{0};
+  bool have_sensors_{false};
 
   std::vector<TaiXiaListener *> listeners_{};
 

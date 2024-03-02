@@ -40,6 +40,20 @@ CONF_WASH_OTHER_FUNCTION = "wash_other_function"
 CONF_WASH_MODE = "wash_mode"
 CONF_WARM_WATER_PROGRAM = "warm_water_program"
 
+DEFAULT_ICON = "mdi:format-list-bulleted"
+ICONS = {
+    CONF_FUZZY_MODE: "mdi:motion-sensor",
+    CONF_DISPLAY_MODE: "mdi:overscan",
+    CONF_MOTION_DETECT: "mdi:motion-sensor",
+    CONF_OPERATING_PROGRAM: "mdi:state-machine",
+    CONF_AIR_PURIFIER: "mdi:air-purifier",
+    CONF_SOUND: "mdi:volume-source",
+    CONF_WASH_PROGRAM: "mdi:washing-machine",
+    CONF_WASH_OTHER_FUNCTION: "mdi:state-machine",
+    CONF_WASH_MODE: "mdi:dishwasher",
+    CONF_WARM_WATER_PROGRAM: "mdi:thermometer-water"
+}
+
 OPTIONS_FUZZY_MODE = {
     "comfort": 0,
     "too cold": 1,
@@ -109,7 +123,8 @@ OPTIONS_OPERATING_PROGRAM = {
     "defrost": 5,
     "fan": 6,
     "comfort": 7,
-    "low humidity": 8
+    "low humidity": 8,
+    "power saving": 9
 }
 
 OPTIONS_AIR_PURFIFIER = {
@@ -161,13 +176,19 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.GenerateID(): cv.declare_id(AirConditionerSelect),
                 cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
                 cv.Optional(CONF_FUZZY_MODE): select.select_schema(
-                    AirConditionerSelect
+                    AirConditionerSelect,
+                    entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_FUZZY_MODE, DEFAULT_ICON)
                 ),
                 cv.Optional(CONF_DISPLAY_MODE): select.select_schema(
-                    AirConditionerSelect
+                    AirConditionerSelect,
+                    entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_DISPLAY_MODE, DEFAULT_ICON)
                 ),
                 cv.Optional(CONF_MOTION_DETECT): select.select_schema(
-                    AirConditionerSelect
+                    AirConditionerSelect,
+                    entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_MOTION_DETECT, DEFAULT_ICON)
                 ),
             }
         ),
@@ -176,7 +197,9 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.GenerateID(): cv.declare_id(AirPurifierSelect),
                 cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
                 cv.Optional(CONF_OPERATING_PROGRAM): select.select_schema(
-                    AirPurifierSelect
+                    AirPurifierSelect,
+                    entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
                 ),
             }
         ),
@@ -185,13 +208,19 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.GenerateID(): cv.declare_id(DehumidifierSelect),
                 cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
                 cv.Optional(CONF_OPERATING_PROGRAM): select.select_schema(
-                    DehumidifierSelect
+                    DehumidifierSelect,
+                    entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
                 ),
                 cv.Optional(CONF_AIR_PURIFIER): select.select_schema(
-                    DehumidifierSelect
+                    DehumidifierSelect,
+                    entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
                 ),
                 cv.Optional(CONF_SOUND): select.select_schema(
-                    DehumidifierSelect
+                    DehumidifierSelect,
+                    entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
                 )
             }
         ),
@@ -202,18 +231,22 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.Optional(CONF_WASH_PROGRAM): select.select_schema(
                     WashingMachineSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_WASH_PROGRAM, DEFAULT_ICON)
                 ),
                 cv.Optional(CONF_WASH_OTHER_FUNCTION): select.select_schema(
                     WashingMachineSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_WASH_OTHER_FUNCTION, DEFAULT_ICON)
                 ),
                 cv.Optional(CONF_WASH_MODE): select.select_schema(
                     WashingMachineSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_WASH_MODE, DEFAULT_ICON)
                 ),
                 cv.Optional(CONF_WARM_WATER_PROGRAM): select.select_schema(
                     WashingMachineSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_WARM_WATER_PROGRAM, DEFAULT_ICON)
                 ),
             }
         ),
@@ -224,6 +257,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.Optional(CONF_OPERATING_PROGRAM): select.select_schema(
                     ElectricFanSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
                 ),
             }
         ),

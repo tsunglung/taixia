@@ -1,9 +1,9 @@
 from esphome.components import binary_sensor
-import esphome.config_validation as cv
 import esphome.codegen as cg
+import esphome.config_validation as cv
 from esphome.const import (
-    CONF_ID,
     CONF_POWER,
+    CONF_TYPE,
     DEVICE_CLASS_POWER,
     ENTITY_CATEGORY_DIAGNOSTIC,
     ICON_CHIP
@@ -11,34 +11,89 @@ from esphome.const import (
 from .. import (
     taixia_ns,
     CONF_TAIXIA_ID,
-    TaiXia
+    TaiXia,
+    CONF_DEHUMIDIFIER,
+    CONF_SUPPORTED_SA
 )
-
-CODEOWNERS = ["@tsunglung"]
 
 DEPENDENCIES = ["taixia"]
 
-TaiXiaBinarySensor = taixia_ns.class_(
-    "TaiXiaBinarySensor", binary_sensor.BinarySensor, cg.PollingComponent
+CONF_WATER_FULL = "water_full"
+CONF_FILTER_NOTIFY = "filter_notify"
+CONF_SIDE_AIR_FLOW = "side_air_flow"
+CONF_DEFROST = "defrost"
+
+ICONS = {
+    CONF_WATER_FULL: "mdi:cup-water",
+    CONF_FILTER_NOTIFY: "mdi:air-filter",
+    CONF_SIDE_AIR_FLOW: "mdi:waves",
+    CONF_DEFROST: "mdi:snowflake-melt"
+}
+
+DEHUMIDIFIER_TYPES = {
+    CONF_WATER_FULL: 0x0A,
+    CONF_FILTER_NOTIFY: 0x0B,
+    CONF_SIDE_AIR_FLOW: 0x0F,
+    CONF_DEFROST: 0x11
+}
+
+COMMON_TYPES = {
+    CONF_POWER: 0x00
+}
+
+TYPES = DEHUMIDIFIER_TYPES
+
+TaiXiaBinarySensor = taixia_ns.class_("TaiXiaBinarySensor", binary_sensor.BinarySensor, cg.Component)
+
+TAIXIA_BINARY_SENSOR_SCHEMA = binary_sensor.binary_sensor_schema(
+    TaiXiaBinarySensor,
+    icon=ICON_CHIP,
+    device_class=DEVICE_CLASS_POWER,
+    entity_category=ENTITY_CATEGORY_DIAGNOSTIC
+).extend(cv.COMPONENT_SCHEMA)
+
+TAIXIA_COMPONENT_SCHEMA = cv.Schema(
+    {
+        cv.GenerateID(): cv.declare_id(TaiXiaBinarySensor),
+        cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
+        cv.Required(CONF_TYPE): cv.string,
+        cv.Optional(CONF_POWER): TAIXIA_BINARY_SENSOR_SCHEMA
+    }
 )
 
-CONFIG_SCHEMA = cv.Schema({
-    cv.GenerateID(): cv.declare_id(TaiXiaBinarySensor),
-    cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
-    cv.Required(CONF_POWER): binary_sensor.binary_sensor_schema(
-        icon=ICON_CHIP,
-        device_class=DEVICE_CLASS_POWER,
-        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-     )
-}).extend(cv.polling_component_schema('60s'))
+CONFIG_SCHEMA = TAIXIA_COMPONENT_SCHEMA.extend(
+    {cv.Optional(type): TAIXIA_BINARY_SENSOR_SCHEMA for type in TYPES}
+)
+
+async def add_binay_sensor(config, sa_type, service_id, sa_id):
+    taixia = await cg.get_variable(config[CONF_TAIXIA_ID])
+    if sa_type in config:
+        conf = config[sa_type]
+        conf['icon'] = ICONS.get(sa_type, ICON_CHIP)
+        var = await binary_sensor.new_binary_sensor(conf)
+        await cg.register_component(var, conf)
+        cg.add(getattr(taixia, f"set_{sa_type}_binary_sensor")(var))
+        cg.add(var.set_parent(taixia))
+        cg.add(var.set_service_id(service_id))
+        cg.add(var.set_sa_id(sa_id))
+        cg.add(taixia.register_listener(var))
 
 async def to_code(config):
+
+    if config[CONF_TYPE] not in CONF_SUPPORTED_SA:
+        raise ("SA TYPE is not supported yet")
+
+    if config[CONF_TYPE] == CONF_DEHUMIDIFIER:
+        sa_id = 4
+        for sa_type, service_id in DEHUMIDIFIER_TYPES.items():
+            await add_binay_sensor(config, sa_type, service_id, sa_id)
+
     taixia = await cg.get_variable(config[CONF_TAIXIA_ID])
-    var = cg.new_Pvariable(config[CONF_ID])
-    await cg.register_component(var, config)
-
-    sens1 = await binary_sensor.new_binary_sensor(config[CONF_POWER])
-    cg.add(var.set_power_sensor(sens1))
-
-    cg.add(taixia.register_listener(var))
-    cg.add(var.set_taixia_parent(taixia))
+    if CONF_POWER in config:
+        var = await binary_sensor.new_binary_sensor(config[CONF_POWER])
+        await cg.register_component(var, config[CONF_POWER])
+        cg.add(getattr(taixia, f"set_power_binary_sensor")(var))
+        cg.add(var.set_parent(taixia))
+        cg.add(var.set_service_id(0x00))
+        cg.add(var.set_sa_id(sa_id))
+        cg.add(taixia.register_listener(var))
