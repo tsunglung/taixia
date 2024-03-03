@@ -27,21 +27,24 @@ static const char *const TAG = "taixia.switch";
 
   void TaiXiaSwitch::handle_response(std::vector<uint8_t> &response) {
     uint8_t i;
+    bool new_state = false;
 
     ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
         response[0], response[1], response[2], response[3], \
         response[4], response[5], response[6], response[7], response[8]);
 
     for (i = 3; i < response[0] - 3; i+=3) {
-      if (this->service_id_ == response[i])
-        this->state = bool(response[i + 2]);
-      if (((this->sa_id_ == SA_ID_CLIMATE) && (this->service_id_ == SERVICE_ID_CLIMATE_BEEPER)) || 
-          ((this->sa_id_ == SA_ID_DEHUMIDIFIER) && (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_BEEPER)))
-          this->state = !this->state;
-        goto done;
+      if (this->service_id_ == response[i]) {
+        new_state = bool(response[i + 2]);
+        if (((this->sa_id_ == SA_ID_CLIMATE) && (this->service_id_ == SERVICE_ID_CLIMATE_BEEPER)) || 
+            ((this->sa_id_ == SA_ID_DEHUMIDIFIER) && (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_BEEPER)))
+            new_state = !new_state;
+          goto done;
+      }
     }
 done:
-    this->publish_state(this->state);
+    if (this->state != new_state)
+      this->publish_state(new_state);
   }
 
 }  // namespace taixia

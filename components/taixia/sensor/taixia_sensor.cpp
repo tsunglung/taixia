@@ -19,7 +19,9 @@ static inline void publish_i16(std::vector<uint8_t> &response, int start, sensor
   if ((response[start + 1] == 0xFF) && (response[start + 2] == 0xFF)) {
     sensor->publish_state(0.0f);
   } else {
-    sensor->publish_state(get_i16(response, start + 1));
+    int16_t new_state = get_i16(response, start + 1);
+    if (sensor->get_state() != new_state)
+      sensor->publish_state(new_state);
   }
 }
 
@@ -27,7 +29,9 @@ static inline void publish_u16(std::vector<uint8_t> &response, int start, sensor
   if ((response[start + 1] == 0xFF) && (response[start + 2] == 0xFF)) {
     sensor->publish_state(0.0f);
   } else {
-    sensor->publish_state(get_u16(response, start + 1));
+    uint16_t new_state = get_u16(response, start + 1);
+    if (sensor->get_state() != new_state)
+      sensor->publish_state(new_state);
   }
 }
 
@@ -35,7 +39,9 @@ static inline void publish_u16_div_10(std::vector<uint8_t> &response, int start,
   if ((response[start + 1] == 0xFF) && (response[start + 2] == 0xFF)) {
     sensor->publish_state(0.0f);
   } else {
-    sensor->publish_state(get_u16(response, start + 1) / 10.0f);
+    uint16_t new_state = get_u16(response, start + 1) / 10.0f;
+    if (sensor->get_state() != new_state)
+      sensor->publish_state(new_state);
   }
 }
 
@@ -85,7 +91,6 @@ void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
         }
       break;
       case SERVICE_ID_CLIMATE_HUMIDITY_INDOOR:
-        ESP_LOGE(TAG, "%x %x %x", response[i], response[i + 1], response[i + 2]);
         if (this->humidity_indoor_sensor_ != nullptr) {
           publish_u16(response, i, this->humidity_indoor_sensor_);
         }
