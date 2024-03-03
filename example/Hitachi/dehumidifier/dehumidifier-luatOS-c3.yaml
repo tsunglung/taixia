@@ -1,0 +1,241 @@
+substitutions:
+  devicename: dehumidifier-c3
+  upper_devicename: "Dehumidifier"
+
+esphome:
+  name: $devicename
+  friendly_name: ${upper_devicename}
+  comment: $upper_devicename luatOS c3 for RD-xx0HS/G
+#  name_add_mac_suffix: true
+  project:
+    name: TaiSEIA.dehumidifier
+    version: "c3-1.0"
+  platformio_options:
+    board_build.flash_mode: dio
+    board_build.mcu: esp32c3
+  on_boot:
+    - priority: 500
+      then:
+        - delay: 1s
+#        - esp32_ble_tracker.stop_scan:
+    - priority: 100
+      then:
+        - delay: 10s
+#        - esp32_ble_tracker.start_scan:
+    - priority: 600
+      then:
+        - lambda: |-
+            gpio_set_direction(GPIO_NUM_12, GPIO_MODE_OUTPUT);
+            gpio_set_direction(GPIO_NUM_13, GPIO_MODE_OUTPUT);
+
+external_components:
+  - source: github://tsunglung/taixia@master
+    components: [ taixia ]
+
+esp32:
+  board: esp32-c3-devkitm-1
+  variant: esp32c3
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${devicename}
+    password: "12345678"
+
+# Enable logging
+logger:
+  baud_rate: 0 # disable serial logging;
+#  level: VERY_VERBOSE
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+#web_server:
+
+uart:
+  id: uart_taixia
+  tx_pin: GPIO21
+  rx_pin: GPIO20
+  baud_rate: 9600
+  debug:
+    direction: BOTH
+
+#bluetooth_proxy:
+#  active: true
+
+# optional binary sensor to monitor serial connection:
+binary_sensor:
+  - platform: status
+    name: "Status"
+  - platform: taixia
+    type: dehumidifier
+    water_full:
+      name: "Water Full"
+#    filter_notify:
+#      name: "Filter Notify"
+    side_air_flow:
+      name: "Side Air Flow"
+    defrost:
+      name: "Defrost"
+
+button:
+  - platform: safe_mode
+    name: Safe Mode Boot
+    entity_category: diagnostic
+  - platform: restart
+    name: "Restart"
+
+#esp32_ble_tracker:
+#  scan_parameters:
+#    interval: 1100ms
+#    window: 1100ms
+#    active: true
+
+fan:
+  - platform: taixia
+    name: ${upper_devicename}
+    type: dehumidifier
+    speed: true
+    speed_count: 5
+    preset_modes:
+#      - auto
+      - config
+#      - continuous
+      - dry
+#      - air purifier
+#      - defrost
+#      - fan
+      - comfort
+      - low humidity
+      - power saving
+
+light:
+  - platform: binary
+    output: redLED
+    id: red_led
+    name: "${upper_devicename} Red Light"
+  - platform: status_led
+    output: statusLED
+    internal: true
+    id: status_light
+    name: "${upper_devicename} Status LED"
+
+number:
+  - platform: taixia
+    type: dehumidifier
+    operating_time:
+      name: "Operating Time"
+    relative_humidity:
+      name: "Relative Humidity"
+#    dehumidifier_level:
+#      name: "Dehumidifier Level"
+#    dry_level:
+#      name: "Dry Level"
+#    fan_angle:
+#      name: "Fan Angle"
+#    air_purifier:
+#      name: "Air Purifier"
+#    fan_level:
+#      name: "Fan Level"
+    sound_mode:
+      name: "Sound Mode"
+#    high_humidity_level:
+#      name: "High Humidity Level"
+
+output:
+  - platform: template
+    id: redLED
+    type: binary
+    write_action:
+      - lambda: |-
+          gpio_set_level(GPIO_NUM_12, state);
+  - platform: template
+    id: statusLED
+    type: binary
+    write_action:
+      - lambda: |-
+          gpio_set_level(GPIO_NUM_13, state);
+
+select:
+  - platform: taixia
+    type: dehumidifier
+    operating_program:
+      name: "Operation Mode"
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "Uptime"
+    filters:
+      - lambda: return x / 3600;
+    unit_of_measurement: "h"
+    accuracy_decimals: 1
+
+  - platform: internal_temperature
+    name: "Internal Temperature"
+
+  - platform: taixia
+    type: dehumidifier
+#    temperature_indoor:
+#      name: "Temperature Indoor"
+    humidity_indoor:
+      name: "Humidity Indoor"
+#    energy_consumption:
+#      name: "Energy"
+    error_code:
+      name: "Error Code"
+
+switch:
+  - platform: taixia
+    type: dehumidifier
+    power:
+      name: "Power Switch"
+    lock:
+      name: "Lock"
+    air_flow_auto:
+      name: "Auto Air Flow"
+    mildew_proof:
+      name: "Mildew Proof"
+#    humidity_notify:
+#      name: "Humidity Notify"
+#    light:
+#      name: "Light"
+    beeper:
+      name: "Beeper"
+    air_purifier:
+      name: "Air Purifier"
+
+text_sensor:
+  - platform: version
+    name: "ESPHome Version"
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+  - platform: taixia
+    sa_id:
+      name: "SA ID"
+      id: sa_id
+    brand:
+      name: "SA Brand"
+    model:
+      name: "SA Model"
+    version:
+      name: "SA Version"
+    services:
+      name: "SA Services"
+
+taixia:
+#  max_length: 28
+  sa_id: 4
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
