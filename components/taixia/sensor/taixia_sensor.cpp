@@ -75,72 +75,64 @@ void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
       response[4], response[5], response[6], response[7], response[8]);
 
   for (i = 3; i < response[0] - 3; i+=3) {
+    if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
+      continue;
+    }
     switch (response[i]) {
       case SERVICE_ID_CLIMATE_TEMPERATURE_INDOOR:
         if (this->temperature_indoor_sensor_ != nullptr) {
           publish_i16(response, i, this->temperature_indoor_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_CLIMATE_HUMIDITY_INDOOR:
         ESP_LOGE(TAG, "%x %x %x", response[i], response[i + 1], response[i + 2]);
         if (this->humidity_indoor_sensor_ != nullptr) {
           publish_u16(response, i, this->humidity_indoor_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_CLIMATE_TEMPERATURE_OUTDOOR:
         if (this->temperature_outdoor_sensor_ != nullptr) {
           publish_i16(response, i, this->temperature_outdoor_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_CLIMATE_HUMIDITY_OUTDOOR:
         if (this->humidity_outdoor_sensor_ != nullptr) {
           publish_u16(response, i, this->humidity_outdoor_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_CLIMATE_CURRENT:
         if (this->operating_current_sensor_ != nullptr) {
           publish_u16_div_10(response, i, this->operating_current_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_CLIMATE_VOLTAGE:
         if (this->operating_voltage_sensor_ != nullptr) {
           publish_u16(response, i, this->operating_voltage_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_CLIMATE_POWER:
         if (this->operating_power_sensor_ != nullptr) {
           publish_u16(response, i, this->operating_power_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_CLIMATE_ENERGY:
         if (this->energy_consumption_sensor_ != nullptr) {
           publish_u16_div_10(response, i, this->energy_consumption_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_CLIMATE_OPERATING_HOURS:
         if (this->operating_hours_sensor_ != nullptr) {
           publish_u16(response, i, this->operating_hours_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_CLIMATE_ERROR_CODR:
         if (this->error_code_sensor_ != nullptr) {
           publish_u16(response, i, this->error_code_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_CLIMATE_FILTER_CLEAN_HOURS:
         if (this->filiter_clean_hours_sensor_ != nullptr) {
           publish_u16(response, i + 1, this->filiter_clean_hours_sensor_);
-          return;
         }
       break;
     }
@@ -187,47 +179,43 @@ void DehumidifierSensor::handle_response(std::vector<uint8_t> &response) {
       response[4], response[5], response[6], response[7], response[8]);
 
   for (i = 3; i < response[0] - 3; i+=3) {
+    if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
+      continue;
+    }
     switch (response[i]) {
       case SERVICE_ID_DEHUMIDTFIER_TEMPERATURE_INDOOR:
         if (this->temperature_indoor_sensor_ != nullptr) {
           publish_i16(response, i, this->temperature_indoor_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_DEHUMIDTFIER_HUMIDITY_INDOOR:
         if (this->humidity_indoor_sensor_ != nullptr) {
           publish_u16(response, i, this->humidity_indoor_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_DEHUMIDTFIER_ERROR_CODR:
         if (this->error_code_sensor_ != nullptr) {
           publish_u16(response, i, this->error_code_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_DEHUMIDTFIER_CURRENT:
         if (this->operating_current_sensor_ != nullptr) {
           publish_u16_div_10(response, i, this->operating_current_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_DEHUMIDTFIER_VOLTAGE:
         if (this->operating_voltage_sensor_ != nullptr) {
           publish_u16(response, i, this->operating_voltage_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_DEHUMIDTFIER_POWER:
         if (this->operating_power_sensor_ != nullptr) {
           publish_u16(response, i, this->operating_power_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_DEHUMIDTFIER_ENERGY:
         if (this->energy_consumption_sensor_ != nullptr) {
           publish_u16_div_10(response, i, this->energy_consumption_sensor_);
-          return;
         }
       break;
     }
@@ -278,89 +266,78 @@ void WashingMachineSensor::handle_response(std::vector<uint8_t> &response) {
       response[4], response[5], response[6], response[7], response[8]);
 
   for (i = 3; i < response[0] - 3; i+=3) {
+    if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
+      continue;
+    }
     switch (response[i]) {
       case SERVICE_ID_WASHER_CURRENT_STATUS:
         if (this->wash_left_count_sensor_ != nullptr) {
           publish_u16(response, i, this->wash_current_status_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_WASHER_WASH_LEFT_COUNT:
         if (this->wash_left_count_sensor_ != nullptr) {
           publish_u16(response, i, this->wash_left_count_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_WASHER_WASH_LEFT_HOURS:
         if (this->wash_left_hours_sensor_ != nullptr) {
           publish_u16(response, i, this->wash_left_hours_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_WASHER_SPIN_LEFT_HOURS:
         if (this->spin_left_hours_sensor_ != nullptr) {
           publish_u16(response, i, this->spin_left_hours_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_WASHER_SOAK_LEFT_HOURS:
         if (this->soak_left_hours_sensor_ != nullptr) {
           publish_u16(response, i, this->soak_left_hours_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_WASHER_DRY_LEFT_HOURS:
         if (this->dry_left_hours_sensor_ != nullptr) {
           publish_u16(response, i, this->dry_left_hours_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_WASHER_TANK_CLEAN_LEFT_HOURS:
         if (this->wash_left_count_sensor_ != nullptr) {
           publish_u16(response, i, this->wash_left_count_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_WASHER_DRY_CLEAN_LEFT_HOURS:
         if (this->tank_clean_left_hours_sensor_ != nullptr) {
           publish_u16(response, i, this->tank_clean_left_hours_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_WASHER_TOTAL_LEFT_HOURS:
         if (this->total_left_hours_sensor_ != nullptr) {
           publish_u16(response, i, this->total_left_hours_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_WASHER_APPOINT_LEFT_HOURS:
         if (this->appoint_left_hours_sensor_ != nullptr) {
           publish_u16(response, i, this->appoint_left_hours_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_WASHER_CURRENT:
         if (this->operating_current_sensor_ != nullptr) {
           publish_u16_div_10(response, i, this->operating_current_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_WASHER_VOLTAGE:
         if (this->operating_voltage_sensor_ != nullptr) {
           publish_u16(response, i, this->operating_voltage_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_WASHER_POWER:
         if (this->operating_power_sensor_ != nullptr) {
           publish_u16(response, i, this->operating_power_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_WASHER_ENERGY:
         if (this->energy_consumption_sensor_ != nullptr) {
           publish_u16_div_10(response, i, this->energy_consumption_sensor_);
-          return;
         }
       break;
     }
@@ -395,35 +372,33 @@ void AirPurifierSensor::handle_response(std::vector<uint8_t> &response) {
       response[4], response[5], response[6], response[7], response[8]);
 
   for (i = 3; i < response[0] - 3; i+=3) {
+    if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
+      continue;
+    }
     switch (response[i]) {
       case SERVICE_ID_PURIFIER_AIR_QUALITY:
         if (this->air_quality_sensor_ != nullptr) {
           publish_i16(response, i, this->air_quality_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_PURIFIER_CURRENT:
         if (this->operating_current_sensor_ != nullptr) {
           publish_u16_div_10(response, i, this->operating_current_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_PURIFIER_VOLTAGE:
         if (this->operating_voltage_sensor_ != nullptr) {
           publish_u16(response, i, this->operating_voltage_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_PURIFIER_POWER:
         if (this->operating_power_sensor_ != nullptr) {
           publish_u16(response, i, this->operating_power_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_PURIFIER_ENERGY:
         if (this->energy_consumption_sensor_ != nullptr) {
           publish_u16_div_10(response, i, this->energy_consumption_sensor_);
-          return;
         }
       break;
     }
@@ -460,41 +435,38 @@ void ElectricFanSensor::handle_response(std::vector<uint8_t> &response) {
       response[4], response[5], response[6], response[7], response[8]);
 
   for (i = 3; i < response[0] - 3; i+=3) {
+    if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
+      continue;
+    }
     switch (response[i]) {
       case SERVICE_ID_FAN_TEMPERATURE:
         if (this->temperature_sensor_ != nullptr) {
           publish_i16(response, i, this->temperature_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_FAN_HUMIDITY:
         if (this->humidity_sensor_ != nullptr) {
           publish_i16(response, i, this->humidity_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_FAN_CURRENT:
         if (this->operating_current_sensor_ != nullptr) {
           publish_u16_div_10(response, i, this->operating_current_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_FAN_VOLTAGE:
         if (this->operating_voltage_sensor_ != nullptr) {
           publish_u16(response, i, this->operating_voltage_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_FAN_POWER:
         if (this->operating_power_sensor_ != nullptr) {
           publish_u16(response, i, this->operating_power_sensor_);
-          return;
         }
       break;
       case SERVICE_ID_FAN_ENERGY:
         if (this->energy_consumption_sensor_ != nullptr) {
           publish_u16_div_10(response, i, this->energy_consumption_sensor_);
-          return;
         }
       break;
     }

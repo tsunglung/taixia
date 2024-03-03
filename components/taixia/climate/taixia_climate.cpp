@@ -70,8 +70,6 @@ using namespace esphome::climate;
   void TaiXiaClimate::loop() {}
 
   void TaiXiaClimate::control(const climate::ClimateCall &call) {
-    //ESP_LOGD(TAG, "Received TaiXiaClimate::control");
-    LOG_CLIMATE("", "TaiXia Climate control", this);
     uint8_t command[6] = {0x06, SA_ID_CLIMATE, 0x00, 0x00, 0x00, 0x00};
     uint8_t buffer[6];
 
@@ -179,22 +177,22 @@ using namespace esphome::climate;
           command[4] = 0;
         break;
         case climate::CLIMATE_FAN_LOW:
-          command[4] = 3;
+          command[4] = 2;
         break;
         case climate::CLIMATE_FAN_MEDIUM:
-          command[4] = 6;
+          command[4] = 3;
         break;
         case climate::CLIMATE_FAN_HIGH:
-          command[4] = 15;
+          command[4] = 4;
         break;
         case climate::CLIMATE_FAN_MIDDLE:
-          command[4] = 12;
+          command[4] = 3;
         break;
         case climate::CLIMATE_FAN_FOCUS:
-          command[4] = 9;
+          command[4] = 5;
         break;
         case climate::CLIMATE_FAN_DIFFUSE:
-          command[4] = 10;
+          command[4] = 6;
         break;
         case climate::CLIMATE_FAN_QUIET:
           command[4] = 1;
@@ -227,17 +225,16 @@ using namespace esphome::climate;
   }
 
   bool TaiXiaClimate::update_status_() {
-    if (!this->parent_->get_have_sensors())
+    if (!this->parent_->have_sensors())
       this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
     return true;
   }
 
   void TaiXiaClimate::update() {
-    ESP_LOGD(TAG, "[%s] update()", this->get_name().c_str());
     // TODO: if the hub component is already polling, do we also need to include polling?
     //  We're already going to get on_status() at the hub's polling interval.
     auto result = this->update_status_();
-    ESP_LOGD(TAG, "[%s] update_status result=%s", this->get_name().c_str(), result ? "true" : "false");
+    ESP_LOGV(TAG, "[%s] update_status result=%s", this->get_name().c_str(), result ? "true" : "false");
   }
 
   void TaiXiaClimate::set_supported_preset_modes(const std::set<climate::ClimatePreset> &modes) {
@@ -354,129 +351,103 @@ using namespace esphome::climate;
         response[4], response[5], response[6], response[7], response[8]);
 
     for (i = 3; i < response[0] - 3; i+=3) {
+      if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
+        continue;
+      }
       switch (response[i]) {
         case SERVICE_ID_CLIMATE_STATUS:
-          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
-              if (get_u16(response, i + 1) != 1) {
-                  this->mode = CLIMATE_MODE_OFF;
-                  mode = this->mode;
-              }
+          if (get_u16(response, i + 1) != 1) {
+              this->mode = CLIMATE_MODE_OFF;
+              mode = this->mode;
           }
           break;
         case SERVICE_ID_CLIMATE_MODE:
-          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
-            switch (response[i + 2]) {
-              case 0:
-                this->mode = CLIMATE_MODE_COOL;
-                break;
-              case 4:
-                this->mode = CLIMATE_MODE_HEAT;
-                break;
-              case 1:
-                this->mode = CLIMATE_MODE_DRY;
-                break;
-              case 2:
-                this->mode = CLIMATE_MODE_FAN_ONLY;
-                break;
-              case 3:
-              default:
-                this->mode = CLIMATE_MODE_AUTO;
-                break;
-            }
-
-            if (mode == CLIMATE_MODE_OFF)
-              this->mode = CLIMATE_MODE_OFF;
+          switch (response[i + 2]) {
+            case 0:
+              this->mode = CLIMATE_MODE_COOL;
+              break;
+            case 4:
+              this->mode = CLIMATE_MODE_HEAT;
+              break;
+            case 1:
+              this->mode = CLIMATE_MODE_DRY;
+              break;
+            case 2:
+              this->mode = CLIMATE_MODE_FAN_ONLY;
+              break;
+            case 3:
+            default:
+              this->mode = CLIMATE_MODE_AUTO;
+              break;
           }
+
+          if (mode == CLIMATE_MODE_OFF)
+            this->mode = CLIMATE_MODE_OFF;
+
         break;
         case SERVICE_ID_CLIMATE_FAN_SPEED:
-          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
-            switch (response[i + 2]) {
-              case 0:
-                this->fan_mode = CLIMATE_FAN_AUTO;
-              break;
-              case 2:
-              case 3:
-                this->fan_mode = CLIMATE_FAN_LOW;
-              break;
-              case 4:
-              case 5:
-              case 6:
-                this->fan_mode = CLIMATE_FAN_MEDIUM;
-              break;
-              case 13:
-              case 14:
-              case 15:
-                this->fan_mode = CLIMATE_FAN_HIGH;
-              break;
-              case 11:
-              case 12:
-                this->fan_mode = CLIMATE_FAN_MIDDLE;
-              break;
-              case 7:
-              case 8:
-              case 9:
-                this->fan_mode = CLIMATE_FAN_FOCUS;
-              break;
-              case 10:
-                this->fan_mode = CLIMATE_FAN_DIFFUSE;
-              break;
-              case 1:
-                this->fan_mode = CLIMATE_FAN_QUIET;
-              break;
-            }
-          } else {
-            this->fan_mode = CLIMATE_FAN_AUTO;
+          this->fan_mode = CLIMATE_FAN_AUTO;
+          switch (response[i + 2]) {
+            case 0:
+              this->fan_mode = CLIMATE_FAN_AUTO;
+            break;
+            case 2:
+              this->fan_mode = CLIMATE_FAN_LOW;
+            break;
+            case 3:
+              this->fan_mode = CLIMATE_FAN_MEDIUM;
+            break;
+            case 4:
+              this->fan_mode = CLIMATE_FAN_HIGH;
+            break;
+            //case 3:
+            //  this->fan_mode = CLIMATE_FAN_MIDDLE;
+            //break;
+            case 5:
+              this->fan_mode = CLIMATE_FAN_FOCUS;
+            break;
+            case 6:
+              this->fan_mode = CLIMATE_FAN_DIFFUSE;
+            break;
+            case 1:
+              this->fan_mode = CLIMATE_FAN_QUIET;
+            break;
           }
-        break;
+          break;
         case SERVICE_ID_CLIMATE_TARGET_TEMPERATURE:
-          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
-              this->target_temperature = (float)get_u16(response, i + 1);
-          }
+          this->target_temperature = (float)get_u16(response, i + 1);
           break;
         case SERVICE_ID_CLIMATE_TEMPERATURE_INDOOR:
-          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
-              this->current_temperature = get_i16(response, i + 1);
-          }
+          this->current_temperature = get_i16(response, i + 1);
           break;
         case SERVICE_ID_CLIMATE_SWING_VERTICAL:
-          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
-              swing_vertical = get_u16(response, i + 1);
-          }
+          swing_vertical = get_u16(response, i + 1);
           break;
         case SERVICE_ID_CLIMATE_SWING_HORIZONTAL:
-          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
-              swing_horizontal = get_u16(response, i + 1);
-          }
+          swing_horizontal = get_u16(response, i + 1);
+          break;
         case SERVICE_ID_CLIMATE_SLEEP:
-          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
-              if (get_u16(response, i + 1) == 1)
-                this->preset = climate::CLIMATE_PRESET_SLEEP;
-          }
+          if (get_u16(response, i + 1) == 1)
+            this->preset = climate::CLIMATE_PRESET_SLEEP;
+          break;
         case SERVICE_ID_CLIMATE_ACTIVITY:
-          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
-              if (get_u16(response, i + 1) == 1)
-                this->preset = climate::CLIMATE_PRESET_ACTIVITY;
-          }
+          if (get_u16(response, i + 1) == 1)
+            this->preset = climate::CLIMATE_PRESET_ACTIVITY;
+          break;
         case SERVICE_ID_CLIMATE_BOOST:
-          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
-              if (get_u16(response, i + 1) == 1)
-                this->preset = climate::CLIMATE_PRESET_BOOST;
-          }
+          if (get_u16(response, i + 1) == 1)
+            this->preset = climate::CLIMATE_PRESET_BOOST;
+          break;
         case SERVICE_ID_CLIMATE_ECO:
-          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
-              if (get_u16(response, i + 1) == 1)
-                this->preset = climate::CLIMATE_PRESET_ECO;
-          }
+          if (get_u16(response, i + 1) == 1)
+            this->preset = climate::CLIMATE_PRESET_ECO;
+          break;
         case SERVICE_ID_CLIMATE_COMFORT:
-          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
-              if (get_u16(response, i + 1) == 1)
-                this->preset = climate::CLIMATE_PRESET_COMFORT;
-          }
+          if (get_u16(response, i + 1) == 1)
+            this->preset = climate::CLIMATE_PRESET_COMFORT;
           break;
         case SERVICE_ID_CLIMATE_HUMIDITY_INDOOR:
-          if ((response[i + 1] != 0xFF) && (response[i + 2] != 0xFF)) {
-            this->current_humidity = get_i16(response, i + 1);
-          }
+          this->current_humidity = get_i16(response, i + 1);
           break;
       }
     }
