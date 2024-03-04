@@ -74,8 +74,8 @@ binary_sensor:
     name: "Status"
   - platform: taixia
     type: dehumidifier
-    water_full:
-      name: "Water Full"
+    water_tank_full:
+      name: "Water Tank Full"
 #    filter_notify:
 #      name: "Filter Notify"
     side_air_flow:
@@ -101,7 +101,7 @@ fan:
     name: ${upper_devicename}
     type: dehumidifier
     speed: true
-    speed_count: 5
+    speed_count: 4
     preset_modes:
 #      - auto
       - config

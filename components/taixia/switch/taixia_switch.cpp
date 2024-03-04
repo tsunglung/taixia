@@ -42,6 +42,7 @@ static const char *const TAG = "taixia.switch";
           goto done;
       }
     }
+    return;
 done:
     if (this->state != new_state)
       this->publish_state(new_state);

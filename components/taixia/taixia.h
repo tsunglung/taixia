@@ -83,7 +83,7 @@ namespace taixia {
 #define SERVICE_ID_DEHUMIDTFIER_MODE 0x01
 #define SERVICE_ID_DEHUMIDTFIER_TEMPERATURE_INDOOR 0x06
 #define SERVICE_ID_DEHUMIDTFIER_HUMIDITY_INDOOR 0x07
-#define SERVICE_ID_DEHUMIDTFIER_WATER_FULL 0x0A
+#define SERVICE_ID_DEHUMIDTFIER_WATER_TANK_FULL 0x0A
 #define SERVICE_ID_DEHUMIDTFIER_FILTER_CLEAN 0x0B
 #define SERVICE_ID_DEHUMIDTFIER_AIR_PURFIFIER 0x0D
 #define SERVICE_ID_DEHUMIDTFIER_FAN_LEVEL 0x0E
@@ -209,7 +209,7 @@ class TaiXia : public uart::UARTDevice, public Component {
   TAIXIA_NUMBER(horizontal_fan_speed_number)
 
   // Dehumiditier 0x04
-  TAIXIA_BINARY_SENSOR(water_full_binary_sensor)
+  TAIXIA_BINARY_SENSOR(water_tank_full_binary_sensor)
   TAIXIA_BINARY_SENSOR(filter_notify_binary_sensor)
   TAIXIA_BINARY_SENSOR(side_air_flow_binary_sensor)
   TAIXIA_BINARY_SENSOR(defrost_binary_sensor)

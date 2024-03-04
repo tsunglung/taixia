@@ -26,8 +26,8 @@ static const char *const TAG = "taixia.binary_sensor";
       }
       if (this->sa_id_ == SA_ID_DEHUMIDIFIER) {
         switch (response[i]) {
-          case SERVICE_ID_DEHUMIDTFIER_WATER_FULL:
-            if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_WATER_FULL) {
+          case SERVICE_ID_DEHUMIDTFIER_WATER_TANK_FULL:
+            if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_WATER_TANK_FULL) {
               this->state = bool(response[i + 2]);
               goto done;
             }

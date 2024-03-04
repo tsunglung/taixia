@@ -5,6 +5,8 @@ from esphome.const import (
     CONF_POWER,
     CONF_TYPE,
     DEVICE_CLASS_POWER,
+    DEVICE_CLASS_RUNNING,
+    DEVICE_CLASS_MOISTURE,
     ENTITY_CATEGORY_DIAGNOSTIC,
     ICON_CHIP
 )
@@ -18,20 +20,29 @@ from .. import (
 
 DEPENDENCIES = ["taixia"]
 
-CONF_WATER_FULL = "water_full"
+CONF_WATER_TANK_FULL = "water_tank_full"
 CONF_FILTER_NOTIFY = "filter_notify"
 CONF_SIDE_AIR_FLOW = "side_air_flow"
 CONF_DEFROST = "defrost"
 
 ICONS = {
-    CONF_WATER_FULL: "mdi:cup-water",
+    CONF_POWER: "mdi:chip",
+    CONF_WATER_TANK_FULL: "mdi:cup-water",
     CONF_FILTER_NOTIFY: "mdi:air-filter",
     CONF_SIDE_AIR_FLOW: "mdi:waves",
     CONF_DEFROST: "mdi:snowflake-melt"
 }
 
+DEVICE_CLASS = {
+    CONF_POWER: DEVICE_CLASS_POWER,
+    CONF_WATER_TANK_FULL: DEVICE_CLASS_MOISTURE,
+    CONF_FILTER_NOTIFY: DEVICE_CLASS_RUNNING,
+    CONF_SIDE_AIR_FLOW: DEVICE_CLASS_RUNNING,
+    CONF_DEFROST: DEVICE_CLASS_RUNNING
+}
+
 DEHUMIDIFIER_TYPES = {
-    CONF_WATER_FULL: 0x0A,
+    CONF_WATER_TANK_FULL: 0x0A,
     CONF_FILTER_NOTIFY: 0x0B,
     CONF_SIDE_AIR_FLOW: 0x0F,
     CONF_DEFROST: 0x11
@@ -70,6 +81,8 @@ async def add_binay_sensor(config, sa_type, service_id, sa_id):
     if sa_type in config:
         conf = config[sa_type]
         conf['icon'] = ICONS.get(sa_type, ICON_CHIP)
+        conf['device_class'] = DEVICE_CLASS.get(
+            sa_type, DEVICE_CLASS_RUNNING)
         var = await binary_sensor.new_binary_sensor(conf)
         await cg.register_component(var, conf)
         cg.add(getattr(taixia, f"set_{sa_type}_binary_sensor")(var))
