@@ -3,6 +3,7 @@ import esphome.config_validation as cv
 from esphome.components import select
 from esphome.const import (
     CONF_ID,
+    CONF_OPTIONS,
     CONF_TYPE,
     ENTITY_CATEGORY_CONFIG,
 )
@@ -116,15 +117,15 @@ OPTIONS_WARM_WATER_PROGRAM = {
 
 OPTIONS_OPERATING_PROGRAM = {
     "auto": 0,
-    "config": 1,
-    "continuous": 2,
-    "dry": 3,
-    "air purifier": 4,
+    "normal": 1,
+    "away": 2,
+    "boost": 3,
+    "baby": 4,
     "defrost": 5,
     "fan": 6,
     "comfort": 7,
-    "low humidity": 8,
-    "power saving": 9
+    "home": 8,
+    "eco": 9
 }
 
 OPTIONS_AIR_PURFIFIER = {
@@ -179,17 +180,35 @@ CONFIG_SCHEMA = cv.typed_schema(
                     AirConditionerSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_FUZZY_MODE, DEFAULT_ICON)
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
                 ),
                 cv.Optional(CONF_DISPLAY_MODE): select.select_schema(
                     AirConditionerSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_DISPLAY_MODE, DEFAULT_ICON)
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
                 ),
                 cv.Optional(CONF_MOTION_DETECT): select.select_schema(
                     AirConditionerSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_MOTION_DETECT, DEFAULT_ICON)
-                ),
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
+                )
             }
         ),
         CONF_AIRPURIFIER: cv.COMPONENT_SCHEMA.extend(
@@ -200,7 +219,13 @@ CONFIG_SCHEMA = cv.typed_schema(
                     AirPurifierSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
-                ),
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
+                )
             }
         ),
         CONF_DEHUMIDIFIER: cv.COMPONENT_SCHEMA.extend(
@@ -211,16 +236,34 @@ CONFIG_SCHEMA = cv.typed_schema(
                     DehumidifierSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
                 ),
                 cv.Optional(CONF_AIR_PURIFIER): select.select_schema(
                     DehumidifierSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
                 ),
                 cv.Optional(CONF_SOUND): select.select_schema(
                     DehumidifierSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
                 )
             }
         ),
@@ -232,22 +275,46 @@ CONFIG_SCHEMA = cv.typed_schema(
                     WashingMachineSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_WASH_PROGRAM, DEFAULT_ICON)
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
                 ),
                 cv.Optional(CONF_WASH_OTHER_FUNCTION): select.select_schema(
                     WashingMachineSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_WASH_OTHER_FUNCTION, DEFAULT_ICON)
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
                 ),
                 cv.Optional(CONF_WASH_MODE): select.select_schema(
                     WashingMachineSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_WASH_MODE, DEFAULT_ICON)
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
                 ),
                 cv.Optional(CONF_WARM_WATER_PROGRAM): select.select_schema(
                     WashingMachineSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_WARM_WATER_PROGRAM, DEFAULT_ICON)
-                ),
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
+                )
             }
         ),
         CONF_ELECTRIC_FAN: cv.COMPONENT_SCHEMA.extend(
@@ -258,7 +325,13 @@ CONFIG_SCHEMA = cv.typed_schema(
                     ElectricFanSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
-                ),
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
+                )
             }
         ),
     },
@@ -267,6 +340,15 @@ CONFIG_SCHEMA = cv.typed_schema(
     space="_",
 )
 
+
+def get_options(options, all_options):
+    new_options = {}
+    for option in options:
+        if option in list(all_options.keys()):
+            new_options[option] = all_options[option]
+    if len(new_options) < 1:
+        return all_options
+    return new_options
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
@@ -280,7 +362,8 @@ async def to_code(config):
     if config[CONF_TYPE] == CONF_AIR_CONDITIONER:
         cg.add(var.set_sa_id(0x01))
         if CONF_FUZZY_MODE in config:
-            options_map = OPTIONS_FUZZY_MODE
+            options_map = get_options(config[CONF_FUZZY_MODE].get(
+                CONF_OPTIONS, {}), OPTIONS_FUZZY_MODE)
             sel = await select.new_select(config[CONF_FUZZY_MODE],
                     options=list(options_map.keys()))
             cg.add(var.set_fuzzy_mode_select(sel))
@@ -290,7 +373,8 @@ async def to_code(config):
             cg.add(sel.set_taixia_parent(taixia))
 
         if CONF_DISPLAY_MODE in config:
-            options_map = OPTIONS_DISPLAY_MODE
+            options_map = get_options(config[CONF_DISPLAY_MODE].get(
+                CONF_OPTIONS, {}), OPTIONS_DISPLAY_MODE)
             sel = await select.new_select(config[CONF_DISPLAY_MODE],
                     options=list(options_map.keys()))
             cg.add(var.set_display_mode_select(sel))
@@ -300,7 +384,8 @@ async def to_code(config):
             cg.add(sel.set_taixia_parent(taixia))
 
         if CONF_MOTION_DETECT in config:
-            options_map = OPTIONS_MOTION_DETECT
+            options_map = get_options(config[CONF_MOTION_DETECT].get(
+                CONF_OPTIONS, {}), OPTIONS_MOTION_DETECT)
             sel = await select.new_select(config[CONF_MOTION_DETECT],
                     options=list(options_map.keys()))
             cg.add(var.set_motion_detect_select(sel))
@@ -312,9 +397,11 @@ async def to_code(config):
     elif config[CONF_TYPE] == CONF_WASHING_MACHINE:
         cg.add(var.set_sa_id(0x03))
         if CONF_WASH_PROGRAM in config:
-            options_map = OPTIONS_WASH_PROGRAM
+            options_map = get_options(config[CONF_WASH_PROGRAM].get(
+                CONF_OPTIONS, {}), OPTIONS_WASH_PROGRAM)
             sel = await select.new_select(config[CONF_WASH_PROGRAM],
-                    options=list(options_map.keys()))
+                    options=config.get(
+                        CONF_OPTIONS, list(options_map.keys())))
             cg.add(var.set_wash_program_select(sel))
             cg.add(sel.set_service_id(0x02))
             cg.add(sel.set_select_mappings(list(options_map.values())))
@@ -322,9 +409,11 @@ async def to_code(config):
             cg.add(sel.set_taixia_parent(taixia))
 
         if CONF_WASH_OTHER_FUNCTION in config:
-            options_map = OPTIONS_WASH_OTHER_FUNCTION
+            options_map = get_options(config[CONF_WASH_OTHER_FUNCTION].get(
+                CONF_OPTIONS, {}), OPTIONS_WASH_OTHER_FUNCTION)
             sel = await select.new_select(config[CONF_WASH_OTHER_FUNCTION],
-                    options=list(options_map.keys()))
+                    options=config.get(
+                        CONF_OPTIONS, list(options_map.keys())))
             cg.add(var.set_wash_other_function_select(sel))
             cg.add(sel.set_service_id(0x16))
             cg.add(sel.set_select_mappings(list(options_map.values())))
@@ -332,18 +421,22 @@ async def to_code(config):
             cg.add(sel.set_taixia_parent(taixia))
 
         if CONF_WASH_MODE in config:
-            options_map = OPTIONS_WASH_MODE
+            options_map = get_options(config[OPTIONS_WASH_MODE].get(
+                CONF_OPTIONS, {}), CONF_WASH_MODE)
             sel = await select.new_select(config[CONF_WASH_MODE],
-                    options=list(options_map.keys()))
+                    options=config.get(
+                        CONF_OPTIONS, list(options_map.keys())))
             cg.add(sel.set_service_id(0x17))
             cg.add(sel.set_wash_mode_select(sel))
             cg.add(taixia.register_listener(sel))
             cg.add(sel.set_taixia_parent(taixia))
 
         if CONF_WARM_WATER_PROGRAM in config:
-            options_map = OPTIONS_WARM_WATER_PROGRAM
+            options_map = get_options(config[OPTIONS_WARM_WATER_PROGRAM].get(
+                CONF_OPTIONS, {}), CONF_WARM_WATER_PROGRAM)
             sel = await select.new_select(config[CONF_WARM_WATER_PROGRAM],
-                    options=list(options_map.keys()))
+                    options=config.get(
+                        CONF_OPTIONS, list(options_map.keys())))
             cg.add(var.set_warm_water_program_select(sel))
             cg.add(sel.set_service_id(0x18))
             cg.add(sel.set_select_mappings(list(options_map.values())))
@@ -353,7 +446,8 @@ async def to_code(config):
     elif config[CONF_TYPE] == CONF_DEHUMIDIFIER:
         cg.add(var.set_sa_id(0x04))
         if CONF_OPERATING_PROGRAM in config:
-            options_map = OPTIONS_OPERATING_PROGRAM
+            options_map = get_options(config[CONF_OPERATING_PROGRAM].get(
+                CONF_OPTIONS, {}), OPTIONS_OPERATING_PROGRAM)
             sel = await select.new_select(config[CONF_OPERATING_PROGRAM],
                     options=list(options_map.keys()))
             cg.add(var.set_operating_program_select(sel))
@@ -363,9 +457,11 @@ async def to_code(config):
             cg.add(sel.set_taixia_parent(taixia))
 
         if CONF_AIR_PURIFIER in config:
-            options_map = OPTIONS_AIR_PURFIFIER
+            options_map = get_options(config[CONF_AIR_PURIFIER].get(
+                CONF_OPTIONS, {}), OPTIONS_AIR_PURFIFIER)
             sel = await select.new_select(config[CONF_AIR_PURIFIER],
-                    options=list(options_map.keys()))
+                    options=config.get(
+                        CONF_OPTIONS, list(options_map.keys())))
             cg.add(var.set_air_purfifier_select(sel))
             cg.add(sel.set_service_id(0x0D))
             cg.add(sel.set_select_mappings(list(options_map.values())))
@@ -375,9 +471,11 @@ async def to_code(config):
     elif config[CONF_TYPE] == CONF_AIRPURIFIER:
         cg.add(var.set_sa_id(0x08))
         if CONF_OPERATING_PROGRAM in config:
-            options_map = OPTIONS_PURIFIER_OPERATING_PROGRAM
+            options_map = get_options(config[CONF_OPERATING_PROGRAM].get(
+                CONF_OPTIONS, {}), OPTIONS_PURIFIER_OPERATING_PROGRAM)
             sel = await select.new_select(config[CONF_OPERATING_PROGRAM],
-                    options=list(options_map.keys()))
+                    options=config.get(
+                        CONF_OPTIONS, list(options_map.keys())))
             cg.add(var.set_operating_program_select(sel))
             cg.add(sel.set_service_id(0x01))
             cg.add(sel.set_select_mappings(list(options_map.values())))
@@ -387,9 +485,11 @@ async def to_code(config):
     if config[CONF_TYPE] == CONF_ELECTRIC_FAN:
         cg.add(var.set_sa_id(0x0F))
         if CONF_OPERATING_PROGRAM in config:
-            options_map = OPTIONS_FAN_OPERATING_PROGRAM
+            options_map = get_options(config[CONF_OPERATING_PROGRAM].get(
+                CONF_OPTIONS, {}), OPTIONS_FAN_OPERATING_PROGRAM)
             sel = await select.new_select(config[CONF_OPERATING_PROGRAM],
-                    options=list(options_map.keys()))
+                    options=config.get(
+                        CONF_OPTIONS, list(options_map.keys())))
             cg.add(var.set_operating_program_select(sel))
             cg.add(sel.set_service_id(0x01))
             cg.add(sel.set_select_mappings(list(options_map.values())))

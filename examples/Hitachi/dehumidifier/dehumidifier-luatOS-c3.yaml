@@ -104,15 +104,15 @@ fan:
     speed_count: 4
     preset_modes:
 #      - auto
-      - config
-#      - continuous
-      - dry
-#      - air purifier
+      - normal 
+      - home
+      - boost
+#      - home
 #      - defrost
 #      - fan
-      - comfort
-      - low humidity
-      - power saving
+#      - comfort
+#      - away
+      - eco
 
 light:
   - platform: binary
@@ -166,6 +166,11 @@ select:
     type: dehumidifier
     operating_program:
       name: "Operation Mode"
+      options:
+        - normal 
+        - boost
+        - home 
+        - eco
 
 sensor:
   - platform: wifi_signal

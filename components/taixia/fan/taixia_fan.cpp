@@ -19,16 +19,16 @@ static const char *const TAG = "taixia.fan";
         return "auto";
       break;
       case 1:
-        return "config";
+        return "normal";
       break;
       case 2:
-        return "continuous";
+        return "away";
       break;
       case 3:
-        return "dry";
+        return "boost";
       break;
       case 4:
-        return "air purifier";
+        return "baby";
       break;
       case 5:
         return "defrost";
@@ -40,10 +40,10 @@ static const char *const TAG = "taixia.fan";
         return "comfort";
       break;
       case 8:
-        return "low humidity";
+        return "home";
       break;
       case 9:
-        return "power saving";
+        return "eco";
       break;
     }
     return "unknown";
@@ -52,13 +52,13 @@ static const char *const TAG = "taixia.fan";
   static inline uint16_t get_preset_mode_value(std::string mode) {
       if (!mode.compare("auto"))
         return 0;
-      if (!mode.compare("config"))
+      if (!mode.compare("normal"))
         return 1;
-      if (!mode.compare("continuous"))
+      if (!mode.compare("away"))
         return 2;
-      if (!mode.compare("dry"))
+      if (!mode.compare("boost"))
         return 3;
-      if (!mode.compare("air purifier"))
+      if (!mode.compare("baby"))
         return 4;
       if (!mode.compare("defrost"))
         return 5;
@@ -66,9 +66,9 @@ static const char *const TAG = "taixia.fan";
         return 6;
       if (!mode.compare("comfort"))
         return 7;
-      if (!mode.compare("low humidity"))
+      if (!mode.compare("home"))
         return 8;
-      if (!mode.compare("power saving"))
+      if (!mode.compare("eco"))
         return 9;
       ESP_LOGE(TAG, "unknow mode", mode.c_str());
       return 0;

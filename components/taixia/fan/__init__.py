@@ -35,14 +35,15 @@ SUPPORTED_FAN_MODES_OPTIONS = {
 }
 SUPPORTED_DEHUMIDIFIER_MODES_OPTIONS = {
     "auto": 0,
-    "config": 1,
-    "continuous": 2,
-    "dry": 3,
-    "air purifier": 4,
+    "normal": 1,
+    "away": 2,
+    "boost": 3,
+    "baby": 4,
     "defrost": 5,
     "fan": 6,
     "comfort": 7,
-    "low humidity": 8
+    "home": 8,
+    "eco": 9
 }
 
 TaiXiaFan = taixia_ns.class_("TaiXiaFan", cg.PollingComponent, fan.Fan)
