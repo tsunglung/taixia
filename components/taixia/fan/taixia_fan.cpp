@@ -280,6 +280,7 @@ static const char *const TAG = "taixia.fan";
     }
 
     this->publish_state();
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
   }
 
 
