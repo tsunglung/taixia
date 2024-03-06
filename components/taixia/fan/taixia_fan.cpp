@@ -31,7 +31,7 @@ static const char *const TAG = "taixia.fan";
         return "baby";
       break;
       case 5:
-        return "defrost";
+        return "sleep";  // anti-mildew, anti-mite
       break;
       case 6:
         return "fan";
@@ -60,7 +60,7 @@ static const char *const TAG = "taixia.fan";
         return 3;
       if (!mode.compare("baby"))
         return 4;
-      if (!mode.compare("defrost"))
+      if (!mode.compare("sleep"))  // anti-mildew, anti-mite
         return 5;
       if (!mode.compare("fan"))
         return 6;

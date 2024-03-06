@@ -108,7 +108,7 @@ fan:
       - home
       - boost
 #      - home
-#      - defrost
+      - sleep
 #      - fan
 #      - comfort
 #      - away
@@ -169,6 +169,7 @@ select:
       options:
         - normal 
         - boost
+        - sleep
         - home 
         - eco
 

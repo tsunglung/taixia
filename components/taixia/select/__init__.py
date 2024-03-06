@@ -121,7 +121,7 @@ OPTIONS_OPERATING_PROGRAM = {
     "away": 2,
     "boost": 3,
     "baby": 4,
-    "defrost": 5,
+    "sleep": 5,
     "fan": 6,
     "comfort": 7,
     "home": 8,
