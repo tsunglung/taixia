@@ -1,34 +1,22 @@
 substitutions:
-  devicename: climate-taiseia-s3
+  devicename: climate-taiseia
   upper_devicename: "Climate"
 
 esphome:
   name: $devicename
   friendly_name: ${upper_devicename}
-  comment: $upper_devicename faikin for RAS-36NJP
-#  name_add_mac_suffix: true
+  comment: $upper_devicename Ultron for RAS-28NK1
+  name_add_mac_suffix: true
   project:
     name: TaiSEIA.climate
-    version: "faikin-s3-1.0"
-  platformio_options:
-    board_build.flash_mode: dio
-    board_build.mcu: esp32s3
-  on_boot:
-    priority: 600
-    then:
-      - lambda: |-
-          gpio_set_pull_mode(GPIO_NUM_34, GPIO_PULLUP_ONLY);
+    version: "faikin-s1-1.0"
 
 external_components:
   - source: github://tsunglung/taixia@master
     components: [ taixia ]
 
 esp32:
-  board: esp32-s3-devkitc-1
-  variant: esp32s3
-  framework:
-    type: arduino
-    version: 2.0.6
+  board: esp32dev
 
 wifi:
   ssid: !secret wifi_ssid
@@ -55,12 +43,8 @@ ota:
 
 uart:
   id: uart_taixia
-  tx_pin: 
-    number: GPIO48
-    inverted: true
-  rx_pin: 
-    number: GPIO34
-    inverted: true
+  tx_pin: GPIO1
+  rx_pin: GPIO3
   baud_rate: 9600
   debug:
     direction: BOTH
@@ -107,36 +91,42 @@ climate:
       - ECO
     supported_humidity: True
 
-interval:
-  - interval: 60s
-    then:
-      if:
-        condition:
-          wifi.connected:
-        then:
-          - light.turn_on:
-              id: s3_wled
-        else:
-          - light.turn_on:
-              id: s3_wled
-              flash_length : 1s
-
 light:
-  - platform: esp32_rmt_led_strip
-    chipset: WS2812
-    pin: GPIO47
-    num_leds: 3
-    rgb_order: GRB
-    rmt_channel: 0
-    id: s3_wled
-    name: "RGB LED"
+  - platform: monochromatic
+    name: "Green LED"
+    output: greenLED
+    id: green_led
+    effects:
+        - lambda:
+            name: Breathing
+            update_interval: 6s
+            lambda: |-
+              static int state = 0;
+              static int color = 1;
+              auto call = id(green_led).turn_on(); //the id of your light
+              call.set_transition_length(5000);
+              if (state == 0) {
+                call.set_brightness(1.0);
+              } else if (state == 1) {
+                call.set_brightness(0.01);
+              }
+              call.perform();
+              state ++;
+              if (state == 2) {
+                state = 0;
+              }
+
+  - platform: monochromatic
+    name: "Red LED"
+    output: redLED
+    id: red_led
 
 number:
   - platform: taixia
     type: airconditioner
-#    vertical_fan_speed:
-#      name: "Vertical Fan Speed"
-#      max_value: 4
+    vertical_fan_speed:
+      name: "Vertical Fan Speed"
+      max_value: 4
     horizontal_fan_speed:
       name: "Horizontal Fan Speed"
       max_value: 4
@@ -144,6 +134,17 @@ number:
       name: "Off Timer"
     on_timer:
       name: "On Timer"
+
+output:
+  - platform: ledc
+    id: greenLED
+    pin: GPIO18
+  - platform: ledc
+    id: redLED
+    pin: GPIO19
+
+#status_led:
+#  pin: GPIO18
 
 select:
   - platform: taixia

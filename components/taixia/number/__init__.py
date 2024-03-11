@@ -87,7 +87,12 @@ TaiXiaNumber = taixia_ns.class_("TaiXiaNumber", number.Number, cg.Component)
 
 TAIXIA_NUMBER_SCHEMA = number.number_schema(
     TaiXiaNumber, icon=ICON_NUMERIC
-).extend(cv.COMPONENT_SCHEMA)
+).extend(cv.COMPONENT_SCHEMA).extend(
+    {
+        cv.Optional(CONF_MIN_VALUE): cv.int_range(min=0, max=1440),
+        cv.Optional(CONF_MAX_VALUE): cv.int_range(min=1, max=1440),
+    }
+)
 
 TAIXIA_COMPONENT_SCHEMA = cv.Schema(
     {
@@ -112,8 +117,8 @@ async def add_number(config, config_type, service_id, sa_id, max, min, step):
         conf['icon'] = ICONS.get(config_type, ICON_NUMERIC)
         var = await number.new_number(
             conf,
-            max_value=max,
-            min_value=min,
+            max_value=max if CONF_MAX_VALUE not in conf else conf[CONF_MAX_VALUE],
+            min_value=min if CONF_MIN_VALUE not in conf else conf[CONF_MIN_VALUE],
             step=step,
         )
         await cg.register_component(var, config)
