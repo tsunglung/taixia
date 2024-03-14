@@ -48,17 +48,17 @@ ota:
 #web_server:
 
 uart:
-  id: s21_uart
-  tx_pin: 
-    number: GPIO48
-    inverted: true
-  rx_pin: 
-    number: GPIO34
-    inverted: true
-  baud_rate: 2400
-  data_bits: 8
-  parity: EVEN
-  stop_bits: 2
+  - id: s21_uart
+    tx_pin:
+      number: GPIO48
+      inverted: true
+    rx_pin:
+      number: GPIO34
+      inverted: true
+    baud_rate: 2400
+    data_bits: 8
+    parity: EVEN
+    stop_bits: 2
 #    debug:
 #      direction: BOTH
 
@@ -75,7 +75,6 @@ climate:
       temperature_step: 1.0
     # Optional HA sensor used to alter setpoint.
     room_temperature_sensor: room_temp  # See homeassistant sensor below
-
 
 # optional binary sensor to monitor serial connection:
 binary_sensor:
@@ -107,10 +106,18 @@ interval:
         then:
           - light.turn_on:
               id: s3_wled
+              brightness: 10%
+              color_brightness: 50%
+              red: 100%
+              blue: 100%
+              green: 98%
         else:
           - light.turn_on:
               id: s3_wled
               flash_length : 1s
+              brightness: 50%
+              color_brightness: 50%
+              red: 100%
 
 light:
   - platform: esp32_rmt_led_strip
@@ -146,7 +153,7 @@ sensor:
       name: Daikin Fan Speed
   - platform: homeassistant
     id: room_temp
-    entity_id: sensor.temperature_158d000227fe65
+    entity_id: sensor.temperature_158d000111fe66
     unit_of_measurement: °C
 
   - platform: internal_temperature

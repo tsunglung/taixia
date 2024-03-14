@@ -21,6 +21,7 @@ DEPENDENCIES = ["taixia"]
 
 ICON_NUMERIC = "mdi:numeric"
 
+CONF_SLEEP_TIMER = "sleep_timer"
 CONF_OFF_TIMER = "off_timer"
 CONF_ON_TIMER = "on_timer"
 CONF_VERTICAL_FAN_SPEED = "vertical_fan_speed"
@@ -58,6 +59,7 @@ AIRPURIFIER_TYPES = {
 }
 
 CLIMATE_TYPES = {
+    CONF_SLEEP_TIMER: (0x06, 0, 1440, 1),
     CONF_ON_TIMER: (0x0B, 0, 1440, 1),
     CONF_OFF_TIMER: (0x0C, 0, 1440, 1),
     CONF_VERTICAL_FAN_SPEED: (0x0F, 0, 15, 1),
