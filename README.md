@@ -10,12 +10,22 @@ ESPHome TaiXia Custom Component
 
 ### UART Port
 
+Hitachi JST PAP-04-V
 |Pin|Meaning|
 |---|-------|
 |1|5V|
-|2|Tx from aircon or Fan- 5V logic|
+|2|GND|
 |3|Rx to aircon or Fan - 5V logic|
-|4|GND|
+|4|Tx from aircon or Fan- 5V logic|
+
+Panasonic 
+|Pin|Meaning|
+|---|-------|
+|1||
+|2||
+|3||
+|4||
+
 
 ## Installation
 Set wifi_ssid and wifi_password in your esphome's secrets.yaml first
