@@ -1,6 +1,6 @@
 substitutions:
   devicename: fan-taiseia
-  upper_devicename: "Fan TaiSeia"
+  upper_devicename: "Fan TaiSEIA"
 
 esphome:
   name: $devicename
@@ -43,15 +43,18 @@ uart:
 
 binary_sensor:
   - platform: status
-    name: "${upper_devicename} Status"
+    name: "Status"
 
 button:
+  - platform: safe_mode
+    name: Safe Mode Boot
+    entity_category: diagnostic
   - platform: restart
-    name: "${upper_devicename} Restart"
+    name: "Restart"
 
 fan:
   - platform: taixia
-    name: ${upper_devicename}
+    name: Fan
     speed: true
     speed_count: 2
 
@@ -59,41 +62,47 @@ number:
   - platform: taixia
     type: electricfan
     off_timer:
-      name: "${upper_devicename} Off Timer"
+      name: "Off Timer"
 
 sensor:
   - platform: wifi_signal
-    name: "${upper_devicename} WiFi Signal"
+    name: "WiFi Signal"
     update_interval: 60s
 
   - platform: uptime
-    name: "${upper_devicename} Uptime"
+    name: "Uptime"
     filters:
       - lambda: return x / 3600;
     unit_of_measurement: "h"
     accuracy_decimals: 1
 
+  - platform: internal_temperature
+    name: "Internal Temperature"
+
 switch:
   - platform: taixia
     type: electricfan
     power:
-      name: "${upper_devicename} Power Switch"
+      name: "Power Switch"
 
 text_sensor:
+  - platform: version
+    name: "ESPHome Version"
   - platform: wifi_info
     ip_address:
-      name: "${upper_devicename} IP Address"
+      name: "IP Address"
   - platform: taixia
     sa_id:
-      name: "${upper_devicename} SA ID"
+      name: "SA ID"
+      id: sa_id
     brand:
-      name: "${upper_devicename} SA Brand"
+      name: "SA Brand"
     model:
-      name: "${upper_devicename} SA Model"
+      name: "SA Model"
     version:
-      name: "${upper_devicename} SA Version"
+      name: "SA Version"
     services:
-      name: "${upper_devicename} SA Services"
+      name: "SA Services"
 
 taixia:
   sa_id: 15

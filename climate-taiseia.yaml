@@ -1,6 +1,6 @@
 substitutions:
   devicename: climate-taiseia
-  upper_devicename: "Climate TaiSeia"
+  upper_devicename: "Climate TaiSEIA"
 
 esphome:
   name: $devicename
@@ -43,67 +43,108 @@ uart:
 
 binary_sensor:
   - platform: status
-    name: "${upper_devicename} Status"
+    name: "Status"
 
 button:
+  - platform: safe_mode
+    name: Safe Mode Boot
+    entity_category: diagnostic
   - platform: restart
-    name: "${upper_devicename} Restart"
+    name: "Restart"
 
+climate:
+  - platform: taixia
+    name: Climate
+    supported_modes:
+      - COOL
+      - HEAT
+      - DRY
+      - FAN_ONLY
+    supported_fan_modes:
+      - LOW
+      - MEDIUM
+      - HIGH
+      - AUTO
+    supported_presets:
+      - ECO
+      - BOOST
+      - AWAY
+      - SLEEP
 
 number:
   - platform: taixia
     type: airconditioner
+    vertical_fan_speed:
+      name: "Vertical Fan Speed"
+    horizontal_fan_speed:
+      name: "Horizontal Fan Speed"
     off_timer:
-      name: "${upper_devicename} Off Timer"
+      name: "Off Timer"
+    on_timer:
+      name: "On Timer"
+    sleep_timer:
+      name: "Sleep Timer"
+
+select:
+  - platform: taixia
+    type: airconditioner
+    fuzzy_mode:
+      name: "Fuzzy Mode"
+    display_mode:
+      name: "Display Mode"
 
 sensor:
   - platform: wifi_signal
-    name: "${upper_devicename} WiFi Signal"
+    name: "WiFi Signal"
     update_interval: 60s
 
   - platform: uptime
-    name: "${upper_devicename} Uptime"
+    name: "Uptime"
     filters:
       - lambda: return x / 3600;
     unit_of_measurement: "h"
     accuracy_decimals: 1
 
+  - platform: internal_temperature
+    name: "Internal Temperature"
+
   - platform: taixia
     type: airconditioner
     temperature_indoor:
-      name: "${upper_devicename} Temperature Indoor"
+      name: "Temperature Indoor"
     humidity_indoor:
-      name: "${upper_devicename} Humidity Indoor"
+      name: "Humidity Indoor"
     temperature_outdoor:
-      name: "${upper_devicename} Temperature Outdoor"
+      name: "Temperature Outdoor"
     energy_consumption:
-      name: "${upper_devicename} Energy"
+      name: "Energy"
     operating_hours:
-      name: "${upper_devicename} Operating Hours"
+      name: "Operating Hours"
 
 switch:
   - platform: taixia
     type: airconditioner
     power:
-      name: "${upper_devicename} Power Switch"
-    beeper:
-      name: "${upper_devicename} Buzzer"
+      name: "Power Switch"
 
 text_sensor:
+  - platform: version
+    name: "ESPHome Version"
   - platform: wifi_info
     ip_address:
-      name: "${upper_devicename} IP Address"
+      name: "IP Address"
   - platform: taixia
     sa_id:
-      name: "${upper_devicename} SA ID"
+      name: "SA ID"
+      id: sa_id
     brand:
-      name: "${upper_devicename} SA Brand"
+      name: "SA Brand"
     model:
-      name: "${upper_devicename} SA Model"
+      name: "SA Model"
     version:
-      name: "${upper_devicename} SA Version"
+      name: "SA Version"
     services:
-      name: "${upper_devicename} SA Services"
+      name: "SA Services"
 
 taixia:
   sa_id: 1
