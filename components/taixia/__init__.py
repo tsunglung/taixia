@@ -15,6 +15,7 @@ TaiXia = taixia_ns.class_("TaiXia", uart.UARTDevice, cg.Component)
 CONF_TAIXIA_ID = "taixia_id"
 CONF_SA_ID = "sa_id"
 CONF_MAX_LENGTH = "max_length"
+CONF_RESPONSE_TIME = "response_time"
 CONF_AIR_CONDITIONER = "airconditioner"
 CONF_AIRPURIFIER = "airpurifier"
 CONF_DEHUMIDIFIER = "dehumidifier"
@@ -34,7 +35,8 @@ CONFIG_SCHEMA = uart.UART_DEVICE_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(TaiXia),
         cv.Optional(CONF_SA_ID): cv.int_range(min=1, max=255),
-        cv.Optional(CONF_MAX_LENGTH, default=6): cv.int_range(min=6, max=100)
+        cv.Optional(CONF_MAX_LENGTH, default=6): cv.int_range(min=6, max=100),
+        cv.Optional(CONF_RESPONSE_TIME): cv.int_range(min=0, max=90000)
     }
 )
 
@@ -52,3 +54,5 @@ async def to_code(config):
 
     if CONF_MAX_LENGTH in config:
         cg.add(var.set_max_length(config[CONF_MAX_LENGTH]))
+    if CONF_RESPONSE_TIME in config:
+        cg.add(var.set_response_time(config[CONF_RESPONSE_TIME]))

@@ -166,7 +166,8 @@ class TaiXia : public uart::UARTDevice, public Component {
   float get_setup_priority() const override { return setup_priority::DATA; }
 
   void set_sa_id(uint8_t id) { this->sa_id_ = id; }
-  void set_max_length(uint8_t len) { this->max_length_ = len; }
+  void set_max_length(uint16_t len) { this->max_length_ = len; }
+  void set_response_time(uint16_t time) { this->response_time_ = time; }
   void register_listener(TaiXiaListener *listener) { this->listeners_.push_back(listener); }
 
   uint8_t checksum(const uint8_t *data, uint8_t len);
@@ -248,7 +249,8 @@ class TaiXia : public uart::UARTDevice, public Component {
   uint8_t protocol_;
   uint8_t sa_id_;
   uint8_t len_;
-  uint8_t max_length_{0};
+  uint16_t max_length_{0};
+  uint16_t response_time_{1};
   bool have_sensors_{false};
 
   std::vector<TaiXiaListener *> listeners_{};

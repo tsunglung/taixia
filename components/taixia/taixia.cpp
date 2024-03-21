@@ -24,7 +24,7 @@ static const uint8_t RESPONSE_LENGTH = 255;
   }
 
   bool TaiXia::write_command_(const uint8_t *command, uint8_t *response, uint8_t len, uint8_t rlen) {
-    ESP_LOGV(TAG, "command %x %x %x %x %x %x", command[0], command[1], command[2], command[3], command[4], command[5]);
+    ESP_LOGV(TAG, "command %x %x %x %x %x %x, wait %d us", command[0], command[1], command[2], command[3], command[4], command[5], this->response_time_);
     uint32_t timeout = 6000;
 
     if (response == nullptr)
@@ -33,8 +33,16 @@ static const uint8_t RESPONSE_LENGTH = 255;
     this->flush();
   
     this->write_array(command, len);
-    while (!available() && timeout > 0) {
-      timeout--;
+
+    if (this->response_time_ != 0) {
+      delayMicroseconds(this->response_time_);
+      while (!available() && timeout > 0) {
+        timeout--;
+        if (timeout == 0) {
+            ESP_LOGE(TAG, "command timeout!");
+            return false;
+        }
+      }
     }
     this->flush();
 
@@ -184,9 +192,9 @@ static const uint8_t RESPONSE_LENGTH = 255;
       // if not preset sa_id
       if (this->sa_id_ == 0xffff)
         this->sa_id_ = this->buffer_[6] << 8 | this->buffer_[7];
-    } else {
-      this->get_info_();
-    }
+      } else {
+        this->get_info_();
+      }
   }
 
   void TaiXia::switch_command(uint8_t sa_id, uint8_t service_id, bool onoff) {
