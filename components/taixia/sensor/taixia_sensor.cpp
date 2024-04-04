@@ -145,7 +145,7 @@ void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
 }
 
 void AirConditionerSensor::update() {
-  this->parent_->send(6, 0, SA_ID_CLIMATE, 0x0, 0xffff);
+  this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
 }
 
 void DehumidifierSensor::dump_config() {
@@ -350,7 +350,7 @@ void WashingMachineSensor::handle_response(std::vector<uint8_t> &response) {
 }
 
 void WashingMachineSensor::update() {
-  this->parent_->send(6, 0, SA_ID_CLIMATE, 0x0, 0xffff);
+  this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
 }
 
 void AirPurifierSensor::dump_config() {
