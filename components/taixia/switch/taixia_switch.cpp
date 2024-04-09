@@ -39,7 +39,7 @@ static const char *const TAG = "taixia.switch";
         if (((this->sa_id_ == SA_ID_CLIMATE) && (this->service_id_ == SERVICE_ID_CLIMATE_BEEPER)) || 
             ((this->sa_id_ == SA_ID_DEHUMIDIFIER) && (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_BEEPER)))
             new_state = !new_state;
-          goto done;
+            goto done;
       }
     }
     return;
