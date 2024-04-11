@@ -2,8 +2,8 @@ ESPHome TaiXia Custom Component
 
 
 ## Special Thank
-  ### Thanks for Andrew Wang provide the related hardware and spec.
-  ### Thanks for Seven Hong provide Air Conditioner for test.
+  ### Thanks for Andrew Wang provide the related hardwares and datasheet.
+  ### Thanks for Seven Hong provide Air Conditioners for test and donate $150.
   ### Thanks for Mr. Wang and Mr Huang donate $230 and $200.
 
 ## Hardware
