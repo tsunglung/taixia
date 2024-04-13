@@ -24,13 +24,15 @@ CONF_WATER_TANK_FULL = "water_tank_full"
 CONF_FILTER_NOTIFY = "filter_notify"
 CONF_SIDE_AIR_FLOW = "side_air_flow"
 CONF_DEFROST = "defrost"
+CONF_ODOURS = "odours"
 
 ICONS = {
     CONF_POWER: "mdi:chip",
     CONF_WATER_TANK_FULL: "mdi:cup-water",
     CONF_FILTER_NOTIFY: "mdi:air-filter",
     CONF_SIDE_AIR_FLOW: "mdi:waves",
-    CONF_DEFROST: "mdi:snowflake-melt"
+    CONF_DEFROST: "mdi:snowflake-melt",
+    CONF_ODOURS: "mdi:emoticon-poop"
 }
 
 DEVICE_CLASS = {
@@ -45,7 +47,8 @@ DEHUMIDIFIER_TYPES = {
     CONF_WATER_TANK_FULL: 0x0A,
     CONF_FILTER_NOTIFY: 0x0B,
     CONF_SIDE_AIR_FLOW: 0x0F,
-    CONF_DEFROST: 0x11
+    CONF_DEFROST: 0x11,
+    CONF_ODOURS: 0x28
 }
 
 COMMON_TYPES = {

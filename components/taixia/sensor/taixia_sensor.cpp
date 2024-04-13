@@ -172,6 +172,8 @@ void DehumidifierSensor::dump_config() {
     LOG_SENSOR("  ", "Energy Consumption", this->energy_consumption_sensor_);
   if (this->operating_hours_sensor_ != nullptr)
     LOG_SENSOR("  ", "Operating Hours", this->operating_hours_sensor_);
+  if (this->pm_2_5_sensor_ != nullptr)
+    LOG_SENSOR("  ", "PM2.5", this->pm_2_5_sensor_);
   this->parent_->set_have_sensors(true);
   this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
 }
@@ -221,6 +223,11 @@ void DehumidifierSensor::handle_response(std::vector<uint8_t> &response) {
       case SERVICE_ID_DEHUMIDTFIER_ENERGY:
         if (this->energy_consumption_sensor_ != nullptr) {
           publish_u16_div_10(response, i, this->energy_consumption_sensor_);
+        }
+      break;
+      case SERVICE_ID_PM_2_5:
+        if (this->pm_2_5_sensor_ != nullptr) {
+          publish_u16(response, i, this->pm_2_5_sensor_);
         }
       break;
     }

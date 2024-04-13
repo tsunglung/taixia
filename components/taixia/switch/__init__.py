@@ -37,6 +37,8 @@ CONF_BEEPER = "beeper"
 CONF_HUMIDITY_NOTIFY = "humidity_notify"
 CONF_LOCK = "lock"
 CONF_MOISTURIZE = "moisturize"
+CONF_FILTER_RESET = "filter_reset"
+CONF_PM25_DETECT = "pm25_detect"
 
 DEFAULT_ICON = "mdi:toggle-switch-variant"
 ICONS = {
@@ -53,7 +55,8 @@ ICONS = {
     CONF_POWER_SAVING: "mdi:flash",
     CONF_BEEPER: "mdi:volume-high",
     CONF_HUMIDITY_NOTIFY: "mdi:water-percent",
-    CONF_LOCK: "mdi:lock"
+    CONF_LOCK: "mdi:lock",
+    CONF_PM25_DETECT: "mdi:molecule"
 }
 
 CLIMATE_TYPES = {
@@ -78,7 +81,9 @@ DEHUMIDIFIER_TYPES = {
     CONF_MILDEW_PROOF: 0x13,
     CONF_HUMIDITY_NOTIFY: 0x14,
     CONF_LOCK: 0x16,
-    CONF_BEEPER: 0x18
+    CONF_BEEPER: 0x18,
+    CONF_PM25_DETECT: 0x29,
+    CONF_FILTER_RESET: 0x52
 }
 
 AIRPURIFIER_TYPES = {

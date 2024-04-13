@@ -10,12 +10,14 @@ from esphome.const import (
     CONF_SENSORS,
     CONF_TYPE,
     CONF_TEMPERATURE,
+    CONF_PM_2_5,
     DEVICE_CLASS_DURATION,
     DEVICE_CLASS_EMPTY,
     DEVICE_CLASS_ENERGY,
     DEVICE_CLASS_HUMIDITY,
     DEVICE_CLASS_TEMPERATURE,
     DEVICE_CLASS_POWER,
+    DEVICE_CLASS_PM25,
     ENTITY_CATEGORY_DIAGNOSTIC,
     ICON_CHIP,
     ICON_CURRENT_AC,
@@ -23,11 +25,13 @@ from esphome.const import (
     ICON_THERMOMETER,
     ICON_TIMER,
     ICON_WATER_PERCENT,
+    ICON_CHEMICAL_WEAPON,
     STATE_CLASS_MEASUREMENT,
     UNIT_CELSIUS,
     UNIT_HOUR,
     UNIT_PERCENT,
     UNIT_KILOWATT_HOURS,
+    UNIT_MICROGRAMS_PER_CUBIC_METER,
     UNIT_VOLT,
     UNIT_WATT
 )
@@ -328,6 +332,13 @@ CONFIG_SCHEMA = cv.typed_schema(
                     device_class=DEVICE_CLASS_ENERGY,
                     state_class=STATE_CLASS_MEASUREMENT,
                 ),
+                cv.Optional(CONF_PM_2_5): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_MICROGRAMS_PER_CUBIC_METER,
+                    icon=ICON_CHEMICAL_WEAPON,
+                    accuracy_decimals=2,
+                    device_class=DEVICE_CLASS_PM25,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                )
             }
         ).extend(cv.polling_component_schema('30s')),
         CONF_AIRPURIFIER: cv.COMPONENT_SCHEMA.extend(
@@ -550,6 +561,9 @@ async def to_code(config):
         if CONF_ENERGY_CONSUMPTON in config:
             sens = await sensor.new_sensor(config[CONF_ENERGY_CONSUMPTON])
             cg.add(var.set_energy_consumption_sensor(sens))
+        if CONF_PM_2_5 in config:
+            sens = await sensor.new_sensor(config[CONF_PM_2_5])
+            cg.add(var.set_pm_2_5_sensor(sens))
 
     if config[CONF_TYPE] == CONF_AIRPURIFIER:
         cg.add(var.set_sa_id(0x08))

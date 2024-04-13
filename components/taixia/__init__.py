@@ -54,5 +54,6 @@ async def to_code(config):
 
     if CONF_MAX_LENGTH in config:
         cg.add(var.set_max_length(config[CONF_MAX_LENGTH]))
+
     if CONF_RESPONSE_TIME in config:
         cg.add(var.set_response_time(config[CONF_RESPONSE_TIME]))

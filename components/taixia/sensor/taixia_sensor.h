@@ -56,6 +56,7 @@ class DehumidifierSensor : public TaiXiaListener, public PollingComponent {
   void set_operating_power_sensor(sensor::Sensor *sensor) { this->operating_power_sensor_ = sensor; }
   void set_energy_consumption_sensor(sensor::Sensor *sensor) { this->energy_consumption_sensor_ = sensor; }
   void set_operating_hours_sensor(sensor::Sensor *sensor) { this->operating_hours_sensor_ = sensor; }
+  void set_pm_2_5_sensor(sensor::Sensor *sensor) { this->pm_2_5_sensor_ = sensor; }
 
   void set_taixia_parent(TaiXia *parent) { this->parent_ = parent; }
 
@@ -72,6 +73,7 @@ class DehumidifierSensor : public TaiXiaListener, public PollingComponent {
   sensor::Sensor *operating_power_sensor_{nullptr};
   sensor::Sensor *energy_consumption_sensor_{nullptr};
   sensor::Sensor *operating_hours_sensor_{nullptr};
+  sensor::Sensor *pm_2_5_sensor_{nullptr};
 
   void handle_response(std::vector<uint8_t> &response) override;
 };

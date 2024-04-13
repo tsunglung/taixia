@@ -82,6 +82,7 @@ namespace taixia {
 #define SERVICE_ID_WASHER_FACTOR 0x1C
 #define SERVICE_ID_WASHER_POWER 0x1D
 #define SERVICE_ID_WASHER_ENERGY 0x1E
+#define SERVICE_ID_PM_2_5 0x25
 
 #define SA_ID_DEHUMIDIFIER 0x04
 #define SERVICE_ID_DEHUMIDTFIER_STATUS 0x00
@@ -211,6 +212,7 @@ class TaiXia : public uart::UARTDevice, public Component {
   TAIXIA_SWITCH(super_mode_switch)
   TAIXIA_SWITCH(power_saving_switch)
   TAIXIA_SWITCH(beeper_switch)
+  TAIXIA_SWITCH(moisturize_switch)
   TAIXIA_NUMBER(vertical_fan_speed_number)
   TAIXIA_NUMBER(horizontal_fan_speed_number)
   TAIXIA_NUMBER(sleep_timer_number)
@@ -220,8 +222,10 @@ class TaiXia : public uart::UARTDevice, public Component {
   TAIXIA_BINARY_SENSOR(filter_notify_binary_sensor)
   TAIXIA_BINARY_SENSOR(side_air_flow_binary_sensor)
   TAIXIA_BINARY_SENSOR(defrost_binary_sensor)
+  TAIXIA_BINARY_SENSOR(odours_binary_sensor)
   TAIXIA_SWITCH(air_flow_auto_switch)
-  TAIXIA_SWITCH(moisturize_switch)
+  TAIXIA_SWITCH(pm25_detect_switch)
+  TAIXIA_SWITCH(filter_reset_switch)
   TAIXIA_NUMBER(operating_time_number)
   TAIXIA_NUMBER(relative_humidity_number)
   TAIXIA_NUMBER(dehumidifier_level_number)
@@ -241,6 +245,7 @@ class TaiXia : public uart::UARTDevice, public Component {
   TAIXIA_SWITCH(humidity_notify_switch)
   TAIXIA_SWITCH(lock_switch)
   TAIXIA_SWITCH(saa_notify_switch)
+  TAIXIA_SWITCH(pm25_switch)
 
   // Fan 0x0F
   TAIXIA_SWITCH(ions_switch)
