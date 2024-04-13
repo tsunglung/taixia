@@ -36,6 +36,7 @@ CONF_AIR_PURIFIER_LEVEL = "air_purifier"
 CONF_FAN_LEVEL = "fan_level"
 CONF_SOUND_MODE = "sound_mode"
 CONF_HIGH_HUMIDITY_LEVEL = "high_humidity_level"
+CONF_LIGHT_LEVEL = "light_level"
 
 ICONS = {
     CONF_OFF_TIMER: "mdi:timer-off-outline",
@@ -50,7 +51,8 @@ ICONS = {
     CONF_AIR_PURIFIER_LEVEL: "mdi:air-purifier",
     CONF_FAN_LEVEL: "mdi:fan-speed-3",
     CONF_SOUND_MODE: "mdi:volume-source",
-    CONF_HIGH_HUMIDITY_LEVEL: "mdi:water-percent"
+    CONF_HIGH_HUMIDITY_LEVEL: "mdi:water-percent",
+    CONF_LIGHT_LEVEL: "mdi:brightness-6"
 }
 
 AIRPURIFIER_TYPES = {
@@ -76,6 +78,7 @@ DEHUMIDIFIER_TYPES = {
     CONF_FAN_LEVEL: (0x0E, 0, 15, 1),
     CONF_SOUND_MODE: (0x10, 0, 2, 1),
     CONF_HIGH_HUMIDITY_LEVEL: (0x15, 0, 99, 1),
+    CONF_LIGHT_LEVEL: (0x27, 0, 3, 1),
 }
 
 FAN_TYPES = {

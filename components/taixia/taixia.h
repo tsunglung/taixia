@@ -231,6 +231,7 @@ class TaiXia : public uart::UARTDevice, public Component {
   TAIXIA_NUMBER(fan_level_number)
   TAIXIA_NUMBER(sound_mode_number)
   TAIXIA_NUMBER(high_humidity_level_number)
+  TAIXIA_NUMBER(light_level_number)
 /*
   TAIXIA_SWITCH(filter_notify_switch)
   TAIXIA_SWITCH(light_switch)
