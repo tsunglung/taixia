@@ -1,0 +1,295 @@
+substitutions:
+  devicename: dehumidifier
+  upper_devicename: "Dehumidifier"
+
+esphome:
+  name: $devicename
+  friendly_name: ${upper_devicename}
+  comment: $upper_devicename for Hitachi RD-240HH
+#  name_add_mac_suffix: true
+  project:
+    name: TaiSEIA.dehumidifier
+    version: "Atom-lite-v1.0"
+
+esp32:
+  board: m5stack-atom
+  framework:
+    type: arduino
+
+external_components:
+  - source: github://tsunglung/taixia@master
+    components: [ taixia ]
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${devicename}
+    password: "12345678"
+
+# captive_portal:
+
+# Enable logging
+logger:
+  baud_rate: 0 # disable serial logging;
+#  level: VERY_VERBOSE
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+# web_server:
+
+uart:
+  id: uart_taixia
+  tx_pin: GPIO26
+  rx_pin: GPIO32
+  baud_rate: 9600
+  debug:
+    direction: BOTH
+
+#bluetooth_proxy:
+#  active: true
+
+# optional binary sensor to monitor serial connection:
+binary_sensor:
+  - platform: status
+    name: "Status"
+  - platform: taixia
+    type: dehumidifier
+    water_tank_full:
+      name: "Water Tank Full"
+    filter_notify:
+      name: "Filter Notify"
+    side_air_flow:
+      name: "Side Air Flow"
+    defrost:
+      name: "Defrost"
+    odours:
+      name: "Odours"
+
+button:
+  - platform: safe_mode
+    name: "Safe Mode Boot"
+    entity_category: diagnostic
+  - platform: restart
+    name: "Restart"
+  - platform: taixia
+    type: dehumidifier
+    get_info:
+      name: "Get Info"
+
+#esp32_ble_tracker:
+#  scan_parameters:
+#    interval: 1100ms
+#    window: 1100ms
+#    active: true
+
+fan:
+  - platform: taixia
+    name: Fan
+    type: dehumidifier
+    id: fan_dehumidifier
+    speed: true
+    speed_count: 4
+    preset_modes:
+#      - auto
+      - normal
+      - home
+      - boost
+#      - home
+      - sleep
+#      - fan
+#      - comfort
+#      - away
+      - eco
+
+light:
+  - platform: status_led
+    id: status_light
+    output: status_output
+  - platform: neopixelbus
+    id: esp32_rgb_led
+    name: Status RGB LED
+    type: RGB
+    variant: 800KBPS
+    pin: 27
+    num_leds: 1
+    icon: mdi:led-outline
+    entity_category: config
+    restore_mode: ALWAYS_OFF
+    method:
+      type: esp32_rmt
+      channel: 0
+
+number:
+  - platform: taixia
+    type: dehumidifier
+    operating_time:
+      name: "Operating Time"
+    relative_humidity:
+      name: "Relative Humidity"
+#    dehumidifier_level:
+#      name: "Dehumidifier Level"
+#    dry_level:
+#      name: "Dry Level"
+#    fan_angle:
+#      name: "Fan Angle"
+#    air_purifier:
+#      name: "Air Purifier"
+    fan_level:
+      name: "Fan Level"
+    sound_mode:
+      name: "Sound Mode"
+#    high_humidity_level:
+#      name: "High Humidity Level"
+    light_level:
+      name: "Light Level"
+
+
+select:
+  - platform: taixia
+    type: dehumidifier
+    operating_program:
+      name: "Operation Mode"
+      options:
+        - normal
+        - eco
+        - home
+        - boost
+        - sleep
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "Uptime"
+    filters:
+      - lambda: return x / 3600;
+    unit_of_measurement: "h"
+    accuracy_decimals: 1
+
+  - platform: internal_temperature
+    name: "Internal Temperature"
+
+  - platform: taixia
+    type: dehumidifier
+#    temperature_indoor:
+#      name: "Temperature Indoor"
+    humidity_indoor:
+      name: "Humidity Indoor"
+      on_value_range:
+        - below: 40
+          then:
+            - lambda: |-
+                // Set a preset mode
+                auto call = id(fan_dehumidifier).turn_on();
+                call.set_preset_mode("eco");
+                call.perform();
+        - above: 80
+          then:
+            - lambda: |-
+                // Set a preset mode
+                auto call = id(fan_dehumidifier).turn_on();
+                call.set_preset_mode("boost");
+                call.perform();
+    energy_consumption:
+      name: "Energy"
+    error_code:
+      name: "Error Code"
+    pm_2_5:
+      name: "PM 2.5"
+
+switch:
+  - platform: taixia
+    type: dehumidifier
+    power:
+      name: "Power Switch"
+    lock:
+      name: "Lock"
+    air_flow_auto:
+      name: "Auto Air Flow"
+    mildew_proof:
+      name: "Mildew Proof"
+    humidity_notify:
+      name: "Humidity Notify"
+#    light:
+#      name: "Light"
+    beeper:
+      name: "Beeper"
+    air_purifier:
+      name: "Air Purifier"
+#    filter_reset:
+#      name: "Filter Reset"
+    pm25_detect:
+      name: "PM2.5 Detect"
+
+  - platform: template
+    id: status_led_switch
+    # name: "Status LED Switch"
+    optimistic: true
+    on_turn_on:
+      - light.turn_on: 
+          id: esp32_rgb_led
+          red: 100%
+          green: 0%
+          blue: 0%
+          brightness: 30%
+          transition_length: 50ms
+    on_turn_off:
+      - light.turn_off: 
+          id: esp32_rgb_led
+          transition_length: 50ms
+
+output:
+  - platform: template
+    id: status_output
+    type: binary
+    write_action:
+      - if:
+          condition:
+             lambda: return state > 0;
+          then:
+            - if:
+                condition:
+                  switch.is_off: status_led_switch
+                then:
+                  switch.turn_on: status_led_switch
+          else:
+            - if:
+                condition:
+                  switch.is_on: status_led_switch
+                then:
+                  switch.turn_off: status_led_switch
+
+text_sensor:
+  - platform: version
+    name: "ESPHome Version"
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+  - platform: taixia
+    sa_id:
+      name: "SA ID"
+      id: sa_id
+    brand:
+      name: "SA Brand"
+    model:
+      name: "SA Model"
+    version:
+      name: "SA Version"
+    services:
+      name: "SA Services"
+
+taixia:
+  sa_id: 4
+#  response_time: 0
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
