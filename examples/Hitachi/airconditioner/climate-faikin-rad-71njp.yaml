@@ -1,0 +1,188 @@
+substitutions:
+  devicename: climate-taiseia
+  upper_devicename: "Climate"
+
+esphome:
+  name: $devicename
+  friendly_name: ${upper_devicename}
+  comment: $upper_devicename faikin for Hitachi RAD-71NJP
+  name_add_mac_suffix: true
+  project:
+    name: TaiSEIA.climate
+    version: "faikin-s3-1.0"
+  platformio_options:
+    board_build.flash_mode: dio
+    board_build.mcu: esp32s3
+  on_boot:
+    priority: 600
+    then:
+      - lambda: |-
+          gpio_set_pull_mode(GPIO_NUM_34, GPIO_PULLUP_ONLY);
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  framework:
+    type: arduino
+    version: 2.0.6
+
+external_components:
+  - source: github://tsunglung/taixia@master
+    components: [ taixia ]
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${devicename}
+    password: "12345678"
+
+# captive_portal:
+
+# Enable logging
+logger:
+  baud_rate: 0 # disable serial logging;
+#  level: VERY_VERBOSE
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+web_server:
+
+uart:
+  id: uart_taixia
+  tx_pin: 
+    number: GPIO48
+    inverted: true
+  rx_pin: 
+    number: GPIO34
+    inverted: true
+  baud_rate: 9600
+  debug:
+    direction: BOTH
+
+#bluetooth_proxy:
+#  active: true
+
+# optional binary sensor to monitor serial connection:
+binary_sensor:
+  - platform: status
+    name: "Status"
+
+button:
+  - platform: safe_mode
+    name: "Safe Mode Boot"
+    entity_category: diagnostic
+  - platform: restart
+    name: "Restart"
+  - platform: taixia
+    type: airconditioner
+    get_info:
+      name: "Get Info"
+
+climate:
+  - platform: taixia
+    name: "Climate"
+    supported_modes:
+      - COOL
+      - HEAT
+      - DRY
+      - FAN_ONLY
+    supported_fan_modes:
+      - LOW
+      - MEDIUM
+      - HIGH
+      - AUTO
+    supported_swing_modes:
+      - VERTICAL
+      - HORIZONTAL
+      - BOTH
+    supported_presets:
+      - NONE
+      - BOOST
+      - ECO
+
+light:
+  - platform: esp32_rmt_led_strip
+    chipset: WS2812
+    pin: GPIO47
+    num_leds: 3
+    rgb_order: GRB
+    rmt_channel: 0
+    id: s3_wled
+    name: "RGB LED"
+
+number:
+  - platform: taixia
+    type: airconditioner
+    off_timer:
+      name: "Off Timer"
+    on_timer:
+      name: "On Timer"
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "Uptime"
+    filters:
+      - lambda: return x / 3600;
+    unit_of_measurement: "h"
+    accuracy_decimals: 1
+
+  - platform: internal_temperature
+    name: "Internal Temperature"
+
+  - platform: taixia
+    type: airconditioner
+    temperature_indoor:
+      name: "Temperature Indoor"
+    temperature_outdoor:
+      name: "Temperature Outdoor"
+    energy_consumption:
+      name: "Energy"
+    operating_hours:
+      name: "Operating Hours"
+
+switch:
+  - platform: taixia
+    type: airconditioner
+    power:
+      name: "Power Switch"
+    beeper:
+      name: "Buzzer"
+    mildew_proof:
+      name: "Mildew Proof"
+
+text_sensor:
+  - platform: version
+    name: "ESPHome Version"
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+  - platform: taixia
+    sa_id:
+      name: "SA ID"
+      id: sa_id
+    brand:
+      name: "SA Brand"
+    model:
+      name: "SA Model"
+    version:
+      name: "SA Version"
+    services:
+      name: "SA Services"
+
+taixia:
+  sa_id: 1
+#  response_time: 0
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time
