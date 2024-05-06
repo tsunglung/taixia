@@ -222,10 +222,15 @@ using namespace esphome::climate;
       this->parent_->send_cmd(command, buffer, 6);
     }
     this->publish_state();
-    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+    if (this->parent_->get_version() < 3.0)
+      this->parent_->read_sa_status();
+    else
+      this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
   }
 
   bool TaiXiaClimate::update_status_() {
+    if (this->parent_->get_version() < 3.0)
+      return this->parent_->read_sa_status();
     if (!this->parent_->have_sensors())
       this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
     return true;
@@ -257,6 +262,16 @@ using namespace esphome::climate;
     this->traits_.set_supported_modes(modes);
     this->traits_.add_supported_mode(climate::CLIMATE_MODE_OFF);   // Always available
     this->traits_.add_supported_mode(climate::CLIMATE_MODE_AUTO);  // Always available
+    for ( auto mode : modes ) {
+      if (mode == climate::CLIMATE_MODE_COOL)
+        this->supports_cool_ = true;
+      if (mode == climate::CLIMATE_MODE_HEAT)
+        this->supports_heat_ = true;
+      if (mode == climate::CLIMATE_MODE_DRY)
+        this->supports_dry_ = true;
+      if (mode == climate::CLIMATE_MODE_FAN_ONLY)
+        this->supports_fan_only_ = true;
+    }
   }
 
   climate::ClimateTraits TaiXiaClimate::traits() {
@@ -265,6 +280,7 @@ using namespace esphome::climate;
   //    traits.set_supports_action(true);
 
       this->traits_.set_supports_current_temperature(true);
+
       if (this->supports_cool_)
         this->traits_.add_supported_mode(CLIMATE_MODE_COOL);
       if (this->supports_heat_)

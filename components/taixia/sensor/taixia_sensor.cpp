@@ -70,8 +70,11 @@ void AirConditionerSensor::dump_config() {
   if (this->filiter_clean_hours_sensor_ != nullptr)
     LOG_SENSOR("  ", "Filiter Clean Hours", this->filiter_clean_hours_sensor_);
   this->parent_->set_have_sensors(true);
-  this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
-}
+
+  if (this->parent_->get_version() < 3.0)
+    this->parent_->read_sa_status();
+  else
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);}
 
 void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
   uint8_t i;
@@ -145,7 +148,10 @@ void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
 }
 
 void AirConditionerSensor::update() {
-  this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+  if (this->parent_->get_version() < 3.0)
+    this->parent_->read_sa_status();
+  else
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
 }
 
 void DehumidifierSensor::dump_config() {
@@ -175,7 +181,11 @@ void DehumidifierSensor::dump_config() {
   if (this->pm_2_5_sensor_ != nullptr)
     LOG_SENSOR("  ", "PM2.5", this->pm_2_5_sensor_);
   this->parent_->set_have_sensors(true);
-  this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+
+  if (this->parent_->get_version() < 3.0)
+    this->parent_->read_sa_status();
+  else
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
 }
 
 void DehumidifierSensor::handle_response(std::vector<uint8_t> &response) {
@@ -235,7 +245,10 @@ void DehumidifierSensor::handle_response(std::vector<uint8_t> &response) {
 }
 
 void DehumidifierSensor::update() {
-  this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+  if (this->parent_->get_version() < 3.0)
+    this->parent_->read_sa_status();
+  else
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
 }
 
 void WashingMachineSensor::dump_config() {
@@ -267,7 +280,11 @@ void WashingMachineSensor::dump_config() {
   if (this->energy_consumption_sensor_ != nullptr)
     LOG_SENSOR("  ", "Energy Consumption", this->energy_consumption_sensor_);
   this->parent_->set_have_sensors(true);
-  this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+
+  if (this->parent_->get_version() < 3.0)
+    this->parent_->read_sa_status();
+  else
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
 }
 
 void WashingMachineSensor::handle_response(std::vector<uint8_t> &response) {
@@ -357,7 +374,10 @@ void WashingMachineSensor::handle_response(std::vector<uint8_t> &response) {
 }
 
 void WashingMachineSensor::update() {
-  this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+  if (this->parent_->get_version() < 3.0)
+    this->parent_->read_sa_status();
+  else
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
 }
 
 void AirPurifierSensor::dump_config() {
@@ -373,7 +393,11 @@ void AirPurifierSensor::dump_config() {
   if (this->energy_consumption_sensor_ != nullptr)
     LOG_SENSOR("  ", "Energy Consumption", this->energy_consumption_sensor_);
   this->parent_->set_have_sensors(true);
-  this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+
+  if (this->parent_->get_version() < 3.0)
+    this->parent_->read_sa_status();
+  else
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
 }
 
 void AirPurifierSensor::handle_response(std::vector<uint8_t> &response) {
@@ -418,7 +442,10 @@ void AirPurifierSensor::handle_response(std::vector<uint8_t> &response) {
 }
 
 void AirPurifierSensor::update() {
-  this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+  if (this->parent_->get_version() < 3.0)
+    this->parent_->read_sa_status();
+  else
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
 }
 
 void ElectricFanSensor::dump_config() {
@@ -436,7 +463,11 @@ void ElectricFanSensor::dump_config() {
   if (this->energy_consumption_sensor_ != nullptr)
     LOG_SENSOR("  ", "Energy Consumption", this->energy_consumption_sensor_);
   this->parent_->set_have_sensors(true);
-  this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+
+  if (this->parent_->get_version() < 3.0)
+    this->parent_->read_sa_status();
+  else
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
 }
 
 void ElectricFanSensor::handle_response(std::vector<uint8_t> &response) {
@@ -486,7 +517,10 @@ void ElectricFanSensor::handle_response(std::vector<uint8_t> &response) {
 }
 
 void ElectricFanSensor::update() {
-  this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+  if (this->parent_->get_version() < 3.0)
+    this->parent_->read_sa_status();
+  else
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
 }
 
 void TaiXiaCustomSensor::dump_config() {

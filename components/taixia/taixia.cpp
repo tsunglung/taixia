@@ -23,15 +23,14 @@ static const uint8_t RESPONSE_LENGTH = 255;
     return crc;
   }
 
-  bool TaiXia::write_command_(const uint8_t *command, uint8_t *response, uint8_t len, uint8_t rlen) {
+  bool TaiXia::write_command_(const uint8_t *command, uint8_t *response, uint8_t len, uint8_t rlen, uint32_t timeout) {
     ESP_LOGV(TAG, "command %x %x %x %x %x %x, wait %d us", command[0], command[1], command[2], command[3], command[4], command[5], this->response_time_);
-    uint32_t timeout = 6000;
 
     if (response == nullptr)
       return true;
 
     this->flush();
-  
+
     this->write_array(command, len);
 
     if (this->response_time_ != 0) {
@@ -53,6 +52,10 @@ static const uint8_t RESPONSE_LENGTH = 255;
     if (crc != response[rlen - 1])
         return false;
     return ret;
+  }
+
+  bool TaiXia::write_command_(const uint8_t *command, uint8_t *response, uint8_t len, uint8_t rlen) {
+    return this->write_command_(command, response, len, rlen, 6000);
   }
 
   void TaiXia::get_info_() {
@@ -139,6 +142,9 @@ static const uint8_t RESPONSE_LENGTH = 255;
 
   void TaiXia::setup() {
     uint8_t i, j, k;
+
+    if (this->version_ < 3.0)
+      return;
 
     this->send(6, 0, 0x00, SERVICE_ID_REGISTER, 0xFFFF);
     this->readline(false);
@@ -236,6 +242,114 @@ static const uint8_t RESPONSE_LENGTH = 255;
     cmd[5] = this->checksum(cmd, 5);
 
     uint8_t ret = this->write_command_(cmd, response, 6, 6);
+  }
+
+  bool TaiXia::read_climate_status_() {
+    uint8_t response[6];
+    uint8_t buffer[RESPONSE_LENGTH];
+    uint8_t cmd[6] = {0x06, 0x00, 0x00, 0xFF, 0xFF, 0x00};
+    uint8_t ret = 0;
+    uint8_t i = 3;
+    uint32_t timeout = 60000;
+
+    memset(response, 0x00, 6);
+    memset(buffer, 0x00, RESPONSE_LENGTH);
+
+    cmd[1] = this->sa_id_;
+    cmd[2] = SERVICE_ID_CLIMATE_STATUS;
+    cmd[5] = this->checksum(cmd, 5);
+    this->write_command_(cmd, response, 6, 6, timeout);
+    buffer[i++] = response[2];
+    buffer[i++] = response[3];
+    buffer[i++] = response[4];
+
+    timeout = 60000;
+    cmd[1] = this->sa_id_;
+    cmd[2] = SERVICE_ID_CLIMATE_MODE;
+    cmd[5] = this->checksum(cmd, 5);
+    this->write_command_(cmd, response, 6, 6, timeout);
+    buffer[i++] = response[2];
+    buffer[i++] = response[3];
+    buffer[i++] = response[4];
+
+    timeout = 60000;
+    cmd[1] = this->sa_id_;
+    cmd[2] = SERVICE_ID_CLIMATE_FAN_SPEED;
+    cmd[5] = this->checksum(cmd, 5);
+
+    this->write_command_(cmd, response, 6, 6, timeout);
+    buffer[i++] = response[2];
+    buffer[i++] = response[3];
+    buffer[i++] = response[4];
+
+    timeout = 60000;
+    cmd[1] = this->sa_id_;
+    cmd[2] = SERVICE_ID_CLIMATE_TARGET_TEMPERATURE;
+    cmd[5] = this->checksum(cmd, 5);
+    this->write_command_(cmd, response, 6, 6, timeout);
+    buffer[i++] = response[2];
+    buffer[i++] = response[3];
+    buffer[i++] = response[4];
+
+    timeout = 60000;
+    cmd[1] = this->sa_id_;
+    cmd[2] = SERVICE_ID_CLIMATE_TEMPERATURE_INDOOR;
+    cmd[5] = this->checksum(cmd, 5);
+    this->write_command_(cmd, response, 6, 6, timeout);
+    buffer[i++] = response[2];
+    buffer[i++] = response[3];
+    buffer[i++] = response[4];
+
+    timeout = 60000;
+    cmd[1] = this->sa_id_;
+    cmd[2] = SERVICE_ID_CLIMATE_OFF_TIME;
+    cmd[5] = this->checksum(cmd, 5);
+    this->write_command_(cmd, response, 6, 6, timeout);
+    buffer[i++] = response[2];
+    buffer[i++] = response[3];
+    buffer[i++] = response[4];
+
+    timeout = 60000;
+    cmd[1] = this->sa_id_;
+    cmd[2] = SERVICE_ID_CLIMATE_ON_TIMER;
+    cmd[5] = this->checksum(cmd, 5);
+
+    this->write_command_(cmd, response, 6, 6, timeout);
+    buffer[i++] = response[2];
+    buffer[i++] = response[3];
+    buffer[i++] = response[4];
+
+    timeout = 60000;
+    cmd[1] = this->sa_id_;
+    cmd[2] = SERVICE_ID_CLIMATE_SWING_HORIZONTAL;
+    cmd[5] = this->checksum(cmd, 5);
+
+    this->write_command_(cmd, response, 6, 6, timeout);
+    buffer[i++] = response[2];
+    buffer[i++] = response[3];
+    buffer[i++] = response[4];
+
+    buffer[i] = this->checksum(cmd, i);
+
+    this->buffer_.clear();
+    buffer[0] = i;
+    for (uint8_t j = 0; j < i; j++) {
+      this->buffer_.push_back(buffer[j]);
+    }
+
+    ESP_LOGV(TAG, "cmd buffer: %x %x %x %x %x %x", this->buffer_[0], this->buffer_[1], this->buffer_[2], this->buffer_[3], this->buffer_[4], this->buffer_[5]);
+    for (auto &listener : this->listeners_)
+      listener->on_response(this->sa_id_, this->buffer_);
+
+    this->buffer_.clear();
+
+    return true;
+  }
+
+  bool TaiXia::read_sa_status() {
+    if (this->sa_id_ == 1)
+      return this->read_climate_status_();
+    return false;
   }
 
   void TaiXia::button_command(uint8_t sa_id, uint8_t service_id) {

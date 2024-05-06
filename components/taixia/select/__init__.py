@@ -246,7 +246,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.Optional(CONF_AIR_PURIFIER): select.select_schema(
                     DehumidifierSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
-                    icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
+                    icon=ICONS.get(CONF_AIR_PURIFIER, DEFAULT_ICON)
                 ).extend(
                     {
                         cv.Optional(CONF_OPTIONS): cv.All(
@@ -257,7 +257,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.Optional(CONF_SOUND): select.select_schema(
                     DehumidifierSelect,
                     entity_category=ENTITY_CATEGORY_CONFIG,
-                    icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
+                    icon=ICONS.get(CONF_SOUND, DEFAULT_ICON)
                 ).extend(
                     {
                         cv.Optional(CONF_OPTIONS): cv.All(

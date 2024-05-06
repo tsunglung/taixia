@@ -42,7 +42,7 @@ class TaiXiaClimate : public climate::Climate, public TaiXiaListener, public Pol
 
   TaiXia *parent_;
   bool supports_cool_{true};
-  bool supports_heat_{true};
+  bool supports_heat_{false};
   bool supports_dry_{false};
   bool supports_fan_only_{false};
   bool supported_humidity_{false};

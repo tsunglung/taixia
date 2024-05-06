@@ -34,6 +34,10 @@ namespace taixia {
 #define SERVICE_ID_CLIMATE_SLEEP 0x05
 #define SERVICE_ID_CLIMATE_FUZZY_MODE 0x07
 #define SERVICE_ID_CLIMATE_AIR_PURIFIER 0x08
+#define SERVICE_ID_CLIMATE_ON_TIME 0x09
+#define SERVICE_ID_CLIMATE_OFF_TIME 0x0A
+#define SERVICE_ID_CLIMATE_ON_TIMER 0x0B
+#define SERVICE_ID_CLIMATE_OFF_TIMER 0x0C
 #define SERVICE_ID_CLIMATE_SWING_VERTICAL 0x0E
 #define SERVICE_ID_CLIMATE_SWING_HORIZONTAL 0x10
 #define SERVICE_ID_CLIMATE_HUMIDITY_INDOOR 0x14
@@ -172,6 +176,7 @@ class TaiXia : public uart::UARTDevice, public Component {
   float get_setup_priority() const override { return setup_priority::DATA; }
 
   void set_sa_id(uint8_t id) { this->sa_id_ = id; }
+  void set_version(float version) { this->version_ = version; }
   void set_max_length(uint16_t len) { this->max_length_ = len; }
   void set_response_time(uint16_t time) { this->response_time_ = time; }
   void register_listener(TaiXiaListener *listener) { this->listeners_.push_back(listener); }
@@ -180,7 +185,10 @@ class TaiXia : public uart::UARTDevice, public Component {
   void readline(bool handle_response);
   bool send(uint8_t packet_length, uint8_t date_type, uint8_t sa_id, uint8_t service_id, uint16_t data);
   bool send_cmd(const uint8_t *command, uint8_t *response, uint8_t len) {
-    return write_command_(command, response, len, len);
+    if (this->version_ < 3.0)
+      return write_command_(command, response, len, len, 60000);
+    else
+      return write_command_(command, response, len, len);
   }
   void switch_command(uint8_t sa_id, uint8_t service_id, bool onoff);
   void set_number(uint8_t sa_id, uint8_t service_id, float value);
@@ -188,6 +196,8 @@ class TaiXia : public uart::UARTDevice, public Component {
   void button_command(uint8_t sa_id, uint8_t service_id);
   bool have_sensors() { return this->have_sensors_; }
   void set_have_sensors(bool have_sensors) { this->have_sensors_ = have_sensors; }
+  float get_version() { return this->version_; }
+  bool read_sa_status();
 
   void power_switch(bool state) { this->power_switch_->publish_state(state); }
 
@@ -257,17 +267,20 @@ class TaiXia : public uart::UARTDevice, public Component {
  protected:
   void readline_(int readch, char *buffer, int len);
   void get_info_(void);
+  bool read_climate_status_(void);
 
   std::vector<uint8_t> buffer_;
   uint8_t protocol_;
   uint8_t sa_id_;
+  float version_{4.0};
   uint8_t len_;
   uint16_t max_length_{0};
-  uint16_t response_time_{1};
+  uint32_t response_time_{1};
   bool have_sensors_{false};
 
   std::vector<TaiXiaListener *> listeners_{};
 
+  bool write_command_(const uint8_t *command, uint8_t *response, uint8_t len, uint8_t tlen, uint32_t timeout);
   bool write_command_(const uint8_t *command, uint8_t *response, uint8_t len, uint8_t tlen);
 };
 

@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import uart
-from esphome.const import CONF_ID
+from esphome.const import CONF_ID, CONF_VERSION
 
 CODEOWNERS = ["@tsunglung"]
 
@@ -35,8 +35,9 @@ CONFIG_SCHEMA = uart.UART_DEVICE_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(TaiXia),
         cv.Optional(CONF_SA_ID): cv.int_range(min=1, max=255),
+        cv.Optional(CONF_VERSION): cv.float_range(min=1.0, max=4.9),
         cv.Optional(CONF_MAX_LENGTH, default=6): cv.int_range(min=6, max=100),
-        cv.Optional(CONF_RESPONSE_TIME): cv.int_range(min=0, max=90000)
+        cv.Optional(CONF_RESPONSE_TIME): cv.int_range(min=0, max=20000)
     }
 )
 
@@ -51,6 +52,9 @@ async def to_code(config):
         if config[CONF_SA_ID] not in CONF_SUPPORTED_SA_ID:
             raise ValueError(f"Not support SA ID {config[CONF_SA_ID]}")
         cg.add(var.set_sa_id(config[CONF_SA_ID]))
+
+    if CONF_VERSION in config:
+        cg.add(var.set_version(config[CONF_VERSION]))
 
     if CONF_MAX_LENGTH in config:
         cg.add(var.set_max_length(config[CONF_MAX_LENGTH]))
