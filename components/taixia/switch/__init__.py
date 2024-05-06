@@ -39,6 +39,7 @@ CONF_LOCK = "lock"
 CONF_MOISTURIZE = "moisturize"
 CONF_FILTER_RESET = "filter_reset"
 CONF_PM25_DETECT = "pm25_detect"
+CONF_FROST_WASH = "frost_wash"
 
 DEFAULT_ICON = "mdi:toggle-switch-variant"
 ICONS = {
@@ -56,7 +57,9 @@ ICONS = {
     CONF_BEEPER: "mdi:volume-high",
     CONF_HUMIDITY_NOTIFY: "mdi:water-percent",
     CONF_LOCK: "mdi:lock",
-    CONF_PM25_DETECT: "mdi:molecule"
+    CONF_FILTER_RESET: "filter-cog-outline",
+    CONF_PM25_DETECT: "mdi:molecule",
+    CONF_FROST_WASH: "mdi:snowflake-melt"
 }
 
 CLIMATE_TYPES = {
@@ -70,7 +73,8 @@ CLIMATE_TYPES = {
     CONF_SUPER_MODE: 0x1A,
     CONF_POWER_SAVING: 0x1B,
     CONF_BEEPER: 0x1E,
-    CONF_MOISTURIZE: 0x20
+    CONF_MOISTURIZE: 0x20,
+    CONF_FROST_WASH: 0x3B
 }
 
 DEHUMIDIFIER_TYPES = {

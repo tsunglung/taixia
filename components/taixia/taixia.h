@@ -213,6 +213,7 @@ class TaiXia : public uart::UARTDevice, public Component {
   TAIXIA_SWITCH(power_saving_switch)
   TAIXIA_SWITCH(beeper_switch)
   TAIXIA_SWITCH(moisturize_switch)
+  TAIXIA_SWITCH(frost_wash_switch)
   TAIXIA_NUMBER(vertical_fan_speed_number)
   TAIXIA_NUMBER(horizontal_fan_speed_number)
   TAIXIA_NUMBER(sleep_timer_number)
