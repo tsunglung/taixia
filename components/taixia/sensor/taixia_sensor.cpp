@@ -210,7 +210,7 @@ void DehumidifierSensor::handle_response(std::vector<uint8_t> &response) {
           publish_u16(response, i, this->humidity_indoor_sensor_);
         }
       break;
-      case SERVICE_ID_DEHUMIDTFIER_ERROR_CODR:
+      case SERVICE_ID_DEHUMIDTFIER_ERROR_CODE:
         if (this->error_code_sensor_ != nullptr) {
           publish_u16(response, i, this->error_code_sensor_);
         }
@@ -235,9 +235,14 @@ void DehumidifierSensor::handle_response(std::vector<uint8_t> &response) {
           publish_u16_div_10(response, i, this->energy_consumption_sensor_);
         }
       break;
-      case SERVICE_ID_PM_2_5:
+      case SERVICE_ID_DEHUMIDTFIER_PM_2_5:
         if (this->pm_2_5_sensor_ != nullptr) {
           publish_u16(response, i, this->pm_2_5_sensor_);
+        }
+      break;
+      case SERVICE_ID_DEHUMIDTFIER_ODOURS:
+        if (this->odours_sensor_ != nullptr) {
+          publish_u16(response, i, this->odours_sensor_);
         }
       break;
     }

@@ -84,9 +84,11 @@ CONF_WATER_FULL = "water_full"
 CONF_FILITER_CLEAN = "filiter_clean"
 CONF_SIDE_AIR_VENT = "side_air_vent"
 CONF_DEFROST = "defrost"
+CONF_ODOURS = "odours"
 
 CONF_AIR_QUALITY = "air_quality"
 ICON_THOUGHT_BUBBLE = "mdi:thought-bubble"
+ICON_ODOURS = "mdi:emoticon-poop"
 
 CONFIG_SCHEMA = cv.typed_schema(
     {
@@ -338,6 +340,11 @@ CONFIG_SCHEMA = cv.typed_schema(
                     accuracy_decimals=2,
                     device_class=DEVICE_CLASS_PM25,
                     state_class=STATE_CLASS_MEASUREMENT,
+                ),
+                cv.Optional(CONF_ODOURS): sensor.sensor_schema(
+                    icon=ICON_ODOURS,
+                    device_class=DEVICE_CLASS_EMPTY,
+                    state_class=STATE_CLASS_MEASUREMENT,
                 )
             }
         ).extend(cv.polling_component_schema('30s')),
@@ -348,7 +355,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.Optional(CONF_AIR_QUALITY): sensor.sensor_schema(
                     icon=ICON_THOUGHT_BUBBLE,
                     device_class=DEVICE_CLASS_EMPTY,
-                    entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+                    entity_category=STATE_CLASS_MEASUREMENT,
                 ),
                 cv.Optional(CONF_OPERATING_CURRENT): sensor.sensor_schema(
                     unit_of_measurement=UNIT_PERCENT,
@@ -564,6 +571,9 @@ async def to_code(config):
         if CONF_PM_2_5 in config:
             sens = await sensor.new_sensor(config[CONF_PM_2_5])
             cg.add(var.set_pm_2_5_sensor(sens))
+        if CONF_ODOURS in config:
+            sens = await sensor.new_sensor(config[CONF_ODOURS])
+            cg.add(var.set_odours_sensor(sens))
 
     if config[CONF_TYPE] == CONF_AIRPURIFIER:
         cg.add(var.set_sa_id(0x08))

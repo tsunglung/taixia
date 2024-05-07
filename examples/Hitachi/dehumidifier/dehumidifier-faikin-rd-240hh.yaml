@@ -75,8 +75,6 @@ binary_sensor:
       name: "Side Air Flow"
     defrost:
       name: "Defrost"
-    odours:
-      name: "Odours"
 
 button:
   - platform: safe_mode
@@ -208,6 +206,8 @@ sensor:
       name: "Error Code"
     pm_2_5:
       name: "PM 2.5"
+    odours:
+      name: "Odours"
 
 switch:
   - platform: taixia

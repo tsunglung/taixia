@@ -31,8 +31,7 @@ ICONS = {
     CONF_WATER_TANK_FULL: "mdi:cup-water",
     CONF_FILTER_NOTIFY: "mdi:air-filter",
     CONF_SIDE_AIR_FLOW: "mdi:waves",
-    CONF_DEFROST: "mdi:snowflake-melt",
-    CONF_ODOURS: "mdi:emoticon-poop"
+    CONF_DEFROST: "mdi:snowflake-melt"
 }
 
 DEVICE_CLASS = {
@@ -47,8 +46,7 @@ DEHUMIDIFIER_TYPES = {
     CONF_WATER_TANK_FULL: 0x0A,
     CONF_FILTER_NOTIFY: 0x0B,
     CONF_SIDE_AIR_FLOW: 0x0F,
-    CONF_DEFROST: 0x11,
-    CONF_ODOURS: 0x28
+    CONF_DEFROST: 0x11
 }
 
 COMMON_TYPES = {
