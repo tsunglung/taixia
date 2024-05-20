@@ -6,7 +6,9 @@ The S21 plug is JST EHR-5.
 
 The S21(mini) is JST PAP-05V-S.
 
-The S403 is JST PAP-10V-S (testing).
+The S403 may be one of three connectors JST PAP-10V-S, XARP-10V(XAP-10V) and X.
+
+<img src="https://github.com/tsunglung/taixia/raw/master/pictures/daikin_s403.png">
 
 The X50A is ?
 
@@ -19,3 +21,4 @@ The X50A is ?
 |4|12V|
 |5|GND|
 
+The reference from ![Faikin S21 Manual](https://github.com/revk/ESP32-Faikin/blob/main/Manuals/S21.md)
