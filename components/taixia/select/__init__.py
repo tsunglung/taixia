@@ -15,6 +15,7 @@ from .. import (
     CONF_AIRPURIFIER,
     CONF_DEHUMIDIFIER,
     CONF_WASHING_MACHINE,
+    CONF_ERV,
     CONF_ELECTRIC_FAN,
     CONF_SUPPORTED_SA
 )
@@ -26,6 +27,7 @@ AirConditionerSelect = taixia_ns.class_("AirConditionerSelect", select.Select, c
 DehumidifierSelect = taixia_ns.class_("DehumidifierSelect", select.Select, cg.Component)
 WashingMachineSelect = taixia_ns.class_("WashingMachineSelect", select.Select, cg.Component)
 AirPurifierSelect = taixia_ns.class_("AirPurifierSelect", select.Select, cg.Component)
+ErvSelect = taixia_ns.class_("ErvSelect", select.Select, cg.Component)
 ElectricFanSelect = taixia_ns.class_("ElectricFanSelect", select.Select, cg.Component)
 
 CONF_FUZZY_MODE = "fuzzy_mode"
@@ -41,6 +43,9 @@ CONF_WASH_OTHER_FUNCTION = "wash_other_function"
 CONF_WASH_MODE = "wash_mode"
 CONF_WARM_WATER_PROGRAM = "warm_water_program"
 
+CONF_VENTILATE_MODE = "ventilate_mode"
+CONF_PRE_HEAT_COOL = "pre_heat_cool"
+
 DEFAULT_ICON = "mdi:format-list-bulleted"
 ICONS = {
     CONF_FUZZY_MODE: "mdi:motion-sensor",
@@ -52,7 +57,9 @@ ICONS = {
     CONF_WASH_PROGRAM: "mdi:washing-machine",
     CONF_WASH_OTHER_FUNCTION: "mdi:state-machine",
     CONF_WASH_MODE: "mdi:dishwasher",
-    CONF_WARM_WATER_PROGRAM: "mdi:thermometer-water"
+    CONF_WARM_WATER_PROGRAM: "mdi:thermometer-water",
+    CONF_VENTILATE_MODE: "mdi:home-thermometer",
+    CONF_PRE_HEAT_COOL: "mdi:home-thermometer-outline"
 }
 
 OPTIONS_FUZZY_MODE = {
@@ -168,6 +175,18 @@ OPTIONS_PURIFIER_OPERATING_PROGRAM = {
     "Standard": 3,
     "High": 4,
     "Super": 5
+}
+
+OPTIONS_ENTILATE_MODE = {
+    "Auto": 0,
+    "Full": 1,
+    "Normal": 2
+}
+
+OPTIONS_PRE_HEAT_COOL = {
+    "None": 0,
+    "30mins": 1,
+    "60mins": 2
 }
 
 CONFIG_SCHEMA = cv.typed_schema(
@@ -317,6 +336,34 @@ CONFIG_SCHEMA = cv.typed_schema(
                 )
             }
         ),
+        CONF_ERV: cv.COMPONENT_SCHEMA.extend(
+            {
+                cv.GenerateID(): cv.declare_id(ErvSelect),
+                cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
+                cv.Optional(CONF_VENTILATE_MODE): select.select_schema(
+                    ErvSelect,
+                    entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_VENTILATE_MODE, DEFAULT_ICON)
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
+                ),
+                cv.Optional(CONF_PRE_HEAT_COOL): select.select_schema(
+                    ErvSelect,
+                    entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_PRE_HEAT_COOL, DEFAULT_ICON)
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
+                )
+            }
+        ),
         CONF_ELECTRIC_FAN: cv.COMPONENT_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(ElectricFanSelect),
@@ -333,7 +380,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                     }
                 )
             }
-        ),
+        )
     },
     key=CONF_TYPE,
     lower=True,
@@ -482,7 +529,32 @@ async def to_code(config):
             cg.add(taixia.register_listener(sel))
             cg.add(sel.set_taixia_parent(taixia))
 
-    if config[CONF_TYPE] == CONF_ELECTRIC_FAN:
+    elif config[CONF_TYPE] == CONF_ERV:
+        cg.add(var.set_sa_id(0x04))
+        if CONF_VENTILATE_MODE in config:
+            options_map = get_options(config[CONF_VENTILATE_MODE].get(
+                CONF_OPTIONS, {}), OPTIONS_ENTILATE_MODE)
+            sel = await select.new_select(config[CONF_VENTILATE_MODE],
+                    options=list(options_map.keys()))
+            cg.add(var.set_ventilate_mode_select(sel))
+            cg.add(sel.set_service_id(0x01))
+            cg.add(sel.set_select_mappings(list(options_map.values())))
+            cg.add(taixia.register_listener(sel))
+            cg.add(sel.set_taixia_parent(taixia))
+
+        if CONF_PRE_HEAT_COOL in config:
+            options_map = get_options(config[CONF_PRE_HEAT_COOL].get(
+                CONF_OPTIONS, {}), OPTIONS_PRE_HEAT_COOL)
+            sel = await select.new_select(config[CONF_PRE_HEAT_COOL],
+                    options=config.get(
+                        CONF_OPTIONS, list(options_map.keys())))
+            cg.add(var.set_pre_heat_cool_select(sel))
+            cg.add(sel.set_service_id(0x0D))
+            cg.add(sel.set_select_mappings(list(options_map.values())))
+            cg.add(taixia.register_listener(sel))
+            cg.add(sel.set_taixia_parent(taixia))
+
+    elif config[CONF_TYPE] == CONF_ELECTRIC_FAN:
         cg.add(var.set_sa_id(0x0F))
         if CONF_OPERATING_PROGRAM in config:
             options_map = get_options(config[CONF_OPERATING_PROGRAM].get(

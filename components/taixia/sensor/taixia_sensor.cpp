@@ -453,6 +453,53 @@ void AirPurifierSensor::update() {
     this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
 }
 
+void ErvSensor::dump_config() {
+  ESP_LOGCONFIG(TAG, "TaiXIA Erv Sensor:");
+  if (this->temperature_indoor_sensor_ != nullptr)
+    LOG_SENSOR(TAG, "Temperature Indoor", this->temperature_indoor_sensor_);
+  if (this->temperature_outdoor_sensor_ != nullptr)
+    LOG_SENSOR(TAG, "Temperature Outdoor", this->temperature_outdoor_sensor_);
+
+
+  if (this->parent_->get_version() < 3.0)
+    this->parent_->read_sa_status();
+  else
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+}
+
+void ErvSensor::handle_response(std::vector<uint8_t> &response) {
+  uint8_t i;
+
+  ESP_LOGD(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
+      response[0], response[1], response[2], response[3], \
+      response[4], response[5], response[6], response[7], response[8]);
+
+  for (i = 3; i < response[0] - 3; i+=3) {
+    if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
+      continue;
+    }
+    switch (response[i]) {
+      case SERVICE_ID_ERV_TEMPERATURE_INDOOR:
+        if (this->temperature_indoor_sensor_ != nullptr) {
+          publish_i16(response, i, this->temperature_indoor_sensor_);
+        }
+      break;
+      case SERVICE_ID_ERV_TEMPERATURE_OUTDOOR:
+        if (this->temperature_outdoor_sensor_ != nullptr) {
+          publish_i16(response, i, this->temperature_outdoor_sensor_);
+        }
+      break;
+    }
+  }
+}
+
+void ErvSensor::update() {
+  if (this->parent_->get_version() < 3.0)
+    this->parent_->read_sa_status();
+  else
+    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+}
+
 void ElectricFanSensor::dump_config() {
   ESP_LOGCONFIG(TAG, "TaiXIA Fan Sensor:");
   if (this->temperature_sensor_ != nullptr)

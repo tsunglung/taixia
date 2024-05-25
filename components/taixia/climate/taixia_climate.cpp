@@ -73,15 +73,24 @@ using namespace esphome::climate;
     uint8_t command[6] = {0x06, SA_ID_CLIMATE, 0x00, 0x00, 0x00, 0x00};
     uint8_t buffer[6];
 
+    if (this->sa_id_ == 14)
+      command[1] = SA_ID_ERV;
+
     if (call.get_mode().has_value()) {
         this->mode = *call.get_mode();
         if (this->mode == CLIMATE_MODE_OFF) {
-            command[2] = WRITE | SERVICE_ID_CLIMATE_STATUS;
+            if (this->sa_id_ == 14)
+              command[2] = WRITE | SERVICE_ID_ERV_STATUS;
+            else
+              command[2] = WRITE | SERVICE_ID_CLIMATE_STATUS;
             command[4] = 0x0;
             this->parent_->power_switch(false);
         } else {
             uint8_t mode;
-            command[2] = WRITE | SERVICE_ID_CLIMATE_STATUS;
+            if (this->sa_id_ == 14)
+              command[2] = WRITE | SERVICE_ID_ERV_STATUS;
+            else
+              command[2] = WRITE | SERVICE_ID_CLIMATE_STATUS;
             command[4] = 0x1;
             command[5] = this->parent_->checksum(command, 5);
             this->parent_->send_cmd(command, buffer, 6);
@@ -104,7 +113,10 @@ using namespace esphome::climate;
                 break;
             }
             this->parent_->power_switch(true);
-            command[2] = WRITE | SERVICE_ID_CLIMATE_MODE;
+            if (this->sa_id_ == 14)
+              command[2] = WRITE | SERVICE_ID_ERV_MODE;
+            else
+              command[2] = WRITE | SERVICE_ID_CLIMATE_MODE;
             command[4] = mode;
         }
         command[5] = this->parent_->checksum(command, 5);
@@ -113,7 +125,10 @@ using namespace esphome::climate;
 
     if (call.get_target_temperature().has_value()) {
       this->target_temperature = *call.get_target_temperature();
-      command[2] = WRITE | SERVICE_ID_CLIMATE_TARGET_TEMPERATURE;
+      if (this->sa_id_ == 14)
+        command[2] = WRITE | SERVICE_ID_ERV_TARGET_TEMPERATURE;
+      else
+        command[2] = WRITE | SERVICE_ID_CLIMATE_TARGET_TEMPERATURE;
       command[4] = this->target_temperature;
       command[5] = this->parent_->checksum(command, 5);
       this->parent_->send_cmd(command, buffer, 6);
@@ -162,15 +177,24 @@ using namespace esphome::climate;
 
     if (call.get_fan_mode().has_value()) {
       this->fan_mode = *call.get_fan_mode();
-      command[2] = WRITE | SERVICE_ID_CLIMATE_FAN_SPEED;
+      if (this->sa_id_ == 14)
+        command[2] = WRITE | SERVICE_ID_ERV_FAN_SPEED;
+      else
+        command[2] = WRITE | SERVICE_ID_CLIMATE_FAN_SPEED;
 
       switch (this->fan_mode.value()) {
         case climate::CLIMATE_FAN_OFF:
-          command[2] = WRITE | SERVICE_ID_CLIMATE_STATUS;
+          if (this->sa_id_ == 14)
+            command[2] = WRITE | SERVICE_ID_ERV_STATUS;
+          else
+            command[2] = WRITE | SERVICE_ID_CLIMATE_STATUS;
           command[4] = 0;
         break;
         case climate::CLIMATE_FAN_ON:
-          command[2] = WRITE | SERVICE_ID_CLIMATE_STATUS;
+          if (this->sa_id_ == 14)
+            command[2] = WRITE | SERVICE_ID_ERV_STATUS;
+          else
+            command[2] = WRITE | SERVICE_ID_CLIMATE_STATUS;
           command[4] = 1;
         break;
         case climate::CLIMATE_FAN_AUTO:
@@ -373,12 +397,14 @@ using namespace esphome::climate;
       }
       switch (response[i]) {
         case SERVICE_ID_CLIMATE_STATUS:
+        //case SERVICE_ID_ERV_STATUS:
           if (get_u16(response, i + 1) != 1) {
               this->mode = CLIMATE_MODE_OFF;
               mode = this->mode;
           }
           break;
         case SERVICE_ID_CLIMATE_MODE:
+        //case SERVICE_ID_FAN_MODE:
           switch (response[i + 2]) {
             case 0:
               this->mode = CLIMATE_MODE_COOL;
@@ -403,6 +429,7 @@ using namespace esphome::climate;
 
         break;
         case SERVICE_ID_CLIMATE_FAN_SPEED:
+        //case SERVICE_ID_FAN_SPEED:
           this->fan_mode = CLIMATE_FAN_AUTO;
           switch (response[i + 2]) {
             case 0:
@@ -432,7 +459,10 @@ using namespace esphome::climate;
           }
           break;
         case SERVICE_ID_CLIMATE_TARGET_TEMPERATURE:
+        //case SERVICE_ID_ERV_TARGET_TEMPERATURE:
           this->target_temperature = (float)get_u16(response, i + 1);
+          if (this->sa_id_ == 14)
+            this->current_temperature = get_i16(response, i + 1);
           break;
         case SERVICE_ID_CLIMATE_TEMPERATURE_INDOOR:
           this->current_temperature = get_i16(response, i + 1);

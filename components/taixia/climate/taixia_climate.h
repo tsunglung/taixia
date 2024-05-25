@@ -26,6 +26,7 @@ class TaiXiaClimate : public climate::Climate, public TaiXiaListener, public Pol
 
   climate::ClimateTraits traits() override;
 
+  void set_sa_id(uint8_t sa_id) { this->sa_id_ = sa_id; }
   void set_max_temperature(float temp) { this->max_temp_ = temp; }
   void set_min_temperature(float temp) { this->min_temp_ = temp; }
   void set_temperature_step(float step) { this->temp_step_ = step; }
@@ -41,6 +42,7 @@ class TaiXiaClimate : public climate::Climate, public TaiXiaListener, public Pol
   void control(const climate::ClimateCall &call) override;
 
   TaiXia *parent_;
+  uint8_t sa_id_{1};
   bool supports_cool_{true};
   bool supports_heat_{false};
   bool supports_dry_{false};

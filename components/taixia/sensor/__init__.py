@@ -43,6 +43,7 @@ from .. import (
     CONF_AIRPURIFIER,
     CONF_DEHUMIDIFIER,
     CONF_WASHING_MACHINE,
+    CONF_ERV,
     CONF_ELECTRIC_FAN,
     CONF_SUPPORTED_SA
 )
@@ -54,6 +55,7 @@ Dehumidifier = taixia_ns.class_("DehumidifierSensor", cg.PollingComponent)
 Washing_Machine = taixia_ns.class_("WashingMachineSensor", cg.PollingComponent)
 AirPurifier = taixia_ns.class_("AirPurifierSensor", cg.PollingComponent)
 ElectricFan = taixia_ns.class_("ElectricFanSensor", cg.PollingComponent)
+Erv = taixia_ns.class_("ErvSensor", cg.PollingComponent)
 TaiXiaCustom = taixia_ns.class_("TaiXiaCustomSensor", cg.PollingComponent)
 TaiXiaCustomSub = taixia_ns.class_("TaiXiaCustomSubSensor", cg.PollingComponent)
 
@@ -387,6 +389,26 @@ CONFIG_SCHEMA = cv.typed_schema(
                 ),
             }
         ).extend(cv.polling_component_schema('30s')),
+        CONF_ERV: cv.COMPONENT_SCHEMA.extend(
+            {
+                cv.GenerateID(): cv.declare_id(Erv),
+                cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
+                cv.Optional(CONF_TEMPERATURE_INDOOR): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_PERCENT,
+                    icon=ICON_THERMOMETER,
+                    accuracy_decimals=1,
+                    device_class=DEVICE_CLASS_TEMPERATURE,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+                cv.Optional(CONF_TEMPERATURE_OUTDOOR): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_CELSIUS,
+                    icon=ICON_THERMOMETER,
+                    accuracy_decimals=1,
+                    device_class=DEVICE_CLASS_TEMPERATURE,
+                    state_class=STATE_CLASS_MEASUREMENT,
+                ),
+            }
+        ).extend(cv.polling_component_schema('30s')),
         CONF_ELECTRIC_FAN: cv.COMPONENT_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(ElectricFan),
@@ -592,6 +614,15 @@ async def to_code(config):
         if CONF_ENERGY_CONSUMPTON in config:
             sens = await sensor.new_sensor(config[CONF_ENERGY_CONSUMPTON])
             cg.add(var.set_energy_consumption_sensor(sens))
+
+    if config[CONF_TYPE] == CONF_ERV:
+        cg.add(var.set_sa_id(0x0E))
+        if CONF_TEMPERATURE_INDOOR in config:
+            sens = await sensor.new_sensor(config[CONF_TEMPERATURE_INDOOR])
+            cg.add(var.set_temperature_indoor_sensor(sens))
+        if CONF_TEMPERATURE_OUTDOOR in config:
+            sens = await sensor.new_sensor(config[CONF_TEMPERATURE_OUTDOOR])
+            cg.add(var.set_temperature_outdoor_sensor(sens))
 
     if config[CONF_TYPE] == CONF_ELECTRIC_FAN:
         cg.add(var.set_sa_id(0x0F))

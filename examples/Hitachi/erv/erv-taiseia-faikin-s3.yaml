@@ -1,0 +1,189 @@
+substitutions:
+  devicename: erv-taiseia-s3
+  upper_devicename: "ERV"
+
+esphome:
+  name: $devicename
+  friendly_name: ${upper_devicename}
+  comment: $upper_devicename for Hitachi KPI-152Y
+  name_add_mac_suffix: true
+  project:
+    name: TaiSEIA.erv
+    version: "faikin-s3-1.0"
+  platformio_options:
+    board_build.flash_mode: dio
+    board_build.mcu: esp32s3
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  framework:
+    type: arduino
+    version: 2.0.6
+
+external_components:
+  - source:
+      type: local
+      path: custom_components
+
+
+#packages:
+#  esphome.bluetooth-proxy: github://esphome/bluetooth-proxies/esp32-generic.yaml@main
+
+wifi:
+  networks:
+  - ssid: !secret wifi_ssid
+    password: !secret wifi_password
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${devicename}
+    password: "12345678"
+
+# Enable logging
+logger:
+  baud_rate: 0 # disable serial logging;
+#  hardware_uart: USB_SERIAL_JTAG
+#  level: VERY_VERBOSE
+
+# Enable Home Assistant API
+api:
+
+ota:
+
+web_server:
+
+uart:
+  id: uart_taixia
+  tx_pin: GPIO21
+  rx_pin: GPIO20
+  baud_rate: 9600
+  debug:
+    direction: BOTH
+
+# optional binary sensor to monitor serial connection:
+binary_sensor:
+  - platform: status
+    name: "Status"
+
+#bluetooth_proxy:
+#  active: true
+
+button:
+  - platform: safe_mode
+    name: Safe Mode Boot
+    entity_category: diagnostic
+  - platform: restart
+    name: "Restart"
+
+climate:
+  - platform: taixia
+    sa_id: 14
+    name: Climate
+    supported_modes:
+      - COOL
+      - HEAT
+      - DRY
+      - FAN_ONLY
+
+#esp32_ble_tracker:
+#  scan_parameters:
+#    interval: 1100ms
+#    window: 1100ms
+#    active: true
+
+light:
+  - platform: monochromatic
+    name: "Red LED"
+    output: blueLED
+    id: blue_led
+    effects:
+        - lambda:
+           name: Breathing
+           update_interval: 6s
+           lambda: |-
+            static int state = 0;
+            static int color = 1;
+            auto call = id(blue_led).turn_on(); //the id of your light
+            call.set_transition_length(5000);
+            if (state == 0) {
+              call.set_brightness(1.0);
+            } else if (state == 1) {
+             call.set_brightness(0.01);
+            }
+            call.perform();
+            state ++;
+            if (state == 2) {
+              state = 0;
+            }
+
+number:
+  - platform: taixia
+    type: erv
+    on_timer:
+      name: "On Timer"
+
+output:
+  - platform: ledc
+    id: blueLED
+    pin: GPIO8
+
+select:
+  - platform: taixia
+    type: erv
+    ventilate_mode:
+      name: "Ventilate Mode"
+    pre_heat_cool:
+      name: "Pre Heat/Cool"
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+
+  - platform: uptime
+    name: "Uptime"
+    filters:
+      - lambda: return x / 3600;
+    unit_of_measurement: "h"
+    accuracy_decimals: 1
+
+  - platform: taixia
+    type: erv
+    temperature_indoor:
+      name: "Temperature In"
+    temperature_outdoor:
+      name: "Temperature Out"
+
+switch:
+  - platform: taixia
+    type: airconditioner
+    power:
+      name: "Power Switch"
+
+text_sensor:
+  - platform: version
+    name: "ESPHome Version"
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+  - platform: taixia
+    sa_id:
+      name: "SA ID"
+      id: sa_id
+    brand:
+      name: "SA Brand"
+    model:
+      name: "SA Model"
+    version:
+      name: "SA Version"
+    services:
+      name: "SA Services"
+
+taixia:
+   sa_id: 14
+#  max_length: 100
+#  uart_id: uart_taixia
+
+time:
+  - platform: homeassistant
+    id: homeassistant_time

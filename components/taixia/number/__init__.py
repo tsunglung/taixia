@@ -13,6 +13,7 @@ from .. import (
     CONF_AIR_CONDITIONER,
     CONF_AIRPURIFIER,
     CONF_DEHUMIDIFIER,
+    CONF_ERV,
     CONF_ELECTRIC_FAN,
     CONF_SUPPORTED_SA
 )
@@ -79,6 +80,10 @@ DEHUMIDIFIER_TYPES = {
     CONF_SOUND_MODE: (0x10, 0, 2, 1),
     CONF_HIGH_HUMIDITY_LEVEL: (0x15, 0, 99, 1),
     CONF_LIGHT_LEVEL: (0x27, 0, 3, 1),
+}
+
+ERV_TYPES = {
+    CONF_ON_TIMER: (0x06, 0, 1440, 1)
 }
 
 FAN_TYPES = {
@@ -149,6 +154,10 @@ async def to_code(config):
     if config[CONF_TYPE] == CONF_AIRPURIFIER:
         for config_type, (service_id, min, max, step) in AIRPURIFIER_TYPES.items():
             await add_number(config, config_type, service_id, 8, max, min, step)
+
+    if config[CONF_TYPE] == CONF_ERV:
+        for config_type, (service_id, min, max, step) in ERV_TYPES.items():
+            await add_number(config, config_type, service_id, 14, max, min, step)
 
     if config[CONF_TYPE] == CONF_ELECTRIC_FAN:
         for config_type, (service_id, min, max, step) in FAN_TYPES.items():

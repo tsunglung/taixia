@@ -17,7 +17,7 @@ from esphome.components.climate import (
     ClimateMode,
     ClimateSwingMode
 )
-from .. import taixia_ns, CONF_TAIXIA_ID, TaiXia
+from .. import taixia_ns, CONF_TAIXIA_ID, CONF_SA_ID, TaiXia
 
 DEFAULT_MIN_TEMPERATURE = 16.0
 DEFAULT_MAX_TEMPERATURE = 35.0
@@ -70,11 +70,19 @@ SUPPORTED_CLIMATE_PRESET_OPTIONS = {
     "ACTIVITY": ClimatePreset.CLIMATE_PRESET_ACTIVITY,
 }
 
+OPTIONS_SWING_MODES = [
+    "OFF",
+    "VERTICAL",
+    "HORIZONTAL",
+    "BOTH"
+]
+
 CONFIG_SCHEMA = cv.All(
     climate.CLIMATE_SCHEMA.extend(
         {
             cv.GenerateID(CONF_OUTPUT_ID): cv.declare_id(TaiXiaClimate),
             cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
+            cv.Optional(CONF_SA_ID, default=1): cv.int_,
             cv.Optional(CONF_MAX_TEMPERATURE, default=DEFAULT_MAX_TEMPERATURE): cv.float_,
             cv.Optional(CONF_MIN_TEMPERATURE, default=DEFAULT_MIN_TEMPERATURE): cv.float_,
             cv.Optional(CONF_TEMPERATURE_STEP, default=DEFAULT_TEMPERATURE_STEP): cv.float_,
@@ -86,12 +94,6 @@ CONFIG_SCHEMA = cv.All(
             ),
             cv.Optional(
                 CONF_SUPPORTED_SWING_MODES,
-                default=[
-                    "OFF",
-                    "VERTICAL",
-                    "HORIZONTAL",
-                    "BOTH",
-                ],
             ): cv.ensure_list(cv.enum(SUPPORTED_SWING_MODES_OPTIONS, upper=True)),
             cv.Optional(CONF_SUPPORTED_PRESETS): cv.ensure_list(
                 cv.enum(SUPPORTED_CLIMATE_PRESET_OPTIONS, upper=True)
@@ -101,6 +103,18 @@ CONFIG_SCHEMA = cv.All(
     ).extend(cv.polling_component_schema("30s"))
 )
 
+
+def _validate_sa_id(config, sa_id):
+    if sa_id not in [1, 14]:
+        raise cv.Invalid("SA ID must be values 1 or 14")
+
+    if sa_id == 14:
+        if ((CONF_SUPPORTED_FAN_MODES in config) or
+            (CONF_SUPPORTED_SWING_MODES in config) or
+            (CONF_SUPPORTED_PRESETS in config)):
+            raise cv.Invalid("There are some unnecessary configurations for ERV.")
+
+
 async def to_code(config):
     taixia = await cg.get_variable(config[CONF_TAIXIA_ID])
 
@@ -108,6 +122,9 @@ async def to_code(config):
     await cg.register_component(var, config)
     await climate.register_climate(var, config)
 
+    if CONF_SA_ID in config:
+        _validate_sa_id(config, config[CONF_SA_ID])
+        cg.add(var.set_sa_id(config[CONF_SA_ID]))
     if CONF_MAX_TEMPERATURE in config:
         cg.add(var.set_max_temperature(config[CONF_MAX_TEMPERATURE]))
     if CONF_MIN_TEMPERATURE in config:
