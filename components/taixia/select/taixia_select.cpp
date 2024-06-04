@@ -276,12 +276,6 @@ static const char *const TAG = "taixia.select";
     }
   }
 
-  void ElectricFanSelect::dump_config() {
-    ESP_LOGCONFIG(TAG, "TaiXIA Fan Select:");
-    if (this->operating_program_select_ != nullptr)
-      LOG_SELECT("  ", "   Operating Program", this->operating_program_select_);
-  }
-
   void ErvSelect::control(const std::string &value) {
     uint8_t command[6] = {0x06, SA_ID_FAN, 0x00, 0x00, 0x00, 0x00};
     uint8_t buffer[6];
@@ -298,6 +292,12 @@ static const char *const TAG = "taixia.select";
     }
 
     ESP_LOGW(TAG, "Invalid value %s", value.c_str());
+  }
+
+  void ElectricFanSelect::dump_config() {
+    ESP_LOGCONFIG(TAG, "TaiXIA Fan Select:");
+    if (this->operating_program_select_ != nullptr)
+      LOG_SELECT("  ", "   Operating Program", this->operating_program_select_);
   }
 
   void ElectricFanSelect::handle_response(std::vector<uint8_t> &response) {

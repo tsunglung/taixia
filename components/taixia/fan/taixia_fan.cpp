@@ -70,7 +70,7 @@ static const char *const TAG = "taixia.fan";
         return 8;
       if (!mode.compare("eco"))
         return 9;
-      ESP_LOGE(TAG, "unknow mode", mode.c_str());
+      ESP_LOGE(TAG, "unknow mode %s", mode.c_str());
       return 0;
   }
 

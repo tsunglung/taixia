@@ -84,7 +84,7 @@ static const uint8_t RESPONSE_LENGTH = 255;
         this->sa_id_textsensor_->publish_state(sa_id);
       }
       // if not preset sa_id
-      if (this->sa_id_ == 0xffff)
+      if (this->sa_id_ == 0)
         this->sa_id_ = this->buffer_[3] << 8 | this->buffer_[4];
     }
     this->buffer_.clear();
@@ -128,9 +128,16 @@ static const uint8_t RESPONSE_LENGTH = 255;
     this->send(6, 0, 0x00, SERVICE_ID_READ_SERVICES, 0xFFFF);
     this->readline(false);
 
-    if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_SERVICES)) {
+    // compatible with Panasonic which do not include service id of read services in response
+    if ((this->buffer_[0] >= 0x0)
+//        && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_SERVICES)
+      ) {
       std::string services;
-      for (i = 3; i < this->buffer_[0]; i++) {
+      uint8_t start = 1;
+      if (this->buffer_[2] == SERVICE_ID_READ_SERVICES)
+        start = 3;
+
+      for (i = start; i < this->buffer_[0]; i++) {
         services = services + format_hex_pretty(this->buffer_[i]) + " ";
       }
       if (this->services_textsensor_ != nullptr) {
@@ -196,7 +203,7 @@ static const uint8_t RESPONSE_LENGTH = 255;
       }
 
       // if not preset sa_id
-      if (this->sa_id_ == 0xffff)
+      if (this->sa_id_ == 0)
         this->sa_id_ = this->buffer_[6] << 8 | this->buffer_[7];
       } else {
         this->get_info_();

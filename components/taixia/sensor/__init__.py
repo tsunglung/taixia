@@ -28,6 +28,7 @@ from esphome.const import (
     ICON_CHEMICAL_WEAPON,
     STATE_CLASS_MEASUREMENT,
     UNIT_CELSIUS,
+    UNIT_AMPERE,
     UNIT_HOUR,
     UNIT_PERCENT,
     UNIT_KILOWATT_HOURS,
@@ -127,7 +128,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                     state_class=STATE_CLASS_MEASUREMENT,
                 ),
                 cv.Optional(CONF_OPERATING_CURRENT): sensor.sensor_schema(
-                    unit_of_measurement=UNIT_PERCENT,
+                    unit_of_measurement=UNIT_AMPERE,
                     icon=ICON_CURRENT_AC,
                     accuracy_decimals=0,
                     device_class=DEVICE_CLASS_POWER,
@@ -508,7 +509,7 @@ async def to_code(config):
             cg.add(var.set_operating_voltage_sensor(sens))
         if CONF_OPERATING_WATT in config:
             sens = await sensor.new_sensor(config[CONF_OPERATING_WATT])
-            cg.add(var.set_operating_watt_sensor(sens))
+            cg.add(var.set_operating_power_sensor(sens))
         if CONF_ENERGY_CONSUMPTON in config:
             sens = await sensor.new_sensor(config[CONF_ENERGY_CONSUMPTON])
             cg.add(var.set_energy_consumption_sensor(sens))
@@ -553,7 +554,7 @@ async def to_code(config):
             cg.add(var.set_operating_voltage_sensor(sens))
         if CONF_OPERATING_WATT in config:
             sens = await sensor.new_sensor(config[CONF_OPERATING_WATT])
-            cg.add(var.set_operating_watt_sensor(sens))
+            cg.add(var.set_operating_power_sensor(sens))
         if CONF_ENERGY_CONSUMPTON in config:
             sens = await sensor.new_sensor(config[CONF_ENERGY_CONSUMPTON])
             cg.add(var.set_energy_consumption_sensor(sens))
@@ -586,7 +587,7 @@ async def to_code(config):
             cg.add(var.set_operating_voltage_sensor(sens))
         if CONF_OPERATING_WATT in config:
             sens = await sensor.new_sensor(config[CONF_OPERATING_WATT])
-            cg.add(var.set_operating_watt_sensor(sens))
+            cg.add(var.set_operating_power_sensor(sens))
         if CONF_ENERGY_CONSUMPTON in config:
             sens = await sensor.new_sensor(config[CONF_ENERGY_CONSUMPTON])
             cg.add(var.set_energy_consumption_sensor(sens))
@@ -610,7 +611,7 @@ async def to_code(config):
             cg.add(var.set_operating_voltage_sensor(sens))
         if CONF_OPERATING_WATT in config:
             sens = await sensor.new_sensor(config[CONF_OPERATING_WATT])
-            cg.add(var.set_operating_watt_sensor(sens))
+            cg.add(var.set_operating_power_sensor(sens))
         if CONF_ENERGY_CONSUMPTON in config:
             sens = await sensor.new_sensor(config[CONF_ENERGY_CONSUMPTON])
             cg.add(var.set_energy_consumption_sensor(sens))
@@ -640,7 +641,7 @@ async def to_code(config):
             cg.add(var.set_operating_voltage_sensor(sens))
         if CONF_OPERATING_WATT in config:
             sens = await sensor.new_sensor(config[CONF_OPERATING_WATT])
-            cg.add(var.set_operating_watt_sensor(sens))
+            cg.add(var.set_operating_power_sensor(sens))
         if CONF_ENERGY_CONSUMPTON in config:
             sens = await sensor.new_sensor(config[CONF_ENERGY_CONSUMPTON])
             cg.add(var.set_energy_consumption_sensor(sens))
