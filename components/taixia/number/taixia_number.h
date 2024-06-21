@@ -15,7 +15,7 @@ class TaiXiaNumber : public number::Number, public TaiXiaListener, public Compon
   void dump_config() override;
 
  protected:
-  void control(float value) override;
+  void control(double value) override;
   uint8_t service_id_;
   uint8_t sa_id_;
 
