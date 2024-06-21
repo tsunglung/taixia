@@ -234,7 +234,7 @@ static const uint8_t RESPONSE_LENGTH = 255;
     uint8_t response[RESPONSE_LENGTH];
     uint8_t cmd[6] = {0x06, sa_id, (uint8_t)(WRITE | service_id), 0x00, 0x00, 0x00};
 
-    cmd[3] = int(value) << 8 & 0xFF00;
+    cmd[3] = (int(value) & 0xFF00) >> 8;
     cmd[4] = int(value) & 0xFF;
     cmd[5] = this->checksum(cmd, 5);
     this->write_command_(cmd, response, 6, 6);
