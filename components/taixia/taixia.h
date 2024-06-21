@@ -233,7 +233,7 @@ class TaiXia : public uart::UARTDevice, public Component {
       return write_command_(command, response, len, len);
   }
   void switch_command(uint8_t sa_id, uint8_t service_id, bool onoff);
-  void set_number(uint8_t sa_id, uint8_t service_id, double value);
+  void set_number(uint8_t sa_id, uint8_t service_id, float value);
   void get_number(uint8_t sa_id, uint8_t service_id, uint8_t *buffer);
   void button_command(uint8_t sa_id, uint8_t service_id);
   bool have_sensors() { return this->have_sensors_; }

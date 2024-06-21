@@ -226,7 +226,7 @@ static const uint8_t RESPONSE_LENGTH = 255;
     this->write_command_(cmd, response, 6, 6);
   }
 
-  void TaiXia::set_number(uint8_t sa_id, uint8_t service_id, double value) {
+  void TaiXia::set_number(uint8_t sa_id, uint8_t service_id, float value) {
     ESP_LOGV(TAG, "set number: %d %d %f", sa_id, service_id, value);
     if (this->sa_id_ != sa_id)
       return;

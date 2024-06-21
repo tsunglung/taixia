@@ -18,7 +18,7 @@ static const char *const TAG = "taixia.nubmer";
       this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
   }
 
-  void TaiXiaNumber::control(double value) {
+  void TaiXiaNumber::control(float value) {
     if (this->service_id_ > 0) {
       this->parent_->set_number(this->sa_id_, this->service_id_, value);
       this->publish_state(value);
