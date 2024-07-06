@@ -460,7 +460,7 @@ using namespace esphome::climate;
           break;
         case SERVICE_ID_CLIMATE_TARGET_TEMPERATURE:
         //case SERVICE_ID_ERV_TARGET_TEMPERATURE:
-          this->target_temperature = (float)get_u16(response, i + 1);
+          this->target_temperature = (float)get_i16(response, i + 1);
           if (this->sa_id_ == 14)
             this->current_temperature = get_i16(response, i + 1);
           break;
