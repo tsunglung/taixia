@@ -120,7 +120,6 @@ void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
       break;
       case SERVICE_ID_CLIMATE_OPERATING_CURRENT:
         if (this->operating_current_sensor_ != nullptr) {
-          ESP_LOGE(TAG, "operating current %x %x %x", response[i], response[i+1], response[i+2]);
           publish_float_div_10(response, i, this->operating_current_sensor_);
         }
       break;

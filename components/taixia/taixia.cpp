@@ -75,6 +75,9 @@ static const uint8_t RESPONSE_LENGTH = 255;
     this->buffer_.clear();
 
     this->send(6, 0, 0x00, SERVICE_ID_READ_SA_ID, 0xFFFF);
+    if (this->response_time_ != 0) {
+      delayMicroseconds(this->response_time_);
+    }
     this->readline(false);
 
     if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_SA_ID)) {
@@ -90,6 +93,9 @@ static const uint8_t RESPONSE_LENGTH = 255;
     this->buffer_.clear();
 
     this->send(6, 0, 0x00, SERVICE_ID_READ_BRAND, 0xFFFF);
+    if (this->response_time_ != 0) {
+      delayMicroseconds(this->response_time_);
+    }
     this->readline(false);
 
     if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_BRAND)) {
@@ -108,6 +114,9 @@ static const uint8_t RESPONSE_LENGTH = 255;
     this->buffer_.clear();
 
     this->send(6, 0, 0x00, SERVICE_ID_READ_MODEL, 0xFFFF);
+    if (this->response_time_ != 0) {
+      delayMicroseconds(this->response_time_);
+    }
     this->readline(false);
 
     if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_MODEL)) {
@@ -126,6 +135,9 @@ static const uint8_t RESPONSE_LENGTH = 255;
     this->buffer_.clear();
 
     this->send(6, 0, 0x00, SERVICE_ID_READ_SERVICES, 0xFFFF);
+    if (this->response_time_ != 0) {
+      delayMicroseconds(this->response_time_);
+    }
     this->readline(false);
 
     uint8_t len = this->buffer_[0];
@@ -436,6 +448,9 @@ static const uint8_t RESPONSE_LENGTH = 255;
 
     this->write_array(frame, packet_length);
     this->flush();
+    if (this->response_time_ != 0) {
+      delayMicroseconds(this->response_time_);
+    }
     return true;
   }
 
