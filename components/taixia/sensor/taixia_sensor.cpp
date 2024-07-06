@@ -45,6 +45,16 @@ static inline void publish_u16_div_10(std::vector<uint8_t> &response, int start,
   }
 }
 
+static inline void publish_float_div_10(std::vector<uint8_t> &response, int start, sensor::Sensor *sensor) {
+  if ((response[start + 1] == 0xFF) && (response[start + 2] == 0xFF)) {
+    sensor->publish_state(0.0f);
+  } else {
+    float new_state = get_u16(response, start + 1) / 10.0f;
+    if (sensor->get_state() != new_state)
+      sensor->publish_state(new_state);
+  }
+}
+
 void AirConditionerSensor::dump_config() {
   ESP_LOGCONFIG(TAG, "Air Conditioner:");
   if (this->temperature_indoor_sensor_ != nullptr)
@@ -110,7 +120,8 @@ void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
       break;
       case SERVICE_ID_CLIMATE_OPERATING_CURRENT:
         if (this->operating_current_sensor_ != nullptr) {
-          publish_u16_div_10(response, i, this->operating_current_sensor_);
+          ESP_LOGE(TAG, "operating current %x %x %x", response[i], response[i+1], response[i+2]);
+          publish_float_div_10(response, i, this->operating_current_sensor_);
         }
       break;
       case SERVICE_ID_CLIMATE_OPERATING_VOLTAGE:
@@ -125,7 +136,7 @@ void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
       break;
       case SERVICE_ID_CLIMATE_ENERGY_CONSUMPTION:
         if (this->energy_consumption_sensor_ != nullptr) {
-          publish_u16_div_10(response, i, this->energy_consumption_sensor_);
+          publish_float_div_10(response, i, this->energy_consumption_sensor_);
         }
       break;
       case SERVICE_ID_CLIMATE_OPERATING_HOURS:
@@ -217,7 +228,7 @@ void DehumidifierSensor::handle_response(std::vector<uint8_t> &response) {
       break;
       case SERVICE_ID_DEHUMIDTFIER_OPERATING_CURRENT:
         if (this->operating_current_sensor_ != nullptr) {
-          publish_u16_div_10(response, i, this->operating_current_sensor_);
+          publish_float_div_10(response, i, this->operating_current_sensor_);
         }
       break;
       case SERVICE_ID_DEHUMIDTFIER_OPERATING_VOLTAGE:
@@ -232,7 +243,7 @@ void DehumidifierSensor::handle_response(std::vector<uint8_t> &response) {
       break;
       case SERVICE_ID_DEHUMIDTFIER_ENERGY_CONSUMPTION:
         if (this->energy_consumption_sensor_ != nullptr) {
-          publish_u16_div_10(response, i, this->energy_consumption_sensor_);
+          publish_float_div_10(response, i, this->energy_consumption_sensor_);
         }
       break;
       case SERVICE_ID_DEHUMIDTFIER_PM_2_5:
@@ -356,7 +367,7 @@ void WashingMachineSensor::handle_response(std::vector<uint8_t> &response) {
       break;
       case SERVICE_ID_WASHER_OPERATING_CURRENT:
         if (this->operating_current_sensor_ != nullptr) {
-          publish_u16_div_10(response, i, this->operating_current_sensor_);
+          publish_float_div_10(response, i, this->operating_current_sensor_);
         }
       break;
       case SERVICE_ID_WASHER_OPERATING_VOLTAGE:
@@ -371,7 +382,7 @@ void WashingMachineSensor::handle_response(std::vector<uint8_t> &response) {
       break;
       case SERVICE_ID_WASHER_ENERGY_CONSUMPTION:
         if (this->energy_consumption_sensor_ != nullptr) {
-          publish_u16_div_10(response, i, this->energy_consumption_sensor_);
+          publish_float_div_10(response, i, this->energy_consumption_sensor_);
         }
       break;
     }
@@ -424,7 +435,7 @@ void AirPurifierSensor::handle_response(std::vector<uint8_t> &response) {
       break;
       case SERVICE_ID_PURIFIER_OPERATING_CURRENT:
         if (this->operating_current_sensor_ != nullptr) {
-          publish_u16_div_10(response, i, this->operating_current_sensor_);
+          publish_float_div_10(response, i, this->operating_current_sensor_);
         }
       break;
       case SERVICE_ID_PURIFIER_OPERATING_VOLTAGE:
@@ -439,7 +450,7 @@ void AirPurifierSensor::handle_response(std::vector<uint8_t> &response) {
       break;
       case SERVICE_ID_PURIFIER_ENERGY_CONSUMPTION:
         if (this->energy_consumption_sensor_ != nullptr) {
-          publish_u16_div_10(response, i, this->energy_consumption_sensor_);
+          publish_float_div_10(response, i, this->energy_consumption_sensor_);
         }
       break;
     }
@@ -546,7 +557,7 @@ void ElectricFanSensor::handle_response(std::vector<uint8_t> &response) {
       break;
       case SERVICE_ID_FAN_OPERATING_CURRENT:
         if (this->operating_current_sensor_ != nullptr) {
-          publish_u16_div_10(response, i, this->operating_current_sensor_);
+          publish_float_div_10(response, i, this->operating_current_sensor_);
         }
       break;
       case SERVICE_ID_FAN_OPERATING_VOLTAGE:
@@ -561,7 +572,7 @@ void ElectricFanSensor::handle_response(std::vector<uint8_t> &response) {
       break;
       case SERVICE_ID_FAN_ENERGY_CONSUMPTION:
         if (this->energy_consumption_sensor_ != nullptr) {
-          publish_u16_div_10(response, i, this->energy_consumption_sensor_);
+          publish_float_div_10(response, i, this->energy_consumption_sensor_);
         }
       break;
     }

@@ -512,6 +512,8 @@ using namespace esphome::climate;
       this->swing_mode = climate::CLIMATE_SWING_VERTICAL;
     else if ((swing_vertical == 1) && (swing_horizontal == 0))
       this->swing_mode = climate::CLIMATE_SWING_HORIZONTAL;
+    else
+      this->swing_mode = climate::CLIMATE_SWING_OFF;
 
     this->publish_state();
   }
