@@ -128,9 +128,20 @@ static const uint8_t RESPONSE_LENGTH = 255;
     this->send(6, 0, 0x00, SERVICE_ID_READ_SERVICES, 0xFFFF);
     this->readline(false);
 
+    uint8_t len = this->buffer_[0];
+    uint8_t crc = 0;
+    if (len >= 6) {
+      uint8_t data = 0;
+      for (i = 0; i < len - 1; i++) {
+        data = this->buffer_[i];
+        crc ^= data++;
+      }
+    }
+
     // compatible with Panasonic which do not include service id of read services in response
     if ((this->buffer_[0] >= 0x0)
 //        && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_SERVICES)
+        && crc == this->buffer_[len - 1]
       ) {
       std::string services;
       uint8_t start = 1;

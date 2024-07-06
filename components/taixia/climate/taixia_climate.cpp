@@ -470,8 +470,16 @@ using namespace esphome::climate;
         case SERVICE_ID_CLIMATE_SWING_VERTICAL:
           swing_vertical = get_u16(response, i + 1);
           break;
+        case SERVICE_ID_CLIMATE_SWING_VERTICAL_LEVEL:
+          if (get_u16(response, i + 1) >= 1)
+            swing_vertical = 1;
+          break;
         case SERVICE_ID_CLIMATE_SWING_HORIZONTAL:
           swing_horizontal = get_u16(response, i + 1);
+          break;
+        case SERVICE_ID_CLIMATE_SWING_HORIZONTAL_LEVEL:
+          if (get_u16(response, i + 1) >= 1)
+            swing_horizontal = 1;
           break;
         case SERVICE_ID_CLIMATE_SLEEP:
           if (get_u16(response, i + 1) == 1)
