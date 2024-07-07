@@ -173,4 +173,4 @@ async def to_code(config):
     cg.add(var.set_parent(taixia))
     cg.add(var.set_service_id(0x00))
     cg.add(var.set_sa_id(sa_id))
-
+    cg.add(taixia.register_listener(var))
