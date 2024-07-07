@@ -192,7 +192,7 @@ text_sensor:
 
 taixia:
   sa_id: 1
-  response_time: 20000
+  response_time: 65000
 
 time:
   - platform: homeassistant
