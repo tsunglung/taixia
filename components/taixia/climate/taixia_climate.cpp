@@ -143,7 +143,7 @@ using namespace esphome::climate;
           command[4] = 0x01;
         break;
         case climate::CLIMATE_PRESET_AWAY:
-          command[2] = WRITE | SERVICE_ID_CLIMATE_DEFROST;
+          command[2] = WRITE | SERVICE_ID_CLIMATE_SELF_CLEANING;
           command[4] = 0x01;
         break;
         case climate::CLIMATE_PRESET_BOOST:

@@ -40,6 +40,7 @@ CONF_MOISTURIZE = "moisturize"
 CONF_FILTER_RESET = "filter_reset"
 CONF_PM25_DETECT = "pm25_detect"
 CONF_FROST_WASH = "frost_wash"
+CONF_SELF_CLEANING = "self_cleaning"
 
 DEFAULT_ICON = "mdi:toggle-switch-variant"
 ICONS = {
@@ -59,7 +60,8 @@ ICONS = {
     CONF_LOCK: "mdi:lock",
     CONF_FILTER_RESET: "filter-cog-outline",
     CONF_PM25_DETECT: "mdi:molecule",
-    CONF_FROST_WASH: "mdi:snowflake-melt"
+    CONF_FROST_WASH: "mdi:snowflake-melt",
+    CONF_SELF_CLEANING: "mdi:broom"
 }
 
 CLIMATE_TYPES = {
@@ -70,6 +72,7 @@ CLIMATE_TYPES = {
     CONF_FILTER_NOTIFY: 0x12,
     CONF_AIR_DETECT: 0x16,
     CONF_MILDEW_PROOF: 0x17,
+    CONF_SELF_CLEANING: 0x18,
     CONF_SUPER_MODE: 0x1A,
     CONF_POWER_SAVING: 0x1B,
     CONF_BEEPER: 0x1E,
