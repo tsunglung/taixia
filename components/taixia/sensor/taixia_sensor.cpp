@@ -93,7 +93,7 @@ void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
       response[0], response[1], response[2], response[3], \
       response[4], response[5], response[6], response[7], response[8]);
 
-  for (i = 3; i < response[0] - 3; i+=3) {
+  for (i = 9; i < response[0] - 3; i+=3) {
     if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
       continue;
     }
@@ -309,7 +309,7 @@ void WashingMachineSensor::handle_response(std::vector<uint8_t> &response) {
       response[0], response[1], response[2], response[3], \
       response[4], response[5], response[6], response[7], response[8]);
 
-  for (i = 3; i < response[0] - 3; i+=3) {
+  for (i = 9; i < response[0] - 3; i+=3) {
     if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
       continue;
     }
@@ -422,7 +422,7 @@ void AirPurifierSensor::handle_response(std::vector<uint8_t> &response) {
       response[0], response[1], response[2], response[3], \
       response[4], response[5], response[6], response[7], response[8]);
 
-  for (i = 3; i < response[0] - 3; i+=3) {
+  for (i = 9; i < response[0] - 3; i+=3) {
     if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
       continue;
     }
@@ -484,7 +484,7 @@ void ErvSensor::handle_response(std::vector<uint8_t> &response) {
       response[0], response[1], response[2], response[3], \
       response[4], response[5], response[6], response[7], response[8]);
 
-  for (i = 3; i < response[0] - 3; i+=3) {
+  for (i = 9; i < response[0] - 3; i+=3) {
     if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
       continue;
     }
@@ -539,7 +539,7 @@ void ElectricFanSensor::handle_response(std::vector<uint8_t> &response) {
       response[0], response[1], response[2], response[3], \
       response[4], response[5], response[6], response[7], response[8]);
 
-  for (i = 3; i < response[0] - 3; i+=3) {
+  for (i = 9; i < response[0] - 3; i+=3) {
     if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
       continue;
     }

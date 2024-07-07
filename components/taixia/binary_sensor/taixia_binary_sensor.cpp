@@ -19,7 +19,7 @@ static const char *const TAG = "taixia.binary_sensor";
         response[0], response[1], response[2], response[3], \
         response[4], response[5], response[6], response[7], response[8]);
 
-    for (i = 3; i < response[0] - 3; i+=3) {
+    for (i = 6; i < response[0] - 3; i+=3) {
       if (this->service_id_ == 0x00) {
         this->state = bool(response[4]);
         goto done;
