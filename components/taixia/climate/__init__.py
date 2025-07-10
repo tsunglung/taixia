@@ -78,7 +78,7 @@ OPTIONS_SWING_MODES = [
 ]
 
 CONFIG_SCHEMA = cv.All(
-    climate.CLIMATE_SCHEMA.extend(
+    climate.climate_schema(TaiXiaClimate).extend(
         {
             cv.GenerateID(CONF_OUTPUT_ID): cv.declare_id(TaiXiaClimate),
             cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),

@@ -49,7 +49,7 @@ SUPPORTED_DEHUMIDIFIER_MODES_OPTIONS = {
 TaiXiaFan = taixia_ns.class_("TaiXiaFan", cg.PollingComponent, fan.Fan)
 
 CONFIG_SCHEMA = cv.All(
-    fan.FAN_SCHEMA.extend(
+    fan.fan_schema(TaiXiaFan).extend(
         {
             cv.GenerateID(CONF_OUTPUT_ID): cv.declare_id(TaiXiaFan),
             cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
