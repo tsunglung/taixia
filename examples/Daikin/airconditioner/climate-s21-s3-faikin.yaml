@@ -18,11 +18,10 @@ esp32:
   board: esp32-s3-devkitc-1
   variant: esp32s3
   framework:
-    type: arduino
-    version: 2.0.6
+    type: esp-idf
 
 external_components:
-  - source: github://joshbenner/esphome-daikin-s21@main
+  - source: github://asund/esphome-daikin-s21@main
     components: [ daikin_s21 ]
 
 wifi:
@@ -34,6 +33,8 @@ wifi:
     ssid: ${devicename}
     password: "12345678"
 
+captive_portal:
+
 # Enable logging
 logger:
   baud_rate: 0 # disable serial logging;
@@ -44,8 +45,9 @@ logger:
 api:
 
 ota:
+  - platform: esphome
 
-#web_server:
+# web_server:
 
 uart:
   - id: s21_uart
@@ -73,13 +75,32 @@ climate:
     platform: daikin_s21
     visual:
       temperature_step: 1.0
+    supports_humidity: true
     # Optional HA sensor used to alter setpoint.
     room_temperature_sensor: room_temp  # See homeassistant sensor below
+    setpoint_interval: 300s
+#    has_presets: false
+    supported_modes:
+      - COOL
+      - HEAT
+      - DRY
+      - FAN_ONLY
 
 # optional binary sensor to monitor serial connection:
 binary_sensor:
   - platform: status
     name: "Status"
+  - platform: daikin_s21
+    powerful:
+      name: Powerful
+    defrost:
+      name: Defrost
+    valve:
+      name: Valve
+    short_cycle:
+      name: Short Cycle
+    system_defrost:
+      name: System Defrost
 
 #bluetooth_proxy:
 #  active: true
@@ -125,7 +146,7 @@ light:
     pin: GPIO47
     num_leds: 3
     rgb_order: GRB
-    rmt_channel: 0
+    # rmt_channel: 0
     id: s3_wled
     name: "RGB LED"
 
@@ -151,6 +172,17 @@ sensor:
       name: Daikin Coil Temperature
     fan_speed:
       name: Daikin Fan Speed
+    swing_vertical_angle:
+      name: Swing Vertical Angle
+    compressor_frequency:
+      name: Compressor Frequency
+    humidity:
+      name: Humidity
+    demand:
+      name: Demand  # 0-15 demand units, use filter to map to %
+      filters:
+        - multiply: !lambda return 100.0F / 15.0F;
+
   - platform: homeassistant
     id: room_temp
     entity_id: sensor.temperature_158d000111fe66
