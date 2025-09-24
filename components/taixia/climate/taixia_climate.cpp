@@ -142,35 +142,83 @@ using namespace esphome::climate;
       this->preset = *call.get_preset();
       command[2] = 0;
       switch (this->preset.value()) {
-        case climate::CLIMATE_PRESET_HOME:
+        case climate::CLIMATE_PRESET_NONE:
+          ESP_LOGV(TAG, "SERVICE_ID_CLIMATE_ECO(%2.2x) turn off", SERVICE_ID_CLIMATE_ECO);
+          command[2] = WRITE | SERVICE_ID_CLIMATE_ECO;
+          command[4] = 0x00;
+          command[5] = this->parent_->checksum(command, 5);
+          this->parent_->send_cmd(command, buffer, 6);
+
+          ESP_LOGV(TAG, "SERVICE_ID_CLIMATE_SELF_CLEANING(%2.2x) turn off", SERVICE_ID_CLIMATE_SELF_CLEANING);
+          command[2] = WRITE | SERVICE_ID_CLIMATE_SELF_CLEANING;
+          command[4] = 0x00;
+          command[5] = this->parent_->checksum(command, 5);
+          this->parent_->send_cmd(command, buffer, 6);
+
+          ESP_LOGV(TAG, "SERVICE_ID_CLIMATE_BOOST(%2.2x) turn off", SERVICE_ID_CLIMATE_BOOST);
+          command[2] = WRITE | SERVICE_ID_CLIMATE_BOOST;
+          command[4] = 0x00;
+          command[5] = this->parent_->checksum(command, 5);
+          this->parent_->send_cmd(command, buffer, 6);
+
+          ESP_LOGV(TAG, "SERVICE_ID_CLIMATE_COMFORT(%2.2x) turn off", SERVICE_ID_CLIMATE_COMFORT);
+          command[2] = WRITE | SERVICE_ID_CLIMATE_COMFORT;
+          command[4] = 0x00;
+          command[5] = this->parent_->checksum(command, 5);
+          this->parent_->send_cmd(command, buffer, 6);
+
+          ESP_LOGV(TAG, "SERVICE_ID_CLIMATE_AIR_PURIFIER(%2.2x) turn off", SERVICE_ID_CLIMATE_AIR_PURIFIER);
           command[2] = WRITE | SERVICE_ID_CLIMATE_AIR_PURIFIER;
+          command[4] = 0x00;
+          command[5] = this->parent_->checksum(command, 5);
+          this->parent_->send_cmd(command, buffer, 6);
+
+          ESP_LOGV(TAG, "SERVICE_ID_CLIMATE_SLEEP(%2.2x) turn off", SERVICE_ID_CLIMATE_SLEEP);
+          command[2] = WRITE | SERVICE_ID_CLIMATE_SLEEP;
+          command[4] = 0x00;
+          command[5] = this->parent_->checksum(command, 5);
+          this->parent_->send_cmd(command, buffer, 6);
+
+          ESP_LOGV(TAG, "SERVICE_ID_CLIMATE_ACTIVITY(%2.2x) turn off", SERVICE_ID_CLIMATE_ACTIVITY);
+          command[2] = WRITE | SERVICE_ID_CLIMATE_ACTIVITY;
+          command[4] = 0x00;
+          // command[5] = this->parent_->checksum(command, 5);
+          // this->parent_->send_cmd(command, buffer, 6);
+          break;
+        case climate::CLIMATE_PRESET_ECO:
+          ESP_LOGV(TAG, "CLIMATE_PRESET_ECO=>SERVICE_ID_CLIMATE_ECO(%2.2x) turn ON", SERVICE_ID_CLIMATE_ECO);
+          command[2] = WRITE | SERVICE_ID_CLIMATE_ECO;
           command[4] = 0x01;
         break;
         case climate::CLIMATE_PRESET_AWAY:
+          ESP_LOGV(TAG, "CLIMATE_PRESET_AWAY=>SERVICE_ID_CLIMATE_SELF_CLEANING(%2.2x) turn ON", SERVICE_ID_CLIMATE_SELF_CLEANING);
           command[2] = WRITE | SERVICE_ID_CLIMATE_SELF_CLEANING;
           command[4] = 0x01;
         break;
         case climate::CLIMATE_PRESET_BOOST:
+          ESP_LOGV(TAG, "CLIMATE_PRESET_BOOST=>SERVICE_ID_CLIMATE_BOOST(%2.2x) turn ON", SERVICE_ID_CLIMATE_BOOST);
           command[2] = WRITE | SERVICE_ID_CLIMATE_BOOST;
           command[4] = 0x01;
         break;
         case climate::CLIMATE_PRESET_COMFORT:
+          ESP_LOGV(TAG, "CLIMATE_PRESET_COMFORT=>SERVICE_ID_CLIMATE_COMFORT(%2.2x) turn ON", SERVICE_ID_CLIMATE_COMFORT);
           command[2] = WRITE | SERVICE_ID_CLIMATE_COMFORT;
           command[4] = 0x01;
         break;
-        case climate::CLIMATE_PRESET_ECO:
-          command[2] = WRITE | SERVICE_ID_CLIMATE_ECO;
+        case climate::CLIMATE_PRESET_HOME:
+          ESP_LOGV(TAG, "CLIMATE_PRESET_HOME=>SERVICE_ID_CLIMATE_AIR_PURIFIER(%2.2x) turn ON", SERVICE_ID_CLIMATE_AIR_PURIFIER);
+          command[2] = WRITE | SERVICE_ID_CLIMATE_AIR_PURIFIER;
           command[4] = 0x01;
         break;
         case climate::CLIMATE_PRESET_SLEEP:
+          ESP_LOGV(TAG, "CLIMATE_PRESET_SLEEP=>SERVICE_ID_CLIMATE_SLEEP(%2.2x) turn ON", SERVICE_ID_CLIMATE_SLEEP);
           command[2] = WRITE | SERVICE_ID_CLIMATE_SLEEP;
           command[4] = 0x01;
         break;
         case climate::CLIMATE_PRESET_ACTIVITY:
+          ESP_LOGV(TAG, "CLIMATE_PRESET_ACTIVITY=>SERVICE_ID_CLIMATE_ACTIVITY(%2.2x) turn ON", SERVICE_ID_CLIMATE_ACTIVITY);
           command[2] = WRITE | SERVICE_ID_CLIMATE_ACTIVITY;
           command[4] = 0x01;
-        break;
-        case climate::CLIMATE_PRESET_NONE:
         break;
       }
       if (command[2] != 0) {
@@ -572,6 +620,27 @@ using namespace esphome::climate;
             swing_horizontal = 0;
           }
           break;
+        // presets
+        case SERVICE_ID_CLIMATE_ECO:
+          if (get_u16(response, i + 1) == 1)
+            this->preset = climate::CLIMATE_PRESET_ECO;
+          break;
+        case SERVICE_ID_CLIMATE_SELF_CLEANING:
+          if (get_u16(response, i + 1) == 1)
+            this->preset = climate::CLIMATE_PRESET_AWAY;
+          break;
+        case SERVICE_ID_CLIMATE_BOOST:
+          if (get_u16(response, i + 1) == 1)
+            this->preset = climate::CLIMATE_PRESET_BOOST;
+          break;
+        case SERVICE_ID_CLIMATE_COMFORT:
+          if (get_u16(response, i + 1) == 1)
+            this->preset = climate::CLIMATE_PRESET_COMFORT;
+          break;
+        case SERVICE_ID_CLIMATE_AIR_PURIFIER:
+          if (get_u16(response, i + 1) == 1)
+            this->preset = climate::CLIMATE_PRESET_HOME;
+          break;
         case SERVICE_ID_CLIMATE_SLEEP:
           if (get_u16(response, i + 1) == 1)
             this->preset = climate::CLIMATE_PRESET_SLEEP;
@@ -580,18 +649,7 @@ using namespace esphome::climate;
           if (get_u16(response, i + 1) == 1)
             this->preset = climate::CLIMATE_PRESET_ACTIVITY;
           break;
-        case SERVICE_ID_CLIMATE_BOOST:
-          if (get_u16(response, i + 1) == 1)
-            this->preset = climate::CLIMATE_PRESET_BOOST;
-          break;
-        case SERVICE_ID_CLIMATE_ECO:
-          if (get_u16(response, i + 1) == 1)
-            this->preset = climate::CLIMATE_PRESET_ECO;
-          break;
-        case SERVICE_ID_CLIMATE_COMFORT:
-          if (get_u16(response, i + 1) == 1)
-            this->preset = climate::CLIMATE_PRESET_COMFORT;
-          break;
+        //
         case SERVICE_ID_CLIMATE_HUMIDITY_INDOOR:
           this->current_humidity = get_i16(response, i + 1);
           break;
