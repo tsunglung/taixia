@@ -16,6 +16,8 @@ class AirConditionerSelect : public select::Select, public TaiXiaListener, publi
   void set_fuzzy_mode_select(select::Select *select) { this->fuzzy_mode_select_ = select; }
   void set_display_mode_select(select::Select *select) { this->display_mode_select_ = select; }
   void set_motion_detect_select(select::Select *select) { this->motion_detect_select_ = select; }
+  void set_swing_horizontal_level_select(select::Select *select) { this->swing_horizontal_level_select_ = select; }
+
   void set_service_id(uint8_t service_id) { this->service_id_ = service_id; }
   void set_select_mappings(std::vector<uint8_t> mappings) { this->mappings_ = std::move(mappings); }
 
@@ -31,6 +33,7 @@ class AirConditionerSelect : public select::Select, public TaiXiaListener, publi
   select::Select *fuzzy_mode_select_{nullptr};
   select::Select *display_mode_select_{nullptr};
   select::Select *motion_detect_select_{nullptr};
+  select::Select *swing_horizontal_level_select_{nullptr};
 
   void handle_response(std::vector<uint8_t> &response) override;
 };

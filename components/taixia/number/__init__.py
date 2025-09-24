@@ -25,8 +25,8 @@ ICON_NUMERIC = "mdi:numeric"
 CONF_SLEEP_TIMER = "sleep_timer"
 CONF_OFF_TIMER = "off_timer"
 CONF_ON_TIMER = "on_timer"
-CONF_VERTICAL_FAN_SPEED = "vertical_fan_speed"
-CONF_HORIZONTAL_FAN_SPEED = "horizontal_fan_speed"
+CONF_SWING_VERTICAL_LEVEL = "swing_vertical_level"
+CONF_SWING_HORIZONTAL_LEVEL = "swing_horizontal_level"
 
 CONF_OPERATING_TIME = "operating_time"
 CONF_RELATIVE_HUMIDITY = "relative_humidity"
@@ -42,8 +42,8 @@ CONF_LIGHT_LEVEL = "light_level"
 ICONS = {
     CONF_OFF_TIMER: "mdi:timer-off-outline",
     CONF_ON_TIMER: "mdi:timer-settings-outline",
-    CONF_VERTICAL_FAN_SPEED: "mdi:heat-waves",
-    CONF_HORIZONTAL_FAN_SPEED: "mdi:waves",
+    CONF_SWING_VERTICAL_LEVEL: "mdi:pan-vertical",
+    CONF_SWING_HORIZONTAL_LEVEL: "mdi:pan-horizontal",
     CONF_OPERATING_TIME: "mdi:developer-board",
     CONF_RELATIVE_HUMIDITY: "mdi:water-percent",
     CONF_DEHUMIDIFIER_LEVEL: "mdi:water-percent",
@@ -65,8 +65,8 @@ CLIMATE_TYPES = {
     CONF_SLEEP_TIMER: (0x06, 0, 1440, 1),
     CONF_ON_TIMER: (0x0B, 0, 1440, 1),
     CONF_OFF_TIMER: (0x0C, 0, 1440, 1),
-    CONF_VERTICAL_FAN_SPEED: (0x0F, 0, 15, 1),
-    CONF_HORIZONTAL_FAN_SPEED: (0x11, 0, 15, 1),
+    CONF_SWING_VERTICAL_LEVEL: (0x0F, 0, 15, 1),
+    CONF_SWING_HORIZONTAL_LEVEL: (0x11, 0, 15, 1),
 }
 
 DEHUMIDIFIER_TYPES = {
