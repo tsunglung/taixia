@@ -256,8 +256,8 @@ class TaiXia : public uart::UARTDevice, public Component {
   // Climate 0x01
   TAIXIA_SWITCH(sleepy_switch)
   TAIXIA_SWITCH(air_purifier_switch)
-  TAIXIA_SWITCH(air_flow_horizontal_switch)
-  TAIXIA_SWITCH(air_flow_vertical_switch)
+  TAIXIA_SWITCH(swing_vertical_switch)
+  TAIXIA_SWITCH(swing_horizontal_switch)
   TAIXIA_SWITCH(filter_notify_switch)
   TAIXIA_SWITCH(air_detect_switch)
   TAIXIA_SWITCH(mildew_proof_switch)
@@ -267,8 +267,8 @@ class TaiXia : public uart::UARTDevice, public Component {
   TAIXIA_SWITCH(moisturize_switch)
   TAIXIA_SWITCH(frost_wash_switch)
   TAIXIA_SWITCH(self_cleaning_switch)
-  TAIXIA_NUMBER(vertical_fan_speed_number)
-  TAIXIA_NUMBER(horizontal_fan_speed_number)
+  TAIXIA_NUMBER(swing_vertical_level_number)
+  TAIXIA_NUMBER(swing_horizontal_level_number)
   TAIXIA_NUMBER(sleep_timer_number)
 
   // Dehumiditier 0x04

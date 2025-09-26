@@ -32,6 +32,7 @@ ElectricFanSelect = taixia_ns.class_("ElectricFanSelect", select.Select, cg.Comp
 
 CONF_FUZZY_MODE = "fuzzy_mode"
 CONF_DISPLAY_MODE = "display_mode"
+CONF_SWING_HORIZONTAL_LEVEL = "swing_horizontal_level"
 CONF_MOTION_DETECT = "motion_detect"
 
 CONF_OPERATING_PROGRAM = "operating_program"
@@ -50,6 +51,7 @@ DEFAULT_ICON = "mdi:format-list-bulleted"
 ICONS = {
     CONF_FUZZY_MODE: "mdi:motion-sensor",
     CONF_DISPLAY_MODE: "mdi:overscan",
+    CONF_SWING_HORIZONTAL_LEVEL: "mdi:pan-horizontal",
     CONF_MOTION_DETECT: "mdi:motion-sensor",
     CONF_OPERATING_PROGRAM: "mdi:state-machine",
     CONF_AIR_PURIFIER: "mdi:air-purifier",
@@ -63,18 +65,27 @@ ICONS = {
 }
 
 OPTIONS_FUZZY_MODE = {
-    "comfort": 0,
-    "too cold": 1,
-    "too hot": 2,
-    "off": 3,
-    "on": 4
+    "Comfortable": 0,
+    "Cold": 1,
+    "Warm": 2,
+    "Off": 3,
+    "On": 4
 }
 
 OPTIONS_DISPLAY_MODE= {
-    "light": 0,
-    "dark": 1,
-    "off": 2,
-    "all off": 3
+    "Bright": 0,
+    "On": 1,
+    "Dim": 2,
+    "Off": 3
+}
+
+OPTIONS_SWING_HORIZONTAL_LEVEL = {
+    "↔": 0,   # swing
+    "→": 1,   # east
+    "↘": 2,   # south-east
+    "↓↓": 3,  # south
+    "↙": 4,   # south-west
+    "←": 5    # west
 }
 
 OPTIONS_MOTION_DETECT = {
@@ -95,9 +106,9 @@ OPTIONS_WASH_PROGRAM = {
     "User-defined": 7,
     "Soak": 8,
     "Dry": 9,
-    "Quick Wash": 10,
+    "Quick wash": 10,
     "Tank wash":11,
-    "Warm Water Wash":12
+    "Warm water wash":12
 }
 
 OPTIONS_WASH_OTHER_FUNCTION = {
@@ -156,8 +167,8 @@ OPTIONS_AIR_PURFIFIER = {
 
 OPTIONS_SOUND = {
     "Off": 0,
-    "Key Sound": 1,
-    "Full and Key sounds": 2
+    "Key sound": 1,
+    "Full and key sounds": 2
 }
 
 OPTIONS_FAN_OPERATING_PROGRAM = {
@@ -169,7 +180,7 @@ OPTIONS_FAN_OPERATING_PROGRAM = {
 }
 
 OPTIONS_PURIFIER_OPERATING_PROGRAM = {
-    "Auot": 0,
+    "Auto": 0,
     "Mute": 1,
     "Low": 2,
     "Standard": 3,
@@ -177,7 +188,7 @@ OPTIONS_PURIFIER_OPERATING_PROGRAM = {
     "Super": 5
 }
 
-OPTIONS_ENTILATE_MODE = {
+OPTIONS_VENTILATE_MODE = {
     "Auto": 0,
     "Full": 1,
     "Normal": 2
@@ -227,7 +238,19 @@ CONFIG_SCHEMA = cv.typed_schema(
                             cv.ensure_list(cv.string_strict), cv.Length(min=1)
                         )
                     }
+                ),
+                cv.Optional(CONF_SWING_HORIZONTAL_LEVEL): select.select_schema(
+                    AirConditionerSelect,
+                    entity_category=ENTITY_CATEGORY_CONFIG,
+                    icon=ICONS.get(CONF_SWING_HORIZONTAL_LEVEL, DEFAULT_ICON)
+                ).extend(
+                    {
+                        cv.Optional(CONF_OPTIONS): cv.All(
+                            cv.ensure_list(cv.string_strict), cv.Length(min=1)
+                        )
+                    }
                 )
+
             }
         ),
         CONF_AIRPURIFIER: cv.COMPONENT_SCHEMA.extend(
@@ -430,6 +453,17 @@ async def to_code(config):
             cg.add(taixia.register_listener(sel))
             cg.add(sel.set_taixia_parent(taixia))
 
+        if CONF_SWING_HORIZONTAL_LEVEL in config:
+            options_map = get_options(config[CONF_SWING_HORIZONTAL_LEVEL].get(
+                CONF_OPTIONS, {}), OPTIONS_SWING_HORIZONTAL_LEVEL)
+            sel = await select.new_select(config[CONF_SWING_HORIZONTAL_LEVEL],
+                    options=list(options_map.keys()))
+            cg.add(var.set_swing_horizontal_level_select(sel))
+            cg.add(sel.set_service_id(0x11))
+            cg.add(sel.set_select_mappings(list(options_map.values())))
+            cg.add(taixia.register_listener(sel))
+            cg.add(sel.set_taixia_parent(taixia))
+
         if CONF_MOTION_DETECT in config:
             options_map = get_options(config[CONF_MOTION_DETECT].get(
                 CONF_OPTIONS, {}), OPTIONS_MOTION_DETECT)
@@ -533,7 +567,7 @@ async def to_code(config):
         cg.add(var.set_sa_id(0x04))
         if CONF_VENTILATE_MODE in config:
             options_map = get_options(config[CONF_VENTILATE_MODE].get(
-                CONF_OPTIONS, {}), OPTIONS_ENTILATE_MODE)
+                CONF_OPTIONS, {}), OPTIONS_VENTILATE_MODE)
             sel = await select.new_select(config[CONF_VENTILATE_MODE],
                     options=list(options_map.keys()))
             cg.add(var.set_ventilate_mode_select(sel))
