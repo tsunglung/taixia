@@ -2,7 +2,8 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import button
 from esphome.const import (
-    CONF_TYPE
+    CONF_TYPE,
+    ENTITY_CATEGORY_CONFIG
 )
 from .. import (
     taixia_ns,
@@ -19,6 +20,7 @@ from .. import (
 DEPENDENCIES = ["taixia"]
 
 ICON_BUTTON_POINTER = "mdi:button-pointer"
+ICON_HELP_NETWORK_OUTLINE = "mdi:help-network-outline"
 
 CONF_FILTER_CLEAN = "filter_clean"
 CONF_ENERGY_RESET = "energy_reset"
@@ -63,7 +65,14 @@ TAIXIA_COMPONENT_SCHEMA = cv.Schema(
         cv.GenerateID(): cv.declare_id(TaiXiaButton),
         cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
         cv.Required(CONF_TYPE): cv.string,
-        cv.Required(CONF_GET_INFO): TAIXIA_BUTTON_SCHEMA
+    }
+).extend(
+    {
+        cv.Required(CONF_GET_INFO): button.button_schema(
+            TaiXiaButton,
+            entity_category=ENTITY_CATEGORY_CONFIG,
+            icon=ICON_HELP_NETWORK_OUTLINE
+        ).extend(cv.COMPONENT_SCHEMA)
     }
 )
 

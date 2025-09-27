@@ -49,8 +49,8 @@ CONF_PRE_HEAT_COOL = "pre_heat_cool"
 
 DEFAULT_ICON = "mdi:format-list-bulleted"
 ICONS = {
-    CONF_FUZZY_MODE: "mdi:motion-sensor",
-    CONF_DISPLAY_MODE: "mdi:overscan",
+    CONF_FUZZY_MODE: "mdi:chip",
+    CONF_DISPLAY_MODE: "mdi:lightbulb-on-outline",
     CONF_SWING_HORIZONTAL_LEVEL: "mdi:pan-horizontal",
     CONF_MOTION_DETECT: "mdi:motion-sensor",
     CONF_OPERATING_PROGRAM: "mdi:state-machine",
@@ -208,7 +208,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
                 cv.Optional(CONF_FUZZY_MODE): select.select_schema(
                     AirConditionerSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_FUZZY_MODE, DEFAULT_ICON)
                 ).extend(
                     {
@@ -219,7 +218,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 ),
                 cv.Optional(CONF_DISPLAY_MODE): select.select_schema(
                     AirConditionerSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_DISPLAY_MODE, DEFAULT_ICON)
                 ).extend(
                     {
@@ -230,7 +228,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 ),
                 cv.Optional(CONF_MOTION_DETECT): select.select_schema(
                     AirConditionerSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_MOTION_DETECT, DEFAULT_ICON)
                 ).extend(
                     {
@@ -241,7 +238,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 ),
                 cv.Optional(CONF_SWING_HORIZONTAL_LEVEL): select.select_schema(
                     AirConditionerSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_SWING_HORIZONTAL_LEVEL, DEFAULT_ICON)
                 ).extend(
                     {
@@ -259,7 +255,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
                 cv.Optional(CONF_OPERATING_PROGRAM): select.select_schema(
                     AirPurifierSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
                 ).extend(
                     {
@@ -276,7 +271,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
                 cv.Optional(CONF_OPERATING_PROGRAM): select.select_schema(
                     DehumidifierSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
                 ).extend(
                     {
@@ -287,7 +281,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 ),
                 cv.Optional(CONF_AIR_PURIFIER): select.select_schema(
                     DehumidifierSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_AIR_PURIFIER, DEFAULT_ICON)
                 ).extend(
                     {
@@ -298,7 +291,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 ),
                 cv.Optional(CONF_SOUND): select.select_schema(
                     DehumidifierSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_SOUND, DEFAULT_ICON)
                 ).extend(
                     {
@@ -315,7 +307,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
                 cv.Optional(CONF_WASH_PROGRAM): select.select_schema(
                     WashingMachineSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_WASH_PROGRAM, DEFAULT_ICON)
                 ).extend(
                     {
@@ -326,7 +317,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 ),
                 cv.Optional(CONF_WASH_OTHER_FUNCTION): select.select_schema(
                     WashingMachineSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_WASH_OTHER_FUNCTION, DEFAULT_ICON)
                 ).extend(
                     {
@@ -337,7 +327,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 ),
                 cv.Optional(CONF_WASH_MODE): select.select_schema(
                     WashingMachineSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_WASH_MODE, DEFAULT_ICON)
                 ).extend(
                     {
@@ -348,7 +337,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 ),
                 cv.Optional(CONF_WARM_WATER_PROGRAM): select.select_schema(
                     WashingMachineSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_WARM_WATER_PROGRAM, DEFAULT_ICON)
                 ).extend(
                     {
@@ -365,7 +353,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
                 cv.Optional(CONF_VENTILATE_MODE): select.select_schema(
                     ErvSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_VENTILATE_MODE, DEFAULT_ICON)
                 ).extend(
                     {
@@ -376,7 +363,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 ),
                 cv.Optional(CONF_PRE_HEAT_COOL): select.select_schema(
                     ErvSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_PRE_HEAT_COOL, DEFAULT_ICON)
                 ).extend(
                     {
@@ -393,7 +379,6 @@ CONFIG_SCHEMA = cv.typed_schema(
                 cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
                 cv.Optional(CONF_OPERATING_PROGRAM): select.select_schema(
                     ElectricFanSelect,
-                    entity_category=ENTITY_CATEGORY_CONFIG,
                     icon=ICONS.get(CONF_OPERATING_PROGRAM, DEFAULT_ICON)
                 ).extend(
                     {
