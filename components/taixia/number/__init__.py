@@ -40,6 +40,7 @@ CONF_HIGH_HUMIDITY_LEVEL = "high_humidity_level"
 CONF_LIGHT_LEVEL = "light_level"
 
 ICONS = {
+    CONF_SLEEP_TIMER: "mdi:bed-clock",
     CONF_OFF_TIMER: "mdi:timer-off-outline",
     CONF_ON_TIMER: "mdi:timer-settings-outline",
     CONF_SWING_VERTICAL_LEVEL: "mdi:pan-vertical",
@@ -53,7 +54,7 @@ ICONS = {
     CONF_FAN_LEVEL: "mdi:fan-speed-3",
     CONF_SOUND_MODE: "mdi:volume-source",
     CONF_HIGH_HUMIDITY_LEVEL: "mdi:water-percent",
-    CONF_LIGHT_LEVEL: "mdi:brightness-6"
+    CONF_LIGHT_LEVEL: "mdi:lightbulb-on-outline"
 }
 
 AIRPURIFIER_TYPES = {
