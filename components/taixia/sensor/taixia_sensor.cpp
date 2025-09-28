@@ -79,6 +79,8 @@ void AirConditionerSensor::dump_config() {
     LOG_SENSOR("  ", "Error Code", this->error_code_sensor_);
   if (this->filiter_clean_hours_sensor_ != nullptr)
     LOG_SENSOR("  ", "Filiter Clean Hours", this->filiter_clean_hours_sensor_);
+  if (this->pm_2_5_sensor_ != nullptr)
+    LOG_SENSOR("  ", "PM2.5", this->pm_2_5_sensor_);
   this->parent_->set_have_sensors(true);
 
   if (this->parent_->get_version() < 3.0)
@@ -151,6 +153,11 @@ void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
       case SERVICE_ID_CLIMATE_FILTER_CLEAN_HOURS:
         if (this->filiter_clean_hours_sensor_ != nullptr) {
           publish_u16(response, i + 1, this->filiter_clean_hours_sensor_);
+        }
+      break;
+      case SERVICE_ID_CLIMATE_PM2_5:
+        if (this->pm_2_5_sensor_ != nullptr) {
+          publish_u16(response, i, this->pm_2_5_sensor_);
         }
       break;
     }

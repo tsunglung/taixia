@@ -21,6 +21,7 @@ class AirConditionerSensor : public TaiXiaListener, public PollingComponent {
   void set_operating_hours_sensor(sensor::Sensor *sensor) { this->operating_hours_sensor_ = sensor; }
   void set_error_code_sensor(sensor::Sensor *sensor) { this->error_code_sensor_ = sensor; }
   void set_filiter_clean_sensor(sensor::Sensor *sensor) { this->filiter_clean_hours_sensor_ = sensor; }
+  void set_pm_2_5_sensor(sensor::Sensor *sensor) { this->pm_2_5_sensor_ = sensor; }
 
   void set_taixia_parent(TaiXia *parent) { this->parent_ = parent; }
 
@@ -37,6 +38,7 @@ class AirConditionerSensor : public TaiXiaListener, public PollingComponent {
   sensor::Sensor *operating_hours_sensor_{nullptr};
   sensor::Sensor *error_code_sensor_{nullptr};
   sensor::Sensor *filiter_clean_hours_sensor_{nullptr};
+  sensor::Sensor *pm_2_5_sensor_{nullptr};
 
   void handle_response(std::vector<uint8_t> &response) override;
 };

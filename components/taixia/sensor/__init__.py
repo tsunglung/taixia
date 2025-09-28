@@ -173,6 +173,13 @@ CONFIG_SCHEMA = cv.typed_schema(
                     accuracy_decimals=0,
                     device_class=DEVICE_CLASS_DURATION,
                     state_class=STATE_CLASS_MEASUREMENT,
+                ),
+                cv.Optional(CONF_PM_2_5): sensor.sensor_schema(
+                    unit_of_measurement=UNIT_MICROGRAMS_PER_CUBIC_METER,
+                    icon=ICON_CHEMICAL_WEAPON,
+                    accuracy_decimals=2,
+                    device_class=DEVICE_CLASS_PM25,
+                    state_class=STATE_CLASS_MEASUREMENT,
                 )
             }
         ).extend(cv.polling_component_schema('30s')),
@@ -516,6 +523,9 @@ async def to_code(config):
         if CONF_OPERATING_HOURS in config:
             sens = await sensor.new_sensor(config[CONF_OPERATING_HOURS])
             cg.add(var.set_operating_hours_sensor(sens))
+        if CONF_PM_2_5 in config:
+            sens = await sensor.new_sensor(config[CONF_PM_2_5])
+            cg.add(var.set_pm_2_5_sensor(sens))
 
     elif config[CONF_TYPE] == CONF_WASHING_MACHINE:
         cg.add(var.set_sa_id(0x03))
