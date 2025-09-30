@@ -2,6 +2,8 @@
 #include "esphome/core/log.h"
 #include "taixia.h"
 
+#undef SUPPORTED_SERVICES_SEARCH_OPTIMIZATION
+
 namespace esphome {
 namespace taixia {
 
@@ -60,6 +62,7 @@ static const uint8_t RESPONSE_LENGTH = 255;
 
   void TaiXia::get_info_() {
     uint8_t i;
+    uint8_t j;
     this->buffer_.clear();
 
     this->send(6, 0, 0x00, SERVICE_ID_READ_VERSION, 0xFFFF);
@@ -166,8 +169,89 @@ static const uint8_t RESPONSE_LENGTH = 255;
       if (this->services_textsensor_ != nullptr) {
         this->services_textsensor_->publish_state(services);
       }
+
+      memset(this->supported_services_, 0x00, SUPPORTED_SERVICES_INDEX_MAX * sizeof(service_info_st));
+      for (i = start, j = 0; (i < this->buffer_[0]) && (j < SUPPORTED_SERVICES_INDEX_MAX); i += sizeof(service_info_st), j++) {
+        this->supported_services_[j].id = (uint8_t)(this->buffer_[i+0]);
+        this->supported_services_[j].min = (int8_t)(this->buffer_[i+1]);
+        this->supported_services_[j].max = (int8_t)(this->buffer_[i+2]);
+
+        ESP_LOGV(TAG, "supported_services_[%d].id=0x%2.2x .min=%d .max=%d",
+            j,
+            SERVICE_ID(this->supported_services_[j].id),
+            this->supported_services_[j].min,
+            this->supported_services_[j].max);
+
+        if (j > 0) {
+          if (SERVICE_ID(this->supported_services_[j].id) < SERVICE_ID(this->supported_services_[j-1].id)) {
+            this->supported_services_array_is_sorted_ = false;
+            ESP_LOGV(TAG, "SERVICE_ID_READ_SERVICES response was NOT sorted");
+          }
+        }
+      }
     }
     this->buffer_.clear();
+  }
+
+  int8_t TaiXia::get_supported_service_info_(uint8_t service_id, int8_t* min, int8_t* max, bool* read_only) {
+    int8_t index;
+
+    // strip the 'write' bit from the service_id
+    service_id = SERVICE_ID(service_id);
+
+    if ((service_id < SUPPORTED_SERVICES_INDEX_MIN) || (service_id > SUPPORTED_SERVICES_INDEX_MAX)) {
+      ESP_LOGE(TAG, "Attempt to get information on service_id 0x%2.2x which is out of range [%d,%d>",
+        service_id, SUPPORTED_SERVICES_INDEX_MIN, SUPPORTED_SERVICES_INDEX_MAX);
+      return -1;
+    }
+
+#ifdef SUPPORTED_SERVICES_SEARCH_OPTIMIZATION
+    // not sure if this kind of search "optimization" is needed or not
+    if (this->supported_services_array_is_sorted_) {
+      // assume all services are supported, so start searching at index equal to the service_id we are querying
+      index = service_id;
+
+      // the logic assumes the list of supported servives reported back by the appliance is sorted numerically (ignoring 'write' bit)
+      if (SERVICE_ID(this->supported_services_[index].id) > service_id) {
+        // search backwards
+        for (; (index >= SUPPORTED_SERVICES_INDEX_MIN) && (SERVICE_ID(this->supported_services_[index].id) != service_id); index--);
+      } else if (SERVICE_ID(this->supported_services_[index].id) < service_id) {
+        // search forwards, but...this should never be the case if you think about it, unless the appliance reports back some services more than once
+        for (; (index < SUPPORTED_SERVICES_INDEX_MAX) && (SERVICE_ID(this->supported_services_[index].id) != service_id); index++);
+      } else {
+        // match!
+      }
+    } else {
+#endif /*SUPPORTED_SERVICES_SEARCH_OPTIMIZATION*/
+      // search from start to found/finish
+      for (index = SUPPORTED_SERVICES_INDEX_MIN; (index < SUPPORTED_SERVICES_INDEX_MAX) && (SERVICE_ID(this->supported_services_[index].id) != service_id); index++);
+#ifdef SUPPORTED_SERVICES_SEARCH_OPTIMIZATION
+    }
+#endif /*SUPPORTED_SERVICES_SEARCH_OPTIMIZATION*/
+
+    if ((index < SUPPORTED_SERVICES_INDEX_MIN) || (index >= SUPPORTED_SERVICES_INDEX_MAX)) {
+      ESP_LOGD(TAG, "Service 0x%2.2x could not be located in set of supported services as reported by appliance (index=%d)", service_id, index);
+      return 0;
+    }
+
+    if (SERVICE_ID(this->supported_services_[index].id) != service_id) {
+      ESP_LOGE(TAG, "Internal error while searching for service_id 0x%2.2x in list of supported services as reported by appliance (supported_services_[%d]=0x%2.2x)",
+          service_id, index, SERVICE_ID(this->supported_services_[index].id));
+      return -1;
+    }
+
+    // report on min/max/read_only if storage provided
+    if (min) {
+      *min = this->supported_services_[index].min;
+    }
+    if (max) {
+      *max = this->supported_services_[index].max;
+    }
+    if (read_only) {
+      *read_only = !(SERVICE_ID_WRITE(this->supported_services_[index].id));
+    }
+
+    return 1;
   }
 
   void TaiXia::setup() {
