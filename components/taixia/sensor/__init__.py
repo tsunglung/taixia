@@ -89,9 +89,12 @@ CONF_SIDE_AIR_VENT = "side_air_vent"
 CONF_DEFROST = "defrost"
 CONF_ODOURS = "odours"
 
+CONF_MODEL_TYPE = "model_type"
+
 CONF_AIR_QUALITY = "air_quality"
 ICON_THOUGHT_BUBBLE = "mdi:thought-bubble"
 ICON_ODOURS = "mdi:emoticon-poop"
+
 
 CONFIG_SCHEMA = cv.typed_schema(
     {
@@ -415,6 +418,16 @@ CONFIG_SCHEMA = cv.typed_schema(
                     device_class=DEVICE_CLASS_TEMPERATURE,
                     state_class=STATE_CLASS_MEASUREMENT,
                 ),
+                cv.Optional(CONF_ERROR_CODE): sensor.sensor_schema(
+                    icon=ICON_CHIP,
+                    device_class=DEVICE_CLASS_EMPTY,
+                    entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+                ),
+                cv.Optional(CONF_MODEL_TYPE): sensor.sensor_schema(
+                    icon=ICON_CHIP,
+                    device_class=DEVICE_CLASS_EMPTY,
+                    entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+                ),
             }
         ).extend(cv.polling_component_schema('30s')),
         CONF_ELECTRIC_FAN: cv.COMPONENT_SCHEMA.extend(
@@ -634,6 +647,12 @@ async def to_code(config):
         if CONF_TEMPERATURE_OUTDOOR in config:
             sens = await sensor.new_sensor(config[CONF_TEMPERATURE_OUTDOOR])
             cg.add(var.set_temperature_outdoor_sensor(sens))
+        if CONF_MODEL_TYPE in config:
+            sens = await sensor.new_sensor(config[CONF_MODEL_TYPE])
+            cg.add(var.set_model_type_sensor(sens))
+        if CONF_ERROR_CODE in config:
+            sens = await sensor.new_sensor(config[CONF_ERROR_CODE])
+            cg.add(var.set_error_code_sensor(sens))
 
     if config[CONF_TYPE] == CONF_ELECTRIC_FAN:
         cg.add(var.set_sa_id(0x0F))

@@ -505,6 +505,14 @@ void ErvSensor::handle_response(std::vector<uint8_t> &response) {
         if (this->temperature_outdoor_sensor_ != nullptr) {
           publish_i16(response, i, this->temperature_outdoor_sensor_);
         }
+      case SERVICE_ID_ERV_MODEL_TYPE:
+        if (this->model_type_sensor_ != nullptr) {
+          publish_i16(response, i, this->model_type_sensor_);
+        }
+      case SERVICE_ID_ERV_ERROR_CODE:
+        if (this->error_code_sensor_ != nullptr) {
+          publish_i16(response, i, this->error_code_sensor_);
+        }
       break;
     }
   }

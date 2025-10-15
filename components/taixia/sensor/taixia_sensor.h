@@ -153,6 +153,8 @@ class ErvSensor : public TaiXiaListener, public PollingComponent {
   void update() override;
   void set_temperature_indoor_sensor(sensor::Sensor *sensor) { this->temperature_indoor_sensor_ = sensor; }
   void set_temperature_outdoor_sensor(sensor::Sensor *sensor) { this->temperature_outdoor_sensor_ = sensor; }
+  void set_model_type_sensor(sensor::Sensor *sensor) { this->model_type_sensor_ = sensor; }
+  void set_error_code_sensor(sensor::Sensor *sensor) { this->error_code_sensor_ = sensor; }
 
   void set_taixia_parent(TaiXia *parent) { this->parent_ = parent; }
 
@@ -161,6 +163,8 @@ class ErvSensor : public TaiXiaListener, public PollingComponent {
 
   sensor::Sensor *temperature_indoor_sensor_{nullptr};
   sensor::Sensor *temperature_outdoor_sensor_{nullptr};
+  sensor::Sensor *model_type_sensor_{nullptr};
+  sensor::Sensor *error_code_sensor_{nullptr};
 
   void handle_response(std::vector<uint8_t> &response) override;
 };
