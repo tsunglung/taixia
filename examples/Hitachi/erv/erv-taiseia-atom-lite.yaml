@@ -119,6 +119,7 @@ sensor:
 switch:
   - platform: taixia
     type: erv
+    immediate_update: false
     power:
       name: "Power Switch"
 

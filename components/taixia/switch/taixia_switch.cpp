@@ -22,7 +22,8 @@ static const char *const TAG = "taixia.switch";
       this->parent_->switch_command(this->sa_id_, this->service_id_, state);
       this->publish_state(org_state);
     }
-    this->parent_->send(6, 0, SA_ID_ALL, SERVICE_ID_READ_STATUS, 0xFFFF);
+    if (this->immediate_update_)
+      this->parent_->send(6, 0, SA_ID_ALL, SERVICE_ID_READ_STATUS, 0xFFFF);
   }
 
   void TaiXiaSwitch::handle_response(std::vector<uint8_t> &response) {
