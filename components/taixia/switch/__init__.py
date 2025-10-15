@@ -15,6 +15,7 @@ from .. import (
     CONF_AIRPURIFIER,
     CONF_ELECTRIC_FAN,
     CONF_DEHUMIDIFIER,
+    CONF_ERV,
     CONF_SUPPORTED_SA
 )
 
@@ -98,6 +99,10 @@ AIRPURIFIER_TYPES = {
     CONF_LOCK: 0x08
 }
 
+ERV_TYPES = {
+    CONF_FILTER_RESET: 0x14
+}
+
 FAN_TYPES = {
     CONF_IONS: 0x06,
     CONF_LIGHT: 0x07,
@@ -159,6 +164,11 @@ async def to_code(config):
     if config[CONF_TYPE] == CONF_AIRPURIFIER:
         sa_id = 8
         for sa_type, service_id in AIRPURIFIER_TYPES.items():
+            await add_switch(config, sa_type, service_id, sa_id)
+
+    if config[CONF_TYPE] == CONF_ERV:
+        sa_id = 14
+        for sa_type, service_id in ERV_TYPES.items():
             await add_switch(config, sa_type, service_id, sa_id)
 
     if config[CONF_TYPE] == CONF_ELECTRIC_FAN:

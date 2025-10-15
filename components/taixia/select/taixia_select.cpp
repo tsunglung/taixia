@@ -282,7 +282,7 @@ static const char *const TAG = "taixia.select";
   }
 
   void ErvSelect::control(const std::string &value) {
-    uint8_t command[6] = {0x06, SA_ID_FAN, 0x00, 0x00, 0x00, 0x00};
+    uint8_t command[6] = {0x06, SA_ID_ERV, 0x00, 0x00, 0x00, 0x00};
     uint8_t buffer[6];
     auto idx = this->index_of(value);
 

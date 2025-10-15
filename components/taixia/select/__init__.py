@@ -549,14 +549,14 @@ async def to_code(config):
             cg.add(sel.set_taixia_parent(taixia))
 
     elif config[CONF_TYPE] == CONF_ERV:
-        cg.add(var.set_sa_id(0x04))
+        cg.add(var.set_sa_id(0x0E))
         if CONF_VENTILATE_MODE in config:
             options_map = get_options(config[CONF_VENTILATE_MODE].get(
                 CONF_OPTIONS, {}), OPTIONS_VENTILATE_MODE)
             sel = await select.new_select(config[CONF_VENTILATE_MODE],
                     options=list(options_map.keys()))
             cg.add(var.set_ventilate_mode_select(sel))
-            cg.add(sel.set_service_id(0x01))
+            cg.add(sel.set_service_id(0x15))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
             cg.add(sel.set_taixia_parent(taixia))
@@ -568,7 +568,7 @@ async def to_code(config):
                     options=config.get(
                         CONF_OPTIONS, list(options_map.keys())))
             cg.add(var.set_pre_heat_cool_select(sel))
-            cg.add(sel.set_service_id(0x0D))
+            cg.add(sel.set_service_id(0x16))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
             cg.add(sel.set_taixia_parent(taixia))

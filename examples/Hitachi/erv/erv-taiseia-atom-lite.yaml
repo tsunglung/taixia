@@ -1,6 +1,6 @@
 substitutions:
-  devicename: erv-taiseia-s3
-  upper_devicename: "ERV"
+  devicename: erv-taiseia-atom-lite
+  upper_devicename: "ERV KPI-H"
 
 esphome:
   name: $devicename
@@ -9,17 +9,13 @@ esphome:
   name_add_mac_suffix: true
   project:
     name: TaiSEIA.erv
-    version: "faikin-s3-1.0"
-  platformio_options:
-    board_build.flash_mode: dio
-    board_build.mcu: esp32s3
+    version: "1.0"
 
 esp32:
-  board: esp32-s3-devkitc-1
-  variant: esp32s3
+  board: nodemcu-32s
+  variant: esp32
   framework:
-    type: arduino
-    version: 2.0.6
+    type: esp-idf
 
 external_components:
   - source: github://tsunglung/taixia@master
@@ -72,46 +68,17 @@ button:
   - platform: restart
     name: "Restart"
 
-climate:
-  - platform: taixia
-    sa_id: 14
-    name: Climate
-    supported_modes:
-      - COOL
-      - HEAT
-      - DRY
-      - FAN_ONLY
-
-#esp32_ble_tracker:
-#  scan_parameters:
-#    interval: 1100ms
-#    window: 1100ms
-#    active: true
-
 light:
-  - platform: monochromatic
-    name: "Red LED"
-    output: blueLED
-    id: blue_led
-    effects:
-        - lambda:
-           name: Breathing
-           update_interval: 6s
-           lambda: |-
-            static int state = 0;
-            static int color = 1;
-            auto call = id(blue_led).turn_on(); //the id of your light
-            call.set_transition_length(5000);
-            if (state == 0) {
-              call.set_brightness(1.0);
-            } else if (state == 1) {
-             call.set_brightness(0.01);
-            }
-            call.perform();
-            state ++;
-            if (state == 2) {
-              state = 0;
-            }
+  - platform: esp32_rmt_led_strip
+    id: esp32_rgb_led
+    name: Status RGB LED
+    rgb_order: RGB
+    pin: GPIO27
+    num_leds: 1
+    icon: mdi:led-outline
+    entity_category: config
+    restore_mode: ALWAYS_OFF
+    chipset: ws2812
 
 number:
   - platform: taixia
@@ -119,18 +86,14 @@ number:
     on_timer:
       name: "On Timer"
 
-output:
-  - platform: ledc
-    id: blueLED
-    pin: GPIO8
-
 select:
   - platform: taixia
     type: erv
     ventilate_mode:
       name: "Ventilate Mode"
-    pre_heat_cool:
-      name: "Pre Heat/Cool"
+      options:
+        Auto
+        Full
 
 sensor:
   - platform: wifi_signal
@@ -147,9 +110,11 @@ sensor:
   - platform: taixia
     type: erv
     temperature_indoor:
-      name: "Temperature In"
-    temperature_outdoor:
-      name: "Temperature Out"
+      name: "Temperature Indoor"
+    model_type:
+      name: "Model Type"
+    error_code:
+      name: "Error Code"
 
 switch:
   - platform: taixia
@@ -178,8 +143,6 @@ text_sensor:
 
 taixia:
    sa_id: 14
-#  max_length: 100
-#  uart_id: uart_taixia
 
 time:
   - platform: homeassistant
