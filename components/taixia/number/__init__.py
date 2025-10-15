@@ -84,6 +84,7 @@ DEHUMIDIFIER_TYPES = {
 }
 
 ERV_TYPES = {
+    CONF_FAN_LEVEL: (0x02, 0, 15, 1),
     CONF_ON_TIMER: (0x06, 0, 1440, 1)
 }
 
