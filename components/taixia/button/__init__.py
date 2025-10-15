@@ -23,6 +23,7 @@ ICON_BUTTON_POINTER = "mdi:button-pointer"
 ICON_HELP_NETWORK_OUTLINE = "mdi:help-network-outline"
 
 CONF_FILTER_CLEAN = "filter_clean"
+CONF_FRONT_FILTER_CLEAN = "front_filter_clean"
 CONF_ENERGY_RESET = "energy_reset"
 CONF_GET_INFO = "get_info"
 
@@ -46,6 +47,7 @@ FAN_TYPES = {
 
 ERV_TYPES = {
     CONF_FILTER_CLEAN: 0x14,
+    CONF_FRONT_FILTER_CLEAN: 0x1C
 }
 
 COMMON_TYPES = {

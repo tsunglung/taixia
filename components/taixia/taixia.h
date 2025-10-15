@@ -44,7 +44,7 @@ namespace taixia {
 #define SERVICE_ID_CLIMATE_SWING_VERTICAL_LEVEL 0x0F
 #define SERVICE_ID_CLIMATE_SWING_HORIZONTAL 0x10
 #define SERVICE_ID_CLIMATE_SWING_HORIZONTAL_LEVEL 0x11
-#define SERVICE_ID_CLIMATE_FILITER_NOTIFY 0x12
+#define SERVICE_ID_CLIMATE_FILTER_NOTIFY 0x12
 #define SERVICE_ID_CLIMATE_HUMIDITY 0x13
 #define SERVICE_ID_CLIMATE_HUMIDITY_INDOOR 0x14
 #define SERVICE_ID_CLIMATE_CHECK 0x15
@@ -159,6 +159,8 @@ namespace taixia {
 #define SERVICE_ID_ERV_RESET_FILTER_NOTIFY 0x14
 #define SERVICE_ID_ERV_VENTILATE_MODE 0x15
 #define SERVICE_ID_ERV_PRE_HEAT_COOL 0x16
+#define SERVICE_ID_ERV_FRONT_FILTER_NOTIFY 0x1C
+#define SERVICE_ID_ERV_FILTER_NOTIFY 0x1D
 
 #define SA_ID_FAN 0x0F
 #define SERVICE_ID_FAN_STATUS 0x00
@@ -236,7 +238,7 @@ class TaiXia : public uart::UARTDevice, public Component {
   void switch_command(uint8_t sa_id, uint8_t service_id, bool onoff);
   void set_number(uint8_t sa_id, uint8_t service_id, float value);
   void get_number(uint8_t sa_id, uint8_t service_id, uint8_t *buffer);
-  void button_command(uint8_t sa_id, uint8_t service_id);
+  void button_command(uint8_t sa_id, uint8_t service_id, uint8_t value);
   bool have_sensors() { return this->have_sensors_; }
   void set_have_sensors(bool have_sensors) { this->have_sensors_ = have_sensors; }
   float get_version() { return this->version_; }

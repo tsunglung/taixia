@@ -24,33 +24,50 @@ static const char *const TAG = "taixia.binary_sensor";
         this->state = bool(response[4]);
         goto done;
       }
-      if (this->sa_id_ == SA_ID_DEHUMIDIFIER) {
-        switch (response[i]) {
-          case SERVICE_ID_DEHUMIDTFIER_WATER_TANK_FULL:
-            if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_WATER_TANK_FULL) {
-              this->state = bool(response[i + 2]);
-              goto done;
-            }
+      switch(this->sa_id_) {
+        case SA_ID_DEHUMIDIFIER:
+          switch (response[i]) {
+            case SERVICE_ID_DEHUMIDTFIER_WATER_TANK_FULL:
+              if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_WATER_TANK_FULL) {
+                this->state = bool(response[i + 2]);
+                goto done;
+              }
+            break;
+            case SERVICE_ID_DEHUMIDTFIER_AIR_PURFIFIER:
+              if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_AIR_PURFIFIER) {
+                this->state = bool(response[i + 2]);
+                goto done;
+              }
+            break;
+            case SERVICE_ID_DEHUMIDTFIER_SIDE_AIR_VENT:
+              if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_SIDE_AIR_VENT) {
+                this->state = bool(response[i + 2]);
+                goto done;
+              }
+            break;
+            case SERVICE_ID_DEHUMIDTFIER_DEFROST:
+              if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_DEFROST) {
+                this->state = bool(response[i + 2]);
+                goto done;
+              }
+            break;
+          }
           break;
-          case SERVICE_ID_DEHUMIDTFIER_AIR_PURFIFIER:
-            if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_AIR_PURFIFIER) {
-              this->state = bool(response[i + 2]);
-              goto done;
-            }
-          break;
-          case SERVICE_ID_DEHUMIDTFIER_SIDE_AIR_VENT:
-            if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_SIDE_AIR_VENT) {
-              this->state = bool(response[i + 2]);
-              goto done;
-            }
-          break;
-          case SERVICE_ID_DEHUMIDTFIER_DEFROST:
-            if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_DEFROST) {
-              this->state = bool(response[i + 2]);
-              goto done;
-            }
-          break;
-        }
+        case SA_ID_ERV:
+          switch (response[i]) {
+            case SERVICE_ID_ERV_RESET_FILTER_NOTIFY:
+              if (this->service_id_ == SERVICE_ID_ERV_RESET_FILTER_NOTIFY) {
+                this->state = bool(response[i + 2]);
+                goto done;
+              }
+            break;
+            case SERVICE_ID_ERV_FRONT_FILTER_NOTIFY:
+              if (this->service_id_ == SERVICE_ID_ERV_FRONT_FILTER_NOTIFY) {
+                this->state = bool(response[i + 2]);
+                goto done;
+              }
+            break;
+          }
       }
     }
 done:

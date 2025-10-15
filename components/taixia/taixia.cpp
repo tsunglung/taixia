@@ -382,9 +382,17 @@ static const uint8_t RESPONSE_LENGTH = 255;
     return false;
   }
 
-  void TaiXia::button_command(uint8_t sa_id, uint8_t service_id) {
+  void TaiXia::button_command(uint8_t sa_id, uint8_t service_id, uint8_t value) {
     if (service_id == 0x00)
       this->get_info_();
+    else {
+      uint8_t response[RESPONSE_LENGTH];
+      uint8_t cmd[6] = {0x06, sa_id, (uint8_t)(WRITE | service_id), 0x00, 0x00, 0x00};
+      cmd[4] = value;
+      cmd[5] = this->checksum(cmd, 5);
+
+      this->write_command_(cmd, response, 6, 6);
+    }
   }
 
   void TaiXia::readline(bool handle_response) {

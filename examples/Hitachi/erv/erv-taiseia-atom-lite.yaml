@@ -85,8 +85,8 @@ number:
     type: erv
     fan_level:
       name: "Fan Level"
-      min: 0
-      max: 1
+      min_value: 2
+      max_value: 4
 
 select:
   - platform: taixia

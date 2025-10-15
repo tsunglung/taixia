@@ -15,6 +15,7 @@ from .. import (
     CONF_TAIXIA_ID,
     TaiXia,
     CONF_DEHUMIDIFIER,
+    CONF_ERV,
     CONF_SUPPORTED_SA
 )
 
@@ -25,6 +26,8 @@ CONF_FILTER_NOTIFY = "filter_notify"
 CONF_SIDE_AIR_FLOW = "side_air_flow"
 CONF_DEFROST = "defrost"
 CONF_ODOURS = "odours"
+CONF_FRONT_FILTER_NOTIFY = "front_filter_notify"
+CONF_NOTIFY = "notify"
 
 ICONS = {
     CONF_POWER: "mdi:chip",
@@ -47,6 +50,12 @@ DEHUMIDIFIER_TYPES = {
     CONF_FILTER_NOTIFY: 0x0B,
     CONF_SIDE_AIR_FLOW: 0x0F,
     CONF_DEFROST: 0x11
+}
+
+ERV_TYPES = {
+    CONF_FILTER_NOTIFY: 0x14,
+    CONF_FRONT_FILTER_NOTIFY: 0x1C,
+    CONF_NOTIFY: 0x1D,
 }
 
 COMMON_TYPES = {
@@ -100,6 +109,11 @@ async def to_code(config):
     if config[CONF_TYPE] == CONF_DEHUMIDIFIER:
         sa_id = 4
         for sa_type, service_id in DEHUMIDIFIER_TYPES.items():
+            await add_binay_sensor(config, sa_type, service_id, sa_id)
+
+    if config[CONF_TYPE] == CONF_ERV:
+        sa_id = 14
+        for sa_type, service_id in ERV_TYPES.items():
             await add_binay_sensor(config, sa_type, service_id, sa_id)
 
     taixia = await cg.get_variable(config[CONF_TAIXIA_ID])

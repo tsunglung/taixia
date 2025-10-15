@@ -14,7 +14,8 @@ static const char *const TAG = "taixia.button";
 
   void TaiXiaButton::press_action() {
     if (this->service_id_ >= 0) {
-      this->parent_->button_command(this->sa_id_, this->service_id_);
+      uint8_t value = 0;
+      this->parent_->button_command(this->sa_id_, this->service_id_, value);
     }
   }
 
