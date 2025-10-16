@@ -71,7 +71,7 @@ CONF_OPERATING_WATT = "operating_watt"
 CONF_ENERGY_CONSUMPTON = "energy_consumption"
 CONF_OPERATING_HOURS = "operating_hours"
 CONF_ERROR_CODE = "error_code"
-CONF_FILITER_CLEAN_HOURS = "filiter_clean_hours"
+CONF_FILTER_CLEAN_HOURS = "filter_clean_hours"
 
 CONF_WASH_LEFT_COUNT = "wash_left_count"
 CONF_WASH_LEFT_HOURS = "wash_left_hours"
@@ -84,7 +84,7 @@ CONF_TOTAL_LEFT_HOURS = "total_left_hours"
 CONF_APPOINT_LEFT_HOURS = "appoint_left_hours"
 
 CONF_WATER_FULL = "water_full"
-CONF_FILITER_CLEAN = "filiter_clean"
+CONF_FILTER_CLEAN = "filter_clean"
 CONF_SIDE_AIR_VENT = "side_air_vent"
 CONF_DEFROST = "defrost"
 CONF_ODOURS = "odours"
@@ -170,7 +170,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                     device_class=DEVICE_CLASS_EMPTY,
                     entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
                 ),
-                cv.Optional(CONF_FILITER_CLEAN_HOURS): sensor.sensor_schema(
+                cv.Optional(CONF_FILTER_CLEAN_HOURS): sensor.sensor_schema(
                     unit_of_measurement=UNIT_HOUR,
                     icon=ICON_TIMER,
                     accuracy_decimals=0,
@@ -304,7 +304,7 @@ CONFIG_SCHEMA = cv.typed_schema(
                     device_class=DEVICE_CLASS_EMPTY,
                     entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
                 ),
-                cv.Optional(CONF_FILITER_CLEAN): sensor.sensor_schema(
+                cv.Optional(CONF_FILTER_CLEAN): sensor.sensor_schema(
                     icon=ICON_CHIP,
                     device_class=DEVICE_CLASS_EMPTY,
                     entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
@@ -539,9 +539,9 @@ async def to_code(config):
         if CONF_PM_2_5 in config:
             sens = await sensor.new_sensor(config[CONF_PM_2_5])
             cg.add(var.set_pm_2_5_sensor(sens))
-        if CONF_FILITER_CLEAN_HOURS in config:
-            sens = await sensor.new_sensor(config[CONF_FILITER_CLEAN_HOURS])
-            cg.add(var.set_filiter_clean_hours_sensor(sens))
+        if CONF_FILTER_CLEAN_HOURS in config:
+            sens = await sensor.new_sensor(config[CONF_FILTER_CLEAN_HOURS])
+            cg.add(var.set_filter_clean_hours_sensor(sens))
 
     elif config[CONF_TYPE] == CONF_WASHING_MACHINE:
         cg.add(var.set_sa_id(0x03))
@@ -596,9 +596,9 @@ async def to_code(config):
         if CONF_WATER_FULL in config:
             sens = await sensor.new_sensor(config[CONF_WATER_FULL])
             cg.add(var.set_appoint_left_hours_sensor(sens))
-        if CONF_FILITER_CLEAN in config:
-            sens = await sensor.new_sensor(config[CONF_FILITER_CLEAN])
-            cg.add(var.set_filiter_clean_sensor(sens))
+        if CONF_FILTER_CLEAN in config:
+            sens = await sensor.new_sensor(config[CONF_FILTER_CLEAN])
+            cg.add(var.set_filter_clean_sensor(sens))
         if CONF_SIDE_AIR_VENT in config:
             sens = await sensor.new_sensor(config[CONF_SIDE_AIR_VENT])
             cg.add(var.set_side_air_vent_sensor(sens))

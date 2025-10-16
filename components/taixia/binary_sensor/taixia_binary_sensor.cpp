@@ -67,6 +67,13 @@ static const char *const TAG = "taixia.binary_sensor";
                 goto done;
               }
             break;
+            case SERVICE_ID_ERV_PM25_FILTER_NOTIFY:
+              if (this->service_id_ == SERVICE_ID_ERV_FRONT_FILTER_NOTIFY) {
+                this->state = bool(response[i + 2]);
+                goto done;
+              }
+            break;
+
           }
       }
     }

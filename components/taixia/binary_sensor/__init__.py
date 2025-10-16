@@ -27,7 +27,7 @@ CONF_SIDE_AIR_FLOW = "side_air_flow"
 CONF_DEFROST = "defrost"
 CONF_ODOURS = "odours"
 CONF_FRONT_FILTER_NOTIFY = "front_filter_notify"
-CONF_NOTIFY = "notify"
+CONF_PM25_FILTER_NOTIFY = "pm25_filter_notify"
 
 ICONS = {
     CONF_POWER: "mdi:chip",
@@ -55,7 +55,7 @@ DEHUMIDIFIER_TYPES = {
 ERV_TYPES = {
     CONF_FILTER_NOTIFY: 0x14,
     CONF_FRONT_FILTER_NOTIFY: 0x1C,
-    CONF_NOTIFY: 0x1D,
+    CONF_PM25_FILTER_NOTIFY: 0x1D,
 }
 
 COMMON_TYPES = {
