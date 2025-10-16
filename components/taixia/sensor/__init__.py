@@ -541,7 +541,7 @@ async def to_code(config):
             cg.add(var.set_pm_2_5_sensor(sens))
         if CONF_FILITER_CLEAN_HOURS in config:
             sens = await sensor.new_sensor(config[CONF_FILITER_CLEAN_HOURS])
-            cg.add(var.set_filiter_clean_hours_sensor(sens))
+            cg.add(var.set_filiter_clean_sensor(sens))
 
     elif config[CONF_TYPE] == CONF_WASHING_MACHINE:
         cg.add(var.set_sa_id(0x03))
