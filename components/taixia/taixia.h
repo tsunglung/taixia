@@ -73,6 +73,7 @@ namespace taixia {
 #define SERVICE_ID_CLIMATE_FROST_WASH 0x39
 #define SERVICE_ID_CLIMATE_3A 0x3A
 #define SERVICE_ID_CLIMATE_3B 0x3B
+#define SERVICE_ID_CLIMATE_40 0x40
 
 #define SA_ID_WASHER 0x03
 #define SERVICE_ID_WASHER_STATUS 0x00
@@ -249,6 +250,8 @@ class TaiXia : public uart::UARTDevice, public Component {
   // TaiXIA
   TAIXIA_BINARY_SENSOR(power_binary_sensor)
   TAIXIA_BUTTON(get_info_button)
+  TAIXIA_BUTTON(filter_clean_notify_button)
+  TAIXIA_BUTTON(operating_hours_button)
   TAIXIA_TEXT_SENSOR(sa_id_textsensor)
   TAIXIA_TEXT_SENSOR(brand_textsensor)
   TAIXIA_TEXT_SENSOR(model_textsensor)
@@ -257,6 +260,8 @@ class TaiXia : public uart::UARTDevice, public Component {
   TAIXIA_SWITCH(power_switch)
 
   // Climate 0x01
+  TAIXIA_BUTTON(energy_reset_button)
+  TAIXIA_BUTTON(filter_clean_hours_button)
   TAIXIA_SWITCH(sleepy_switch)
   TAIXIA_SWITCH(air_purifier_switch)
   TAIXIA_SWITCH(swing_vertical_switch)
@@ -293,6 +298,12 @@ class TaiXia : public uart::UARTDevice, public Component {
   TAIXIA_NUMBER(sound_mode_number)
   TAIXIA_NUMBER(high_humidity_level_number)
   TAIXIA_NUMBER(light_level_number)
+
+  // ERV 0x14
+  TAIXIA_BINARY_SENSOR(front_filter_notify_binary_sensor)
+  TAIXIA_BINARY_SENSOR(pm25_filter_notify_binary_sensor)
+  TAIXIA_BUTTON(front_filter_notify_button)
+  TAIXIA_BUTTON(pm25_filter_notify_button)
 /*
   TAIXIA_SWITCH(filter_notify_switch)
   TAIXIA_SWITCH(light_switch)

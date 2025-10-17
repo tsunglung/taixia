@@ -57,6 +57,14 @@ uart:
 binary_sensor:
   - platform: status
     name: "Status"
+  - platform: taixia
+    type: erv
+    filter_notify:
+      name: "Filter Notify
+    front_filter_notify:
+      name: "Front Filter Notify
+    pm25_filter_notify:
+      name: "PM2.5 Filter Notify"
 
 #bluetooth_proxy:
 #  active: true
@@ -67,6 +75,16 @@ button:
     entity_category: diagnostic
   - platform: restart
     name: "Restart"
+  - platform: taixia
+    type: erv
+    get_info:
+      name: "Get Info"
+    filter_notify:
+      name: "Reset Filter Notify
+    front_filter_notify:
+      name: "Rest Front Filter Notify
+    pm25_filter_notify:
+      name: "Rest PM2.5 Filter Notify"
 
 light:
   - platform: esp32_rmt_led_strip
@@ -93,9 +111,6 @@ select:
     type: erv
     ventilate_mode:
       name: "Ventilate Mode"
-      options:
-        Auto
-        Full
 
 sensor:
   - platform: wifi_signal

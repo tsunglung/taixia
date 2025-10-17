@@ -62,6 +62,12 @@ button:
     type: airconditioner
     get_info:
       name: "Get Info"
+    operating_hours:
+      name: "Reset Operating Hours"
+    energy_reset:
+      name: "Reset Energy Consumption"
+    filter_clean_hours:
+      name: "Reset Filter Clean Hours"
 
 climate:
   - platform: taixia

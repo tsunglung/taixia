@@ -152,7 +152,7 @@ void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
       break;
       case SERVICE_ID_CLIMATE_FILTER_CLEAN_HOURS:
         if (this->filter_clean_hours_sensor_ != nullptr) {
-          publish_u16(response, i + 1, this->filter_clean_hours_sensor_);
+          publish_u16(response, i, this->filter_clean_hours_sensor_);
         }
       break;
       case SERVICE_ID_CLIMATE_PM2_5:
