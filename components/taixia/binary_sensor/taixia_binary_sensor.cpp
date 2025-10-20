@@ -61,6 +61,12 @@ static const char *const TAG = "taixia.binary_sensor";
                 goto done;
               }
             break;
+            case SERVICE_ID_DEHUMIDTFIER_FILTER_RESET:
+              if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_FILTER_RESET) {
+                this->state = bool(response[i + 2]);
+                goto done;
+              }
+            break;
           }
           break;
         case SA_ID_ERV:

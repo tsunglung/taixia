@@ -29,6 +29,7 @@ CONF_DEFROST = "defrost"
 CONF_ODOURS = "odours"
 CONF_FRONT_FILTER_NOTIFY = "front_filter_notify"
 CONF_PM25_FILTER_NOTIFY = "pm25_filter_notify"
+CONF_FILTER_RESET = "filter_reset"
 
 ICONS = {
     CONF_POWER: "mdi:chip",
@@ -58,7 +59,8 @@ DEHUMIDIFIER_TYPES = {
     CONF_WATER_TANK_FULL: 0x0A,
     CONF_FILTER_NOTIFY: 0x0B,
     CONF_SIDE_AIR_FLOW: 0x0F,
-    CONF_DEFROST: 0x11
+    CONF_DEFROST: 0x11,
+    CONF_FILTER_RESET: 0x52
 }
 
 ERV_TYPES = {

@@ -239,6 +239,7 @@ static const char *const TAG = "taixia.fan";
         }
         set_speed = true;
     }
+    ESP_LOGE(TAG, "set speed %d", set_speed);
     if (call.get_state().has_value()) {
         this->state = *call.get_state();
         if (!set_speed) {

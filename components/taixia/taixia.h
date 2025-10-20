@@ -285,6 +285,8 @@ class TaiXia : public uart::UARTDevice, public Component {
   TAIXIA_BINARY_SENSOR(side_air_flow_binary_sensor)
   TAIXIA_BINARY_SENSOR(defrost_binary_sensor)
   TAIXIA_BINARY_SENSOR(odours_binary_sensor)
+  TAIXIA_BINARY_SENSOR(filter_reset_binary_sensor)
+  TAIXIA_BUTTON(filter_reset_button)
   TAIXIA_SWITCH(air_flow_auto_switch)
   TAIXIA_SWITCH(pm25_detect_switch)
   TAIXIA_SWITCH(filter_reset_switch)
