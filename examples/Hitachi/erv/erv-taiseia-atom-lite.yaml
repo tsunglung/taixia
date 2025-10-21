@@ -60,9 +60,9 @@ binary_sensor:
   - platform: taixia
     type: erv
     filter_notify:
-      name: "Filter Notify
+      name: "Filter Notify"
     front_filter_notify:
-      name: "Front Filter Notify
+      name: "Front Filter Notify"
     pm25_filter_notify:
       name: "PM2.5 Filter Notify"
 
@@ -79,10 +79,10 @@ button:
     type: erv
     get_info:
       name: "Get Info"
-    filter_notify:
-      name: "Reset Filter Notify
+    filter_clean_notify:
+      name: "Reset Filter Notify"
     front_filter_notify:
-      name: "Rest Front Filter Notify
+      name: "Rest Front Filter Notify"
     pm25_filter_notify:
       name: "Rest PM2.5 Filter Notify"
 
