@@ -66,8 +66,7 @@ uart:
 
 # The base UART communication hub.
 daikin_s21:
-  tx_uart: s21_uart
-  rx_uart: s21_uart
+  uart: s21_uart
 #  debug_protocol: true
 
 climate:
@@ -75,10 +74,6 @@ climate:
     platform: daikin_s21
     visual:
       temperature_step: 1.0
-    supports_humidity: true
-    # Optional HA sensor used to alter setpoint.
-    room_temperature_sensor: room_temp  # See homeassistant sensor below
-    setpoint_interval: 300s
 #    has_presets: false
     supported_modes:
       - COOL

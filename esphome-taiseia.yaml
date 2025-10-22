@@ -30,6 +30,7 @@ logger:
 api:
 
 ota:
+  - platform: esphome
 
 uart:
   id: uart_taixia
@@ -40,9 +41,9 @@ uart:
 binary_sensor:
   - platform: status
     name: "${upper_devicename} Status"
-  - platform: taixia
-    power:
-      name: "${upper_devicename} Power"
+  # - platform: taixia
+  #   power:
+  #     name: "${upper_devicename} Power"
 
 button:
   - platform: restart

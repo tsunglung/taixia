@@ -14,7 +14,7 @@ esphome:
 esp32:
   board: m5stack-atom
   framework:
-    type: arduino
+    type: esp-idf
 
 external_components:
   - source: github://tsunglung/taixia@master
@@ -40,6 +40,7 @@ logger:
 api:
 
 ota:
+  - platform: esphome
 
 # web_server:
 
@@ -109,19 +110,16 @@ light:
   - platform: status_led
     id: status_light
     output: status_output
-  - platform: neopixelbus
+  - platform: esp32_rmt_led_strip
     id: esp32_rgb_led
     name: Status RGB LED
-    type: RGB
-    variant: 800KBPS
-    pin: 27
+    chipset: WS2812
+    pin: GPIO27
     num_leds: 1
+    rgb_order: RGB
     icon: mdi:led-outline
     entity_category: config
     restore_mode: ALWAYS_OFF
-    method:
-      type: esp32_rmt
-      channel: 0
 
 number:
   - platform: taixia
@@ -234,7 +232,7 @@ switch:
     # name: "Status LED Switch"
     optimistic: true
     on_turn_on:
-      - light.turn_on: 
+      - light.turn_on:
           id: esp32_rgb_led
           red: 100%
           green: 0%
@@ -242,7 +240,7 @@ switch:
           brightness: 30%
           transition_length: 50ms
     on_turn_off:
-      - light.turn_off: 
+      - light.turn_off:
           id: esp32_rgb_led
           transition_length: 50ms
 

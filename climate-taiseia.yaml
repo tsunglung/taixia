@@ -17,6 +17,8 @@ external_components:
 
 esp32:
   board: esp32dev
+  framework:
+    type: esp-idf
 
 wifi:
   ssid: !secret wifi_ssid
@@ -34,6 +36,7 @@ logger:
 api:
 
 ota:
+  - platform: esphome
 
 uart:
   id: uart_taixia
@@ -74,10 +77,8 @@ climate:
 number:
   - platform: taixia
     type: airconditioner
-    vertical_fan_speed:
-      name: "Vertical Fan Speed"
-    horizontal_fan_speed:
-      name: "Horizontal Fan Speed"
+    swing_vertical_level:
+      name: "Swing Vertical Level"
     off_timer:
       name: "Off Timer"
     on_timer:
@@ -92,6 +93,8 @@ select:
       name: "Fuzzy Mode"
     display_mode:
       name: "Display Mode"
+    swing_horizontal_level:
+      name: "Swing Horizontal Level"
 
 sensor:
   - platform: wifi_signal

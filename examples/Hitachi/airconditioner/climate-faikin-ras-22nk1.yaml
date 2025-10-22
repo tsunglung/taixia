@@ -27,8 +27,7 @@ esp32:
   board: esp32-s3-devkitc-1
   variant: esp32s3
   framework:
-    type: arduino
-    version: 2.0.6
+    type: esp-idf
 
 wifi:
   ssid: !secret wifi_ssid
@@ -50,15 +49,16 @@ logger:
 api:
 
 ota:
+  - platform: esphome
 
 #web_server:
 
 uart:
   id: uart_taixia
-  tx_pin: 
+  tx_pin:
     number: GPIO48
     inverted: true
-  rx_pin: 
+  rx_pin:
     number: GPIO34
     inverted: true
   baud_rate: 9600
@@ -127,19 +127,12 @@ light:
     pin: GPIO47
     num_leds: 3
     rgb_order: GRB
-    rmt_channel: 0
     id: s3_wled
     name: "RGB LED"
 
 number:
   - platform: taixia
     type: airconditioner
-#    vertical_fan_speed:
-#      name: "Vertical Fan Speed"
-#      max_value: 4
-    horizontal_fan_speed:
-      name: "Horizontal Fan Speed"
-      max_value: 4
     sleep_timer:
       name: "Sleep Timer"
     off_timer:
@@ -152,6 +145,8 @@ select:
     type: airconditioner
     display_mode:
       name: "Display Mode"
+    swing_horizontal_level:
+      name: "Swing Horizontal Level"
 
 sensor:
   - platform: wifi_signal
@@ -190,7 +185,7 @@ switch:
       name: "Buzzer"
     mildew_proof:
       name: "Mildew Proof"
-    air_flow_vertical:
+    swing_vertical:
       name: "Vertical Fan"
 
 text_sensor:

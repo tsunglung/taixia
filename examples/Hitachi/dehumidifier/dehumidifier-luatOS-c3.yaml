@@ -35,6 +35,8 @@ external_components:
 esp32:
   board: esp32-c3-devkitm-1
   variant: esp32c3
+  framework:
+    type: esp-idf
 
 wifi:
   ssid: !secret wifi_ssid
@@ -54,6 +56,7 @@ logger:
 api:
 
 ota:
+  - platform: esphome
 
 #web_server:
 
@@ -104,7 +107,7 @@ fan:
     speed_count: 4
     preset_modes:
 #      - auto
-      - normal 
+      - normal
       - home
       - boost
 #      - home
@@ -167,10 +170,10 @@ select:
     operating_program:
       name: "Operation Mode"
       options:
-        - normal 
+        - normal
         - boost
         - sleep
-        - home 
+        - home
         - eco
 
 sensor:

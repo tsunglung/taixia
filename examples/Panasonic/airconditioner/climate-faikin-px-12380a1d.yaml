@@ -55,10 +55,10 @@ web_server:
 
 uart:
   id: uart_taixia
-  tx_pin: 
+  tx_pin:
     number: GPIO48
     inverted: true
-  rx_pin: 
+  rx_pin:
     number: GPIO34
     inverted: true
   baud_rate: 9600
@@ -108,7 +108,6 @@ light:
     pin: GPIO47
     num_leds: 3
     rgb_order: GRB
-    rmt_channel: 0
     id: s3_wled
     name: "RGB LED"
 
@@ -121,10 +120,14 @@ number:
 #      name: "On Timer"
     swing_vertical_level:
       name: "Swing Vertical Level"
-    swing_horizontal_level:
-      name: "Swing Horizontal Level"
+
+select:
+  - platform: taixia
+    type: airconditioner
     display_mode:
       name: "Display Mode"
+    swing_horizontal_level:
+      name: "Swing Horizontal Level"
 
 sensor:
   - platform: wifi_signal
