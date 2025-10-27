@@ -198,6 +198,18 @@ namespace taixia {
 #define TAIXIA_SWITCH(name) TAIXIA_ENTITY_(switch_::Switch, name)
 #define TAIXIA_TEXT_SENSOR(name) TAIXIA_ENTITY_(text_sensor::TextSensor, name)
 
+struct service_info_st {
+  uint8_t id;
+  int8_t min;
+  int8_t max;
+};
+
+#define SUPPORTED_SERVICES_INDEX_MIN  0
+#define SUPPORTED_SERVICES_INDEX_MAX  60
+
+#define SERVICE_ID(x) (uint8_t)(x & 0x7f)
+#define SERVICE_ID_WRITE(x) (bool)((x & WRITE) > 0)
+
 using response_parser_t = std::function<float(std::vector<uint8_t> &)>;
 
 class TaiXia;
@@ -246,6 +258,8 @@ class TaiXia : public uart::UARTDevice, public Component {
   bool read_sa_status();
 
   void power_switch(bool state) { this->power_switch_->publish_state(state); }
+
+  int8_t get_supported_service_info_(uint8_t service_id, int8_t* min, int8_t* max, bool* read_only);
 
   // TaiXIA
   TAIXIA_BINARY_SENSOR(power_binary_sensor)
@@ -328,6 +342,8 @@ class TaiXia : public uart::UARTDevice, public Component {
   void get_info_(void);
   bool read_climate_status_(void);
 
+  service_info_st supported_services_[SUPPORTED_SERVICES_INDEX_MAX];
+  bool supported_services_array_is_sorted_{true};
   std::vector<uint8_t> buffer_;
   uint8_t protocol_;
   uint8_t sa_id_;
@@ -336,7 +352,6 @@ class TaiXia : public uart::UARTDevice, public Component {
   uint16_t max_length_{0};
   uint32_t response_time_{1};
   bool have_sensors_{false};
-
   std::vector<TaiXiaListener *> listeners_{};
 
   bool write_command_(const uint8_t *command, uint8_t *response, uint8_t len, uint8_t tlen, uint32_t timeout);
