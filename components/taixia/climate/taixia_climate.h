@@ -16,6 +16,14 @@ enum TaiXiaPreset : uint8_t {
   CLIMATE_PRESET_BODY_MOTION = climate::CLIMATE_PRESET_ACTIVITY + 4,
 };
 
+class Constants {
+ public:
+  static const char *const AIR_DETECT;
+  static const char *const ANTI_MILDEW;
+  static const char *const SELF_CLEAN;
+  static const char *const BODY_MOTION;
+};
+
 class TaiXiaClimate : public climate::Climate, public TaiXiaListener, public PollingComponent {
  public:
   void setup() override;
@@ -30,10 +38,10 @@ class TaiXiaClimate : public climate::Climate, public TaiXiaListener, public Pol
   void set_max_temperature(float temp) { this->max_temp_ = temp; }
   void set_min_temperature(float temp) { this->min_temp_ = temp; }
   void set_temperature_step(float step) { this->temp_step_ = step; }
-  void set_supported_modes(const std::set<esphome::climate::ClimateMode> &modes);
-  void set_supported_fan_modes(const std::set<esphome::climate::ClimateFanMode> &modes);
-  void set_supported_swing_modes(const std::set<esphome::climate::ClimateSwingMode> &modes);
-  void set_supported_preset_modes(const std::set<esphome::climate::ClimatePreset> &modes);
+  void set_supported_modes(const climate::ClimateModeMask &modes);
+  void set_supported_fan_modes(const climate::ClimateFanModeMask &modes);
+  void set_supported_swing_modes(const climate::ClimateSwingModeMask &modes);
+  void set_supported_preset_modes(const climate::ClimatePresetMask &modes);
   void set_supported_humidity(bool feature) { this->supported_humidity_ = feature; }
 
   void set_taixia_parent(TaiXia *parent) { this->parent_ = parent; }

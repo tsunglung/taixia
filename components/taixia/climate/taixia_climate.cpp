@@ -9,6 +9,11 @@ static const char *const TAG = "taixia.climate";
 
 using namespace esphome::climate;
 
+  const char *const Constants::AIR_DETECT = "Air Detect";
+  const char *const Constants::ANTI_MILDEW = "Anti Mildew";
+  const char *const Constants::SELF_CLEAN = "Self Clean";
+  const char *const Constants::BODY_MOTION = "Body Motion";
+
   static inline uint16_t get_u16(std::vector<uint8_t> &response, int start) {
     return (response[start] << 8) + response[start + 1];
   }
@@ -31,7 +36,7 @@ using namespace esphome::climate;
       ESP_LOGCONFIG(TAG, "   - %s", LOG_STR_ARG(climate_fan_mode_to_string(mode)));
     }
     for (const auto &mode : traits.get_supported_custom_fan_modes()) {
-      ESP_LOGCONFIG(TAG, "   - %s (c)", mode.c_str());
+      ESP_LOGCONFIG(TAG, "   - %s (c)", mode);
     }
 
     ESP_LOGCONFIG(TAG, "  Supported presets:");
@@ -39,7 +44,7 @@ using namespace esphome::climate;
       ESP_LOGCONFIG(TAG, "   - %s", LOG_STR_ARG(climate_preset_to_string(preset)));
     }
     for (const auto &preset : traits.get_supported_custom_presets()) {
-      ESP_LOGCONFIG(TAG, "   - %s (c)", preset.c_str());
+      ESP_LOGCONFIG(TAG, "   - %s (c)", preset);
     }
   }
 
@@ -63,7 +68,7 @@ using namespace esphome::climate;
     this->target_temperature = NAN;
     this->current_temperature = NAN;
     this->preset.reset();
-    this->custom_preset.reset();
+    this->clear_custom_preset_();
     this->publish_state();
   }
 
@@ -346,22 +351,22 @@ using namespace esphome::climate;
     ESP_LOGV(TAG, "[%s] update_status result=%s", this->get_name().c_str(), result ? "true" : "false");
   }
 
-  void TaiXiaClimate::set_supported_preset_modes(const std::set<climate::ClimatePreset> &modes) {
+  void TaiXiaClimate::set_supported_preset_modes(const climate::ClimatePresetMask &modes) {
     this->traits_.set_supported_presets(modes);
   }
 
-  void TaiXiaClimate::set_supported_swing_modes(const std::set<climate::ClimateSwingMode> &modes) {
+  void TaiXiaClimate::set_supported_swing_modes(const climate::ClimateSwingModeMask &modes) {
     this->traits_.set_supported_swing_modes(modes);
     this->traits_.add_supported_swing_mode(climate::CLIMATE_SWING_OFF);       // Always available
   }
 
-  void TaiXiaClimate::set_supported_fan_modes(const std::set<climate::ClimateFanMode> &modes) {
+  void TaiXiaClimate::set_supported_fan_modes(const climate::ClimateFanModeMask &modes) {
     this->traits_.set_supported_fan_modes(modes);
     this->traits_.add_supported_fan_mode(climate::CLIMATE_FAN_ON);   // Always available
     this->traits_.add_supported_fan_mode(climate::CLIMATE_FAN_OFF);  // Always available
   }
 
-  void TaiXiaClimate::set_supported_modes(const std::set<climate::ClimateMode> &modes) {
+  void TaiXiaClimate::set_supported_modes(const climate::ClimateModeMask &modes) {
     this->traits_.set_supported_modes(modes);
     this->traits_.add_supported_mode(climate::CLIMATE_MODE_OFF);   // Always available
     this->traits_.add_supported_mode(climate::CLIMATE_MODE_AUTO);  // Always available
@@ -382,7 +387,7 @@ using namespace esphome::climate;
 
   //    traits.set_supports_action(true);
 
-      this->traits_.set_supports_current_temperature(true);
+      this->traits_.add_feature_flags(climate::CLIMATE_SUPPORTS_CURRENT_TEMPERATURE);
 
       if (this->supports_cool_)
         this->traits_.add_supported_mode(CLIMATE_MODE_COOL);
@@ -439,13 +444,13 @@ using namespace esphome::climate;
           this->traits_.add_supported_preset(CLIMATE_PRESET_ACTIVITY);
 
         if (this->preset_modes_ & 1 << CLIMATE_PRESET_AIR_DETECT)
-          this->traits_.add_supported_custom_preset("Air Detect");
+          this->traits_.set_supported_custom_presets({Constants::AIR_DETECT});
         if (this->preset_modes_ & 1 << CLIMATE_PRESET_ANTI_MILDEW)
-          this->traits_.add_supported_custom_preset("Anti Mildew");
+          this->traits_.set_supported_custom_presets({Constants::ANTI_MILDEW});
         if (this->preset_modes_ & 1 << CLIMATE_PRESET_SELF_CLEAN)
-          this->traits_.add_supported_custom_preset("Self Clean");
+          this->traits_.set_supported_custom_presets({Constants::SELF_CLEAN});
         if (this->preset_modes_ & 1 << CLIMATE_PRESET_BODY_MOTION)
-          this->traits_.add_supported_custom_preset("Body Motion");
+          this->traits_.set_supported_custom_presets({Constants::BODY_MOTION});
       }
 
       this->traits_.set_visual_min_temperature(this->min_temp_);
@@ -453,9 +458,9 @@ using namespace esphome::climate;
       this->traits_.set_visual_temperature_step(this->temp_step_);
       this->traits_.set_visual_target_temperature_step(this->temp_step_);
       this->traits_.set_visual_current_temperature_step(this->temp_step_);
-      this->traits_.set_supports_two_point_target_temperature(false);
+      this->traits_.clear_feature_flags(climate::CLIMATE_REQUIRES_TWO_POINT_TARGET_TEMPERATURE);;
       if (this->supported_humidity_)
-          this->traits_.set_supports_current_humidity(true);
+          this->traits_.add_feature_flags(climate::CLIMATE_SUPPORTS_CURRENT_HUMIDITY);
 
       return this->traits_;
   }

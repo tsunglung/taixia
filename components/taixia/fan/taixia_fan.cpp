@@ -13,7 +13,7 @@ static const char *const TAG = "taixia.fan";
     return (response[start] << 8) + response[start + 1];
   }
 
-  static inline std::string get_preset_mode(uint16_t mode) {
+  static inline std::string get_preset_mode_(uint16_t mode) {
     switch (mode){
       case 0:
         return "auto";
@@ -180,7 +180,7 @@ static const char *const TAG = "taixia.fan";
                     this->speed = get_u16(response, i + 1);
                   break;
                   case SERVICE_ID_DEHUMIDTFIER_MODE:
-                    this->preset_mode = get_preset_mode(get_u16(response, i + 1));
+                    this->set_preset_mode_(get_preset_mode_(get_u16(response, i + 1)));
                   break;
                 }
             }
@@ -270,9 +270,8 @@ static const char *const TAG = "taixia.fan";
             this->parent_->send_cmd(command, buffer, 6);
         }
     }
-    if (!call.get_preset_mode().empty()) {
-      this->preset_mode = call.get_preset_mode();
-      uint8_t mode = get_preset_mode_value(this->preset_mode);
+    if (call.get_preset_mode() != nullptr) {
+      uint8_t mode = get_preset_mode_value(call.get_preset_mode());
 
       command[2] = WRITE | preset_mode;
       command[4] = mode;
