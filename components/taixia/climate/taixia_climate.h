@@ -50,7 +50,7 @@ class TaiXiaClimate : public climate::Climate, public TaiXiaListener, public Pol
   void control(const climate::ClimateCall &call) override;
 
   TaiXia *parent_;
-  uint8_t sa_id_{1};
+  uint8_t sa_id_{SA_ID_CLIMATE};
   bool supports_cool_{true};
   bool supports_heat_{false};
   bool supports_dry_{false};
