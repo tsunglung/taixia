@@ -127,7 +127,6 @@ TAIXIA_COMPONENT_SCHEMA = cv.Schema(
         cv.GenerateID(): cv.declare_id(TaiXiaSwitch),
         cv.GenerateID(CONF_TAIXIA_ID): cv.use_id(TaiXia),
         cv.Required(CONF_TYPE): cv.string,
-        cv.Optional(CONF_IMMEDIATE_UPDATE): cv.boolean,
         cv.Required(CONF_POWER): TAIXIA_SWITCH_SCHEMA
     }
 )
@@ -187,6 +186,3 @@ async def to_code(config):
     cg.add(var.set_service_id(0x00))
     cg.add(var.set_sa_id(sa_id))
     cg.add(taixia.register_listener(var))
-
-    if CONF_IMMEDIATE_UPDATE in config:
-        cg.add(var.set_immediate_update(config[CONF_IMMEDIATE_UPDATE]))
