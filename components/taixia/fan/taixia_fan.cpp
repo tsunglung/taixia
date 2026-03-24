@@ -151,12 +151,11 @@ static const char *const TAG = "taixia.fan";
   void TaiXiaFan::handle_response(std::vector<uint8_t> &response) {
     uint8_t i;
 
-    ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
-      response[0], response[1], response[2], response[3], \
-      response[4], response[5], response[6], response[7], response[8]);
-
     if (response[1] == 0x00 && response[2] == SERVICE_ID_READ_STATUS) {
         for (i = 3; i < response[0] - 3; i+=3) {
+            ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
+                          i, response[i+0], response[i+1], response[i+2]);
+
             if (this->sa_id_ == SA_ID_FAN) {
                 switch (response[i]) {
                   case SERVICE_ID_FAN_STATUS:

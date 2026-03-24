@@ -91,11 +91,10 @@ void AirConditionerSensor::dump_config() {
 void AirConditionerSensor::handle_response(std::vector<uint8_t> &response) {
   uint8_t i;
 
-  ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
-      response[0], response[1], response[2], response[3], \
-      response[4], response[5], response[6], response[7], response[8]);
-
   for (i = 9; i < response[0] - 3; i+=3) {
+    ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
+                  i, response[i+0], response[i+1], response[i+2]);
+
     if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
       continue;
     }
@@ -208,11 +207,10 @@ void DehumidifierSensor::dump_config() {
 void DehumidifierSensor::handle_response(std::vector<uint8_t> &response) {
   uint8_t i;
 
-  ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
-      response[0], response[1], response[2], response[3], \
-      response[4], response[5], response[6], response[7], response[8]);
-
   for (i = 3; i < response[0] - 3; i+=3) {
+    ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
+                  i, response[i+0], response[i+1], response[i+2]);
+
     if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
       continue;
     }
@@ -312,11 +310,10 @@ void WashingMachineSensor::dump_config() {
 void WashingMachineSensor::handle_response(std::vector<uint8_t> &response) {
   uint8_t i;
 
-  ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
-      response[0], response[1], response[2], response[3], \
-      response[4], response[5], response[6], response[7], response[8]);
-
   for (i = 9; i < response[0] - 3; i+=3) {
+    ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
+                  i, response[i+0], response[i+1], response[i+2]);
+
     if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
       continue;
     }
@@ -425,11 +422,10 @@ void AirPurifierSensor::dump_config() {
 void AirPurifierSensor::handle_response(std::vector<uint8_t> &response) {
   uint8_t i;
 
-  ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
-      response[0], response[1], response[2], response[3], \
-      response[4], response[5], response[6], response[7], response[8]);
-
   for (i = 9; i < response[0] - 3; i+=3) {
+    ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
+                  i, response[i+0], response[i+1], response[i+2]);
+
     if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
       continue;
     }
@@ -487,11 +483,10 @@ void ErvSensor::dump_config() {
 void ErvSensor::handle_response(std::vector<uint8_t> &response) {
   uint8_t i;
 
-  ESP_LOGD(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
-      response[0], response[1], response[2], response[3], \
-      response[4], response[5], response[6], response[7], response[8]);
-
   for (i = 9; i < response[0] - 3; i+=3) {
+    ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
+                  i, response[i+0], response[i+1], response[i+2]);
+
     if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
       continue;
     }
@@ -550,11 +545,10 @@ void ElectricFanSensor::dump_config() {
 void ElectricFanSensor::handle_response(std::vector<uint8_t> &response) {
   uint8_t i;
 
-  ESP_LOGD(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
-      response[0], response[1], response[2], response[3], \
-      response[4], response[5], response[6], response[7], response[8]);
-
   for (i = 9; i < response[0] - 3; i+=3) {
+    ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
+                  i, response[i+0], response[i+1], response[i+2]);
+
     if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
       continue;
     }

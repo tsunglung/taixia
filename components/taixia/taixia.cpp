@@ -397,8 +397,14 @@ static const uint8_t RESPONSE_LENGTH = 255;
 
   void TaiXia::readline(bool handle_response) {
       uint8_t c, len;
-      uint8_t response[255];
-      read_byte(&c);
+      uint8_t response[RESPONSE_LENGTH];
+
+      // start with 0xff everywhere so we can check if the read data makes sense
+      memset(response, 0xff, RESPONSE_LENGTH);
+
+      if (!read_byte(&c)) {
+        ESP_LOGW(TAG, "Could not read appliance's response length from UART");
+      }
 
       this->len_ = c;
       this->buffer_.push_back(c);
@@ -408,7 +414,9 @@ static const uint8_t RESPONSE_LENGTH = 255;
           len = this->max_length_;
 
       // wait for data
-      read_array(response, len);
+      if (!read_array(response, len)) {
+        ESP_LOGW(TAG, "Could not read appliance's response from UART");
+      }
 
       for (uint8_t i = 0; i < len; i++) {
         this->buffer_.push_back(response[i]);
@@ -419,6 +427,8 @@ static const uint8_t RESPONSE_LENGTH = 255;
         if (crc == response[len - 1]) {
           for (auto &listener : this->listeners_)
             listener->on_response(this->sa_id_, this->buffer_);
+        } else {
+          ESP_LOGE(TAG, "CRC mismatch! Ignoring response from appliance");
         }
         this->buffer_.clear();
       }

@@ -15,11 +15,10 @@ static const char *const TAG = "taixia.binary_sensor";
   void TaiXiaBinarySensor::handle_response(std::vector<uint8_t> &response) {
     uint8_t i;
 
-    ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
-        response[0], response[1], response[2], response[3], \
-        response[4], response[5], response[6], response[7], response[8]);
-
     for (i = 6; i < response[0] - 3; i+=3) {
+      ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
+                    i, response[i+0], response[i+1], response[i+2]);
+
       if (this->service_id_ == 0x00) {
         this->state = bool(response[4]);
         goto done;

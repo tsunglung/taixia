@@ -489,14 +489,14 @@ using namespace esphome::climate;
      * 5: //---- stationary left
      */
 
-    ESP_LOGV(TAG, " handle_response %x %x %x %x %x %x %x %x %x", \
-        response[0], response[1], response[2], response[3], \
-        response[4], response[5], response[6], response[7], response[8]);
-
     for (i = 3; i < response[0] - 3; i+=3) {
       if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
         continue;
       }
+
+      ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
+                    i, response[i+0], response[i+1], response[i+2]);
+
       switch (response[i]) {
         case SERVICE_ID_CLIMATE_STATUS:
         //case SERVICE_ID_ERV_STATUS:
