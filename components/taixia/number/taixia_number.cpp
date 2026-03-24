@@ -22,6 +22,13 @@ static const char *const TAG = "taixia.nubmer";
     if (this->service_id_ > 0) {
       this->parent_->set_number(this->sa_id_, this->service_id_, value);
       this->publish_state(value);
+      ESP_LOGV(
+        TAG,
+        "Control is %s",
+        (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
+      if (!this->parent_->get_optimistic()) {
+        this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+      }
     }
   }
 

@@ -16,6 +16,7 @@ CONF_TAIXIA_ID = "taixia_id"
 CONF_SA_ID = "sa_id"
 CONF_MAX_LENGTH = "max_length"
 CONF_RESPONSE_TIME = "response_time"
+CONF_OPTIMISTIC = "optimistic"
 CONF_AIR_CONDITIONER = "airconditioner"
 CONF_AIRPURIFIER = "airpurifier"
 CONF_DEHUMIDIFIER = "dehumidifier"
@@ -39,7 +40,8 @@ CONFIG_SCHEMA = uart.UART_DEVICE_SCHEMA.extend(
         cv.Optional(CONF_SA_ID): cv.int_range(min=1, max=255),
         cv.Optional(CONF_VERSION): cv.float_range(min=1.0, max=4.9),
         cv.Optional(CONF_MAX_LENGTH, default=6): cv.int_range(min=6, max=100),
-        cv.Optional(CONF_RESPONSE_TIME): cv.int_range(min=0, max=65000)
+        cv.Optional(CONF_RESPONSE_TIME): cv.int_range(min=0, max=65000),
+        cv.Optional(CONF_OPTIMISTIC): cv.boolean
     }
 )
 
@@ -63,3 +65,6 @@ async def to_code(config):
 
     if CONF_RESPONSE_TIME in config:
         cg.add(var.set_response_time(config[CONF_RESPONSE_TIME]))
+
+    if CONF_OPTIMISTIC in config:
+        cg.add(var.set_optimistic(config[CONF_OPTIMISTIC]))

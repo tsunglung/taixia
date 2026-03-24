@@ -227,6 +227,8 @@ class TaiXia : public uart::UARTDevice, public Component {
   void set_max_length(uint16_t len) { this->max_length_ = len; }
   void set_response_time(uint16_t time) { this->response_time_ = time; }
   void register_listener(TaiXiaListener *listener) { this->listeners_.push_back(listener); }
+  void set_optimistic(bool update) { this->optimistic_ = update; }
+  bool get_optimistic() { return this->optimistic_; }
 
   uint8_t checksum(const uint8_t *data, uint8_t len);
   void readline(bool handle_response);
@@ -336,6 +338,7 @@ class TaiXia : public uart::UARTDevice, public Component {
   uint8_t len_;
   uint16_t max_length_{0};
   uint32_t response_time_{1};
+  bool optimistic_{false};
   bool have_sensors_{false};
 
   std::vector<TaiXiaListener *> listeners_{};

@@ -84,6 +84,17 @@ static const char *const TAG = "taixia.select";
       command[4] = mapping;
       command[5] = this->parent_->checksum(command, 5);
       this->parent_->send_cmd(command, buffer, 6);
+      ESP_LOGV(
+        TAG,
+        "Control is %s",
+        (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
+      if (!this->parent_->get_optimistic()) {
+        if (this->parent_->get_version() < 3.0) {
+          this->parent_->read_sa_status();
+        } else {
+          this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+        }
+      }
       return;
     }
 
@@ -145,6 +156,17 @@ static const char *const TAG = "taixia.select";
       command[4] = mapping;
       command[5] = this->parent_->checksum(command, 5);
       this->parent_->send_cmd(command, buffer, 6);
+      ESP_LOGV(
+        TAG,
+        "Control is %s",
+        (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
+      if (!this->parent_->get_optimistic()) {
+        if (this->parent_->get_version() < 3.0) {
+          this->parent_->read_sa_status();
+        } else {
+          this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+        }
+      }
       return;
     }
 
@@ -196,6 +218,17 @@ static const char *const TAG = "taixia.select";
       command[4] = mapping;
       command[5] = this->parent_->checksum(command, 5);
       this->parent_->send_cmd(command, buffer, 6);
+      ESP_LOGV(
+        TAG,
+        "Control is %s",
+        (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
+      if (!this->parent_->get_optimistic()) {
+        if (this->parent_->get_version() < 3.0) {
+          this->parent_->read_sa_status();
+        } else {
+          this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+        }
+      }
       return;
     }
 
@@ -242,6 +275,17 @@ static const char *const TAG = "taixia.select";
       command[4] = mapping;
       command[5] = this->parent_->checksum(command, 5);
       this->parent_->send_cmd(command, buffer, 6);
+      ESP_LOGV(
+        TAG,
+        "Control is %s",
+        (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
+      if (!this->parent_->get_optimistic()) {
+        if (this->parent_->get_version() < 3.0) {
+          this->parent_->read_sa_status();
+        } else {
+          this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+        }
+      }
       return;
     }
 
@@ -293,6 +337,17 @@ static const char *const TAG = "taixia.select";
       command[4] = mapping;
       command[5] = this->parent_->checksum(command, 5);
       this->parent_->send_cmd(command, buffer, 6);
+      ESP_LOGV(
+        TAG,
+        "Control is %s",
+        (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
+      if (!this->parent_->get_optimistic()) {
+        if (this->parent_->get_version() < 3.0) {
+          this->parent_->read_sa_status();
+        } else {
+          this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+        }
+      }
       return;
     }
 
@@ -339,6 +394,18 @@ static const char *const TAG = "taixia.select";
       command[4] = mapping;
       command[5] = this->parent_->checksum(command, 5);
       this->parent_->send_cmd(command, buffer, 6);
+      ESP_LOGV(
+        TAG,
+        "Control is %s",
+        (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
+      if (!this->parent_->get_optimistic()) {
+        if (this->parent_->get_version() < 3.0) {
+          this->parent_->read_sa_status();
+        } else {
+          this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+        }
+      }
+
       return;
     }
 

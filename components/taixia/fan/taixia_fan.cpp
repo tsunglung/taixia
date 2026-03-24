@@ -280,7 +280,13 @@ static const char *const TAG = "taixia.fan";
     }
 
     this->publish_state();
-    this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+    ESP_LOGV(
+      TAG,
+      "Control is %s",
+      (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
+    if (!this->parent_->get_optimistic()) {
+      this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+    }
   }
 
 
