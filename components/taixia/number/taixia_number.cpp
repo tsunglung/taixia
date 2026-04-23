@@ -36,13 +36,17 @@ static const char *const TAG = "taixia.number";
     uint8_t i;
 
     for (i = 3; i < response[0] - 3; i+=3) {
+      // all the logic acts only if 'this' matches the response service_id
+      // so just skip entries that do not match to speed things up a little
+      if (this->service_id_ != response[i]) {
+        continue;
+      }
+
       ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
                     i, response[i+0], response[i+1], response[i+2]);
 
-      if (this->service_id_ == response[i]) {
-        this->publish_state(get_u16(response, i + 1));
-        return;
-      }
+      this->publish_state(get_u16(response, i + 1));
+      break;
     }
   }
 

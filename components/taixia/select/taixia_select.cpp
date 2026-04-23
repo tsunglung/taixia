@@ -44,30 +44,28 @@ static const char *const TAG = "taixia.select";
     uint8_t i;
     size_t mapping_idx = -1;
 
-    for (i = 9; i < response[0] - 3; i+=3) {
+    for (i = 3; i < response[0] - 3; i+=3) {
+      // all the logic acts only if 'this' matches the response service_id
+      // so just skip entries that do not match to speed things up a little
+      if (this->service_id_ != response[i]) {
+        continue;
+      }
+
       ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
                     i, response[i+0], response[i+1], response[i+2]);
 
       switch (response[i]) {
         case SERVICE_ID_CLIMATE_FUZZY_MODE:
-            mapping_idx = get_mapping_idx(response, i, this->mappings_);
-        break;
         case SERVICE_ID_CLIMATE_DISPLAY_MODE:
-            mapping_idx = get_mapping_idx(response, i, this->mappings_);
-        break;
         case SERVICE_ID_CLIMATE_ACTIVITY:
-            mapping_idx = get_mapping_idx(response, i, this->mappings_);
-        break;
         case SERVICE_ID_CLIMATE_SWING_HORIZONTAL_LEVEL:
-            mapping_idx = get_mapping_idx(response, i, this->mappings_);
-        break;
+          mapping_idx = get_mapping_idx(response, i, this->mappings_);
+          break;
       }
-
-      if ((mapping_idx != -1) && (this->service_id_ == response[i])) {
-        auto value = this->at(mapping_idx);
-        this->publish_state(value.value());
-        return;
-      }
+      break;
+    }
+    if (mapping_idx != -1) {
+      this->publish_state(this->at(mapping_idx).value());
     }
   }
 
@@ -116,29 +114,28 @@ static const char *const TAG = "taixia.select";
     uint8_t i;
     size_t mapping_idx = -1;
 
-    for (i = 9; i < response[0] - 3; i+=3) {
+    for (i = 3; i < response[0] - 3; i+=3) {
+      // all the logic acts only if 'this' matches the response service_id
+      // so just skip entries that do not match to speed things up a little
+      if (this->service_id_ != response[i]) {
+        continue;
+      }
+
       ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
                     i, response[i+0], response[i+1], response[i+2]);
 
       switch (response[i]) {
         case SERVICE_ID_WASHER_WASH_PROGRAM:
-          mapping_idx = get_mapping_idx(response, i, this->mappings_);
-        break;
         case SERVICE_ID_WASHER_OTHER_FUNCTION:
-          mapping_idx = get_mapping_idx(response, i, this->mappings_);
-        break;
         case SERVICE_ID_WASHER_WASH_MODE:
-          mapping_idx = get_mapping_idx(response, i, this->mappings_);
-        break;
         case SERVICE_ID_WASHER_WARM_WATER_PROGRAM:
-            mapping_idx = get_mapping_idx(response, i, this->mappings_);
-        break;
+          mapping_idx = get_mapping_idx(response, i, this->mappings_);
+          break;
       }
-      if ((mapping_idx != -1) && (this->service_id_ == response[i])) {
-        auto value = this->at(mapping_idx);
-        this->publish_state(value.value());
-        return;
-      }
+      break;
+    }
+    if (mapping_idx != -1) {
+      this->publish_state(this->at(mapping_idx).value());
     }
   }
 
@@ -183,24 +180,28 @@ static const char *const TAG = "taixia.select";
     uint8_t i;
     size_t mapping_idx = -1;
 
-    for (i = 6; i < response[0] - 3; i+=3) {
+    for (i = 3; i < response[0] - 3; i+=3) {
+      // all the logic acts only if 'this' matches the response service_id
+      // so just skip entries that do not match to speed things up a little
+      if (this->service_id_ != response[i]) {
+        continue;
+      }
+
       ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
                     i, response[i+0], response[i+1], response[i+2]);
 
       switch (response[i]) {
         case SERVICE_ID_DEHUMIDTFIER_MODE:
-            mapping_idx = get_mapping_idx(response, i, this->mappings_);
-        break;
         case SERVICE_ID_DEHUMIDTFIER_AIR_PURFIFIER:
-            mapping_idx = get_mapping_idx(response, i, this->mappings_);
-        break;
+          mapping_idx = get_mapping_idx(response, i, this->mappings_);
+          break;
       }
-      if ((mapping_idx != -1) && (this->service_id_ == response[i])) {
-        auto value = this->at(mapping_idx);
-        this->publish_state(value.value());
-        return;
-      }
+      break;
     }
+    if (mapping_idx != -1) {
+      this->publish_state(this->at(mapping_idx).value());
+    }
+
   }
 
   void DehumidifierSelect::control(const std::string &value) {
@@ -242,20 +243,25 @@ static const char *const TAG = "taixia.select";
     uint8_t i;
     size_t mapping_idx = -1;
 
-    for (i = 6; i < response[0] - 3; i+=3) {
+    for (i = 3; i < response[0] - 3; i+=3) {
+      // all the logic acts only if 'this' matches the response service_id
+      // so just skip entries that do not match to speed things up a little
+      if (this->service_id_ != response[i]) {
+        continue;
+      }
+
       ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
                     i, response[i+0], response[i+1], response[i+2]);
 
       switch (response[i]) {
         case SERVICE_ID_PURIFIER_MODE:
-            mapping_idx = get_mapping_idx(response, i, this->mappings_);
-        break;
+          mapping_idx = get_mapping_idx(response, i, this->mappings_);
+          break;
       }
-      if ((mapping_idx != -1) && (this->service_id_ == response[i])) {
-        auto value = this->at(mapping_idx);
-        this->publish_state(value.value());
-        return;
-      }
+      break;
+    }
+    if (mapping_idx != -1) {
+      this->publish_state(this->at(mapping_idx).value());
     }
   }
 
@@ -300,23 +306,26 @@ static const char *const TAG = "taixia.select";
     uint8_t i;
     size_t mapping_idx = -1;
 
-    for (i = 6; i < response[0] - 3; i+=3) {
+    for (i = 3; i < response[0] - 3; i+=3) {
+      // all the logic acts only if 'this' matches the response service_id
+      // so just skip entries that do not match to speed things up a little
+      if (this->service_id_ != response[i]) {
+        continue;
+      }
+
       ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
                     i, response[i+0], response[i+1], response[i+2]);
 
       switch (response[i]) {
         case SERVICE_ID_ERV_VENTILATE_MODE:
-            mapping_idx = get_mapping_idx(response, i, this->mappings_);
-        break;
         case SERVICE_ID_ERV_PRE_HEAT_COOL:
-            mapping_idx = get_mapping_idx(response, i, this->mappings_);
-        break;
+          mapping_idx = get_mapping_idx(response, i, this->mappings_);
+          break;
       }
-      if ((mapping_idx != -1) && (this->service_id_ == response[i])) {
-        auto value = this->at(mapping_idx);
-        this->publish_state(value.value());
-        return;
-      }
+      break;
+    }
+    if (mapping_idx != -1) {
+      this->publish_state(this->at(mapping_idx).value());
     }
   }
 
@@ -359,20 +368,25 @@ static const char *const TAG = "taixia.select";
     uint8_t i;
     size_t mapping_idx = -1;
 
-    for (i = 6; i < response[0] - 3; i+=3) {
+    for (i = 3; i < response[0] - 3; i+=3) {
+      // all the logic acts only if 'this' matches the response service_id
+      // so just skip entries that do not match to speed things up a little
+      if (this->service_id_ != response[i]) {
+        continue;
+      }
+
       ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
                     i, response[i+0], response[i+1], response[i+2]);
 
       switch (response[i]) {
         case SERVICE_ID_FAN_MODE:
-            mapping_idx = get_mapping_idx(response, i, this->mappings_);
-        break;
+          mapping_idx = get_mapping_idx(response, i, this->mappings_);
+          break;
       }
-      if ((mapping_idx != -1) && (this->service_id_ == response[i])) {
-        auto value = this->at(mapping_idx);
-        this->publish_state(value.value());
-        return;
-      }
+      break;
+    }
+    if (mapping_idx != -1) {
+      this->publish_state(this->at(mapping_idx).value());
     }
   }
 
