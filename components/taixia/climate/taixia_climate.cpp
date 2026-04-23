@@ -2,6 +2,9 @@
 #include "esphome/core/log.h"
 #include "taixia_climate.h"
 
+#define OVERRIDE_REPORTED_TARGET_TEMPERATURE
+#define LIMIT_REPORTED_TARGET_TEMPERATURE
+
 namespace esphome {
 namespace taixia {
 
@@ -476,7 +479,8 @@ using namespace esphome::climate;
   void TaiXiaClimate::handle_response(std::vector<uint8_t> &response) {
     uint8_t i;
     auto mode = CLIMATE_MODE_AUTO;
-    uint16_t value;
+    float fvalue;
+    uint16_t uvalue;
     uint8_t swing_vertical = 0;
     uint8_t swing_vertical_level = -1;
     uint8_t swing_horizontal = 0;
@@ -488,10 +492,17 @@ using namespace esphome::climate;
      * 4: --/--- stationary center-left
      * 5: //---- stationary left
      */
+    bool override_reported_target_temperature = false;
 
     for (i = 3; i < response[0] - 3; i+=3) {
-      if ((response[i + 1] == 0xFF) && (response[i + 2] == 0xFF)) {
-        continue;
+      if (get_u16(response, i + 1) == 0xffff) {
+        switch (response[i]) {
+          case SERVICE_ID_CLIMATE_TARGET_TEMPERATURE:
+          case SERVICE_ID_CLIMATE_TEMPERATURE_INDOOR:
+            break;
+          default:
+            continue;
+        }
       }
 
       ESP_LOGV(TAG, "handle_response[%d] {0x%2.2x, 0x%2.2x, 0x%2.2x}",
@@ -569,22 +580,69 @@ using namespace esphome::climate;
           break;
         case SERVICE_ID_CLIMATE_TARGET_TEMPERATURE:
         //case SERVICE_ID_ERV_TARGET_TEMPERATURE:
-          this->target_temperature = (float)get_i16(response, i + 1);
-          if (this->sa_id_ == 14)
-            this->current_temperature = get_i16(response, i + 1);
+          fvalue = (float)get_i16(response, i + 1);
+          ESP_LOGD(TAG, "'Target temperature' = '%f'", fvalue);
+          if (fvalue < 0.0 || fvalue > 100.0) {
+            if (this->target_temperature >= this->min_temp_ &&
+                this->target_temperature <= this->max_temp_) {
+              // climate control already has a sane target temperature
+              // so we can ignore the appliance in this case
+              ESP_LOGW(TAG, "Ignoring target temperature reported by appliance: '%f'", fvalue);
+            } else {
+#if defined(OVERRIDE_REPORTED_TARGET_TEMPERATURE)
+              this->target_temperature = fvalue;
+              override_reported_target_temperature = true;
+              // we have received an invalid target_temperature from the appliance
+              // and we do not have a valid target_temperature set (yet)
+              // we want to set the target_temperature to the current_temperature to
+              // at least enable the target_temperature controls in the widget,
+              // but we might not have received a current_temperature from the appliance yet
+              // so, before we publish() we will check if this was the case and determine
+              // a sane target_temperature on the spot
+#else  // OVERRIDE_REPORTED_TARGET_TEMPERATURE
+              ESP_LOGE(TAG, "Ignoring target temperature reported by appliance: '%f'", fvalue);
+#endif // OVERRIDE_REPORTED_TARGET_TEMPERATURE
+            }
+          }
+#if defined(LIMIT_REPORTED_TARGET_TEMPERATURE)
+          else if (fvalue < this->min_temp_) {
+            ESP_LOGW(TAG, "Limiting target temperature reported by appliance: " \
+                          "'%3.2f' -> '%3.2f' (MIN)",
+                     fvalue, this->min_temp_);
+            this->target_temperature = this->min_temp_;
+          } else if (fvalue > this->max_temp_) {
+            ESP_LOGW(TAG, "Limiting target temperature reported by appliance: " \
+                          "'%3.2f' -> '%3.2f' (MAX)",
+                     fvalue, this->min_temp_);
+            this->target_temperature = this->max_temp_;
+          }
+#else  // LIMIT_REPORTED_TARGET_TEMPERATURE
+#endif // LIMIT_REPORTED_TARGET_TEMPERATURE
+          else {
+            this->target_temperature = fvalue;
+          }
+          if (this->sa_id_ == 14) {
+            this->current_temperature = fvalue;
+          }
           break;
         case SERVICE_ID_CLIMATE_TEMPERATURE_INDOOR:
-          this->current_temperature = get_i16(response, i + 1);
+          fvalue = (float)get_i16(response, i + 1);
+          ESP_LOGD(TAG, "'Current indoor temperature' = '%f'", fvalue);
+          if (fvalue < 0.0 || fvalue > 100.0) {
+            ESP_LOGE(TAG, "Ignoring current indoor temperature reported by appliance: '%f'", fvalue);
+          } else {
+            this->current_temperature = fvalue;
+          }
           break;
         case SERVICE_ID_CLIMATE_SWING_VERTICAL:
-          value = get_u16(response, i + 1);
+          uvalue = get_u16(response, i + 1);
           ESP_LOGV(
               TAG,
               "SERVICE_ID_CLIMATE_SWING_VERTICAL(%2.2x): %2.2d",
               SERVICE_ID_CLIMATE_SWING_VERTICAL,
-              value);
+              uvalue);
           if (swing_vertical_level != -1) {
-            if (value >= 1)
+            if (uvalue >= 1)
               swing_vertical = 1;
           } else {
             ESP_LOGW(
@@ -595,13 +653,13 @@ using namespace esphome::climate;
           }
           break;
         case SERVICE_ID_CLIMATE_SWING_VERTICAL_LEVEL:
-          value = get_u16(response, i + 1);
+          uvalue = get_u16(response, i + 1);
           ESP_LOGV(
             TAG,
             "SERVICE_ID_CLIMATE_SWING_VERTICAL_LEVEL(%2.2x): %2.2d",
             SERVICE_ID_CLIMATE_SWING_VERTICAL_LEVEL,
-            value);
-          swing_vertical_level = (uint8_t)(value & 0xFF);
+            uvalue);
+          swing_vertical_level = (uint8_t)(uvalue & 0xFF);
           if (swing_vertical_level == 0) {
             swing_vertical = 1;
           } else {
@@ -609,14 +667,14 @@ using namespace esphome::climate;
           }
           break;
         case SERVICE_ID_CLIMATE_SWING_HORIZONTAL:
-          value = get_u16(response, i + 1);
+          uvalue = get_u16(response, i + 1);
           ESP_LOGV(
             TAG,
             "SERVICE_ID_CLIMATE_SWING_HORIZONTAL(%2.2x): %2.2d",
             SERVICE_ID_CLIMATE_SWING_HORIZONTAL,
-            value);
+            uvalue);
           if (swing_horizontal_level != -1) {
-            if (value >= 1)
+            if (uvalue >= 1)
               swing_horizontal = 1;
           } else {
             ESP_LOGW(
@@ -627,13 +685,13 @@ using namespace esphome::climate;
           }
           break;
         case SERVICE_ID_CLIMATE_SWING_HORIZONTAL_LEVEL:
-          value = get_u16(response, i + 1);
+          uvalue = get_u16(response, i + 1);
           ESP_LOGV(
             TAG,
             "SERVICE_ID_CLIMATE_SWING_HORIZONTAL_LEVEL(%2.2x): %2.2d",
             SERVICE_ID_CLIMATE_SWING_HORIZONTAL_LEVEL,
-            value);
-          swing_horizontal_level = (uint8_t)(value & 0xFF);
+            uvalue);
+          swing_horizontal_level = (uint8_t)(uvalue & 0xFF);
           if (swing_horizontal_level == 0) {
             swing_horizontal = 1;
           } else {
@@ -683,6 +741,25 @@ using namespace esphome::climate;
       this->swing_mode = climate::CLIMATE_SWING_VERTICAL;
     else
       this->swing_mode = climate::CLIMATE_SWING_OFF;
+
+#if defined(OVERRIDE_REPORTED_TARGET_TEMPERATURE)
+    if (override_reported_target_temperature) {
+      float temp;
+      if (this->current_temperature < this->min_temp_) {
+        temp = this->min_temp_;
+      } else if (this->current_temperature > this->max_temp_) {
+        temp = this->max_temp_;
+      } else {
+        temp = this->current_temperature;
+      }
+      ESP_LOGW(TAG, "Overriding reported target temperature to " \
+                    "(adjusted) current indoor temperature: " \
+                    "'%3.2f' -> '%3.2f'",
+        this->target_temperature, temp);
+        this->target_temperature = temp;
+    }
+#else  // OVERRIDE_REPORTED_TARGET_TEMPERATURE
+#endif // OVERRIDE_REPORTED_TARGET_TEMPERATURE
 
     this->publish_state();
   }
