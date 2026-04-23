@@ -32,7 +32,7 @@ ElectricFanSelect = taixia_ns.class_("ElectricFanSelect", select.Select, cg.Comp
 
 CONF_FUZZY_MODE = "fuzzy_mode"
 CONF_DISPLAY_MODE = "display_mode"
-CONF_SWING_HORIZONTAL_LEVEL = "swing_horizontal_level"
+CONF_SWING_HORIZONTAL_ANGLE = "swing_horizontal_angle"
 CONF_MOTION_DETECT = "motion_detect"
 
 CONF_OPERATING_PROGRAM = "operating_program"
@@ -51,7 +51,7 @@ DEFAULT_ICON = "mdi:format-list-bulleted"
 ICONS = {
     CONF_FUZZY_MODE: "mdi:chip",
     CONF_DISPLAY_MODE: "mdi:lightbulb-on-outline",
-    CONF_SWING_HORIZONTAL_LEVEL: "mdi:pan-horizontal",
+    CONF_SWING_HORIZONTAL_ANGLE: "mdi:pan-horizontal",
     CONF_MOTION_DETECT: "mdi:motion-sensor",
     CONF_OPERATING_PROGRAM: "mdi:state-machine",
     CONF_AIR_PURIFIER: "mdi:air-purifier",
@@ -79,7 +79,7 @@ OPTIONS_DISPLAY_MODE= {
     "Off": 3
 }
 
-OPTIONS_SWING_HORIZONTAL_LEVEL = {
+OPTIONS_SWING_HORIZONTAL_ANGLE = {
     "↔": 0,   # swing
     "→": 1,   # east
     "↘": 2,   # south-east
@@ -236,9 +236,9 @@ CONFIG_SCHEMA = cv.typed_schema(
                         )
                     }
                 ),
-                cv.Optional(CONF_SWING_HORIZONTAL_LEVEL): select.select_schema(
+                cv.Optional(CONF_SWING_HORIZONTAL_ANGLE): select.select_schema(
                     AirConditionerSelect,
-                    icon=ICONS.get(CONF_SWING_HORIZONTAL_LEVEL, DEFAULT_ICON)
+                    icon=ICONS.get(CONF_SWING_HORIZONTAL_ANGLE, DEFAULT_ICON)
                 ).extend(
                     {
                         cv.Optional(CONF_OPTIONS): cv.All(
@@ -438,12 +438,12 @@ async def to_code(config):
             cg.add(taixia.register_listener(sel))
             cg.add(sel.set_taixia_parent(taixia))
 
-        if CONF_SWING_HORIZONTAL_LEVEL in config:
-            options_map = get_options(config[CONF_SWING_HORIZONTAL_LEVEL].get(
-                CONF_OPTIONS, {}), OPTIONS_SWING_HORIZONTAL_LEVEL)
-            sel = await select.new_select(config[CONF_SWING_HORIZONTAL_LEVEL],
+        if CONF_SWING_HORIZONTAL_ANGLE in config:
+            options_map = get_options(config[CONF_SWING_HORIZONTAL_ANGLE].get(
+                CONF_OPTIONS, {}), OPTIONS_SWING_HORIZONTAL_ANGLE)
+            sel = await select.new_select(config[CONF_SWING_HORIZONTAL_ANGLE],
                     options=list(options_map.keys()))
-            cg.add(var.set_swing_horizontal_level_select(sel))
+            cg.add(var.set_swing_horizontal_angle_select(sel))
             cg.add(sel.set_service_id(0x11))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))

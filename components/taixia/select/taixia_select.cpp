@@ -36,8 +36,8 @@ static const char *const TAG = "taixia.select";
       LOG_SELECT("  ", "Display Mode", this->display_mode_select_);
     if (this->motion_detect_select_ != nullptr)
       LOG_SELECT("  ", "Motion Detect", this->motion_detect_select_);
-    if (this->swing_horizontal_level_select_ != nullptr)
-      LOG_SELECT("  ", "Swing horizontal level", this->swing_horizontal_level_select_);
+    if (this->swing_horizontal_angle_select_ != nullptr)
+      LOG_SELECT("  ", "Swing horizontal level", this->swing_horizontal_angle_select_);
   }
 
   void AirConditionerSelect::handle_response(std::vector<uint8_t> &response) {
