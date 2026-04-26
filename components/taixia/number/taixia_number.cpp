@@ -20,8 +20,9 @@ static const char *const TAG = "taixia.number";
 
   void TaiXiaNumber::control(float value) {
     if (this->service_id_ > 0) {
-      this->parent_->set_number(this->sa_id_, this->service_id_, value);
-      this->publish_state(value);
+      if (this->parent_->set_number(this->sa_id_, this->service_id_, value)) {
+        this->publish_state(value);
+      }
       ESP_LOGV(
         TAG,
         "Control is %s",

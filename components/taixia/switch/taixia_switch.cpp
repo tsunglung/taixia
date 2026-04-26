@@ -17,16 +17,21 @@ static const char *const TAG = "taixia.switch";
     if (this->service_id_ >= 0) {
       bool org_state = state;
       if (((this->sa_id_ == SA_ID_CLIMATE) && (this->service_id_ == SERVICE_ID_CLIMATE_BEEPER)) || 
-          ((this->sa_id_ == SA_ID_DEHUMIDIFIER) && (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_BEEPER)))
+          ((this->sa_id_ == SA_ID_DEHUMIDIFIER) && (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_BEEPER))) {
         state = !state;
-      this->parent_->switch_command(this->sa_id_, this->service_id_, state);
-      this->publish_state(org_state);
-      ESP_LOGV(
-        TAG,
-        "Control is %s",
-        (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
-      if (this->parent_->get_optimistic())
-        this->parent_->send(6, 0, SA_ID_ALL, SERVICE_ID_READ_STATUS, 0xFFFF);
+      }
+      if (this->parent_->switch_command(this->sa_id_, this->service_id_, state)) {
+        this->publish_state(org_state);
+      }
+
+      ESP_LOGV(TAG, "Control is %s", (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
+      if (!this->parent_->get_optimistic()) {
+        if (this->parent_->get_version() < 3.0) {
+          this->parent_->read_sa_status();
+        } else {
+          this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+        }
+      }
     }
   }
 

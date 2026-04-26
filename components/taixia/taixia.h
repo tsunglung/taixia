@@ -239,8 +239,9 @@ class TaiXia : public uart::UARTDevice, public Component {
     else
       return write_command_(command, response, len, len);
   }
-  void switch_command(uint8_t sa_id, uint8_t service_id, bool onoff);
-  void set_number(uint8_t sa_id, uint8_t service_id, float value);
+  bool set_select(uint8_t sa_id, uint8_t service_id, uint16_t selection);
+  bool switch_command(uint8_t sa_id, uint8_t service_id, bool onoff);
+  bool set_number(uint8_t sa_id, uint8_t service_id, float value);
   void get_number(uint8_t sa_id, uint8_t service_id, uint8_t *buffer);
   void button_command(uint8_t sa_id, uint8_t service_id, uint8_t value);
   bool have_sensors() { return this->have_sensors_; }

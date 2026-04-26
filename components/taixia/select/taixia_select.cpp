@@ -70,32 +70,33 @@ static const char *const TAG = "taixia.select";
   }
 
   void AirConditionerSelect::control(const std::string &value) {
-    uint8_t command[6] = {0x06, SA_ID_CLIMATE, 0x00, 0x00, 0x00, 0x00};
-    uint8_t buffer[6];
     auto idx = this->index_of(value);
 
-    if (idx.has_value()) {
-      uint8_t mapping = this->mappings_.at(idx.value());
-      ESP_LOGV(TAG, "Setting value to %u:%s", mapping, value.c_str());
-      command[2] = WRITE | this->service_id_;
-      command[4] = mapping;
-      command[5] = this->parent_->checksum(command, 5);
-      this->parent_->send_cmd(command, buffer, 6);
-      ESP_LOGV(
-        TAG,
-        "Control is %s",
-        (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
-      if (!this->parent_->get_optimistic()) {
-        if (this->parent_->get_version() < 3.0) {
-          this->parent_->read_sa_status();
-        } else {
-          this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
-        }
-      }
+    if (!idx.has_value()) {
+      ESP_LOGW(TAG, "Invalid value %s", value.c_str());
       return;
     }
 
-    ESP_LOGW(TAG, "Invalid value %s", value.c_str());
+    uint8_t mapping = this->mappings_.at(idx.value());
+
+    ESP_LOGV(TAG, "Setting value to %u:%s", mapping, value.c_str());
+
+    if (this->parent_->set_select(this->sa_id_,
+                                  this->service_id_,
+                                  (uint16_t)mapping)) {
+      this->publish_state(value);
+    }
+
+    ESP_LOGV(TAG, "Control is %s",
+             (this->parent_->get_optimistic() ? "optimistic" :
+                                                "pessimistic"));
+    if (!this->parent_->get_optimistic()) {
+      if (this->parent_->get_version() < 3.0) {
+        this->parent_->read_sa_status();
+      } else {
+        this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+      }
+    }
   }
 
   void WashingMachineSelect::dump_config() {
@@ -140,32 +141,33 @@ static const char *const TAG = "taixia.select";
   }
 
   void WashingMachineSelect::control(const std::string &value) {
-    uint8_t command[6] = {0x06, SA_ID_WASHER, 0x00, 0x00, 0x00, 0x00};
-    uint8_t buffer[6];
     auto idx = this->index_of(value);
 
-    if (idx.has_value()) {
-      uint8_t mapping = this->mappings_.at(idx.value());
-      ESP_LOGV(TAG, "Setting value to %u:%s", mapping, value.c_str());
-      command[2] = WRITE | this->service_id_;
-      command[4] = mapping;
-      command[5] = this->parent_->checksum(command, 5);
-      this->parent_->send_cmd(command, buffer, 6);
-      ESP_LOGV(
-        TAG,
-        "Control is %s",
-        (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
-      if (!this->parent_->get_optimistic()) {
-        if (this->parent_->get_version() < 3.0) {
-          this->parent_->read_sa_status();
-        } else {
-          this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
-        }
-      }
+    if (!idx.has_value()) {
+      ESP_LOGW(TAG, "Invalid value %s", value.c_str());
       return;
     }
 
-    ESP_LOGW(TAG, "Invalid value %s", value.c_str());
+    uint8_t mapping = this->mappings_.at(idx.value());
+
+    ESP_LOGV(TAG, "Setting value to %u:%s", mapping, value.c_str());
+
+    if (this->parent_->set_select(this->sa_id_,
+                                  this->service_id_,
+                                  (uint16_t)mapping)) {
+      this->publish_state(value);
+    }
+
+    ESP_LOGV(TAG, "Control is %s",
+             (this->parent_->get_optimistic() ? "optimistic" :
+                                                "pessimistic"));
+    if (!this->parent_->get_optimistic()) {
+      if (this->parent_->get_version() < 3.0) {
+        this->parent_->read_sa_status();
+      } else {
+        this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+      }
+    }
   }
 
   void DehumidifierSelect::dump_config() {
@@ -205,32 +207,33 @@ static const char *const TAG = "taixia.select";
   }
 
   void DehumidifierSelect::control(const std::string &value) {
-    uint8_t command[6] = {0x06, SA_ID_DEHUMIDIFIER, 0x00, 0x00, 0x00, 0x00};
-    uint8_t buffer[6];
     auto idx = this->index_of(value);
 
-    if (idx.has_value()) {
-      uint8_t mapping = this->mappings_.at(idx.value());
-      ESP_LOGV(TAG, "Setting value to %u:%s", mapping, value.c_str());
-      command[2] = WRITE | this->service_id_;
-      command[4] = mapping;
-      command[5] = this->parent_->checksum(command, 5);
-      this->parent_->send_cmd(command, buffer, 6);
-      ESP_LOGV(
-        TAG,
-        "Control is %s",
-        (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
-      if (!this->parent_->get_optimistic()) {
-        if (this->parent_->get_version() < 3.0) {
-          this->parent_->read_sa_status();
-        } else {
-          this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
-        }
-      }
+    if (!idx.has_value()) {
+      ESP_LOGW(TAG, "Invalid value %s", value.c_str());
       return;
     }
 
-    ESP_LOGW(TAG, "Invalid value %s", value.c_str());
+    uint8_t mapping = this->mappings_.at(idx.value());
+
+    ESP_LOGV(TAG, "Setting value to %u:%s", mapping, value.c_str());
+
+    if (this->parent_->set_select(this->sa_id_,
+                                  this->service_id_,
+                                  (uint16_t)mapping)) {
+      this->publish_state(value);
+    }
+
+    ESP_LOGV(TAG, "Control is %s",
+             (this->parent_->get_optimistic() ? "optimistic" :
+                                                "pessimistic"));
+    if (!this->parent_->get_optimistic()) {
+      if (this->parent_->get_version() < 3.0) {
+        this->parent_->read_sa_status();
+      } else {
+        this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+      }
+    }
   }
 
   void AirPurifierSelect::dump_config() {
@@ -266,32 +269,33 @@ static const char *const TAG = "taixia.select";
   }
 
   void AirPurifierSelect::control(const std::string &value) {
-    uint8_t command[6] = {0x06, SA_ID_AIR_PURIFIER, 0x00, 0x00, 0x00, 0x00};
-    uint8_t buffer[6];
     auto idx = this->index_of(value);
 
-    if (idx.has_value()) {
-      uint8_t mapping = this->mappings_.at(idx.value());
-      ESP_LOGV(TAG, "Setting value to %u:%s", mapping, value.c_str());
-      command[2] = WRITE | this->service_id_;
-      command[4] = mapping;
-      command[5] = this->parent_->checksum(command, 5);
-      this->parent_->send_cmd(command, buffer, 6);
-      ESP_LOGV(
-        TAG,
-        "Control is %s",
-        (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
-      if (!this->parent_->get_optimistic()) {
-        if (this->parent_->get_version() < 3.0) {
-          this->parent_->read_sa_status();
-        } else {
-          this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
-        }
-      }
+    if (!idx.has_value()) {
+      ESP_LOGW(TAG, "Invalid value %s", value.c_str());
       return;
     }
 
-    ESP_LOGW(TAG, "Invalid value %s", value.c_str());
+    uint8_t mapping = this->mappings_.at(idx.value());
+
+    ESP_LOGV(TAG, "Setting value to %u:%s", mapping, value.c_str());
+
+    if (this->parent_->set_select(this->sa_id_,
+                                  this->service_id_,
+                                  (uint16_t)mapping)) {
+      this->publish_state(value);
+    }
+
+    ESP_LOGV(TAG, "Control is %s",
+             (this->parent_->get_optimistic() ? "optimistic" :
+                                                "pessimistic"));
+    if (!this->parent_->get_optimistic()) {
+      if (this->parent_->get_version() < 3.0) {
+        this->parent_->read_sa_status();
+      } else {
+        this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+      }
+    }
   }
 
   void ErvSelect::dump_config() {
@@ -330,32 +334,33 @@ static const char *const TAG = "taixia.select";
   }
 
   void ErvSelect::control(const std::string &value) {
-    uint8_t command[6] = {0x06, SA_ID_ERV, 0x00, 0x00, 0x00, 0x00};
-    uint8_t buffer[6];
     auto idx = this->index_of(value);
 
-    if (idx.has_value()) {
-      uint8_t mapping = this->mappings_.at(idx.value());
-      ESP_LOGV(TAG, "Setting value to %u:%s", mapping, value.c_str());
-      command[2] = WRITE | this->service_id_;
-      command[4] = mapping;
-      command[5] = this->parent_->checksum(command, 5);
-      this->parent_->send_cmd(command, buffer, 6);
-      ESP_LOGV(
-        TAG,
-        "Control is %s",
-        (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
-      if (!this->parent_->get_optimistic()) {
-        if (this->parent_->get_version() < 3.0) {
-          this->parent_->read_sa_status();
-        } else {
-          this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
-        }
-      }
+    if (!idx.has_value()) {
+      ESP_LOGW(TAG, "Invalid value %s", value.c_str());
       return;
     }
 
-    ESP_LOGW(TAG, "Invalid value %s", value.c_str());
+    uint8_t mapping = this->mappings_.at(idx.value());
+
+    ESP_LOGV(TAG, "Setting value to %u:%s", mapping, value.c_str());
+
+    if (this->parent_->set_select(this->sa_id_,
+                                  this->service_id_,
+                                  (uint16_t)mapping)) {
+      this->publish_state(value);
+    }
+
+    ESP_LOGV(TAG, "Control is %s",
+             (this->parent_->get_optimistic() ? "optimistic" :
+                                                "pessimistic"));
+    if (!this->parent_->get_optimistic()) {
+      if (this->parent_->get_version() < 3.0) {
+        this->parent_->read_sa_status();
+      } else {
+        this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+      }
+    }
   }
 
   void ElectricFanSelect::dump_config() {
@@ -391,33 +396,33 @@ static const char *const TAG = "taixia.select";
   }
 
   void ElectricFanSelect::control(const std::string &value) {
-    uint8_t command[6] = {0x06, SA_ID_FAN, 0x00, 0x00, 0x00, 0x00};
-    uint8_t buffer[6];
     auto idx = this->index_of(value);
 
-    if (idx.has_value()) {
-      uint8_t mapping = this->mappings_.at(idx.value());
-      ESP_LOGV(TAG, "Setting value to %u:%s", mapping, value.c_str());
-      command[2] = WRITE | this->service_id_;
-      command[4] = mapping;
-      command[5] = this->parent_->checksum(command, 5);
-      this->parent_->send_cmd(command, buffer, 6);
-      ESP_LOGV(
-        TAG,
-        "Control is %s",
-        (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
-      if (!this->parent_->get_optimistic()) {
-        if (this->parent_->get_version() < 3.0) {
-          this->parent_->read_sa_status();
-        } else {
-          this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
-        }
-      }
-
+    if (!idx.has_value()) {
+      ESP_LOGW(TAG, "Invalid value %s", value.c_str());
       return;
     }
 
-    ESP_LOGW(TAG, "Invalid value %s", value.c_str());
+    uint8_t mapping = this->mappings_.at(idx.value());
+
+    ESP_LOGV(TAG, "Setting value to %u:%s", mapping, value.c_str());
+
+    if (this->parent_->set_select(this->sa_id_,
+                                  this->service_id_,
+                                  (uint16_t)mapping)) {
+      this->publish_state(value);
+    }
+
+    ESP_LOGV(TAG, "Control is %s",
+             (this->parent_->get_optimistic() ? "optimistic" :
+                                                "pessimistic"));
+    if (!this->parent_->get_optimistic()) {
+      if (this->parent_->get_version() < 3.0) {
+        this->parent_->read_sa_status();
+      } else {
+        this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+      }
+    }
   }
 
 }  // namespace taixia

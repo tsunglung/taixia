@@ -422,6 +422,7 @@ async def to_code(config):
             sel = await select.new_select(config[CONF_FUZZY_MODE],
                     options=list(options_map.keys()))
             cg.add(var.set_fuzzy_mode_select(sel))
+            cg.add(sel.set_sa_id(0x01))
             cg.add(sel.set_service_id(0x07))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
@@ -433,6 +434,7 @@ async def to_code(config):
             sel = await select.new_select(config[CONF_DISPLAY_MODE],
                     options=list(options_map.keys()))
             cg.add(var.set_display_mode_select(sel))
+            cg.add(sel.set_sa_id(0x01))
             cg.add(sel.set_service_id(0x1F))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
@@ -444,6 +446,7 @@ async def to_code(config):
             sel = await select.new_select(config[CONF_SWING_HORIZONTAL_ANGLE],
                     options=list(options_map.keys()))
             cg.add(var.set_swing_horizontal_angle_select(sel))
+            cg.add(sel.set_sa_id(0x01))
             cg.add(sel.set_service_id(0x11))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
@@ -455,6 +458,7 @@ async def to_code(config):
             sel = await select.new_select(config[CONF_MOTION_DETECT],
                     options=list(options_map.keys()))
             cg.add(var.set_motion_detect_select(sel))
+            cg.add(sel.set_sa_id(0x01))
             cg.add(sel.set_service_id(0x19))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
@@ -469,6 +473,7 @@ async def to_code(config):
                     options=config.get(
                         CONF_OPTIONS, list(options_map.keys())))
             cg.add(var.set_wash_program_select(sel))
+            cg.add(sel.set_sa_id(0x03))
             cg.add(sel.set_service_id(0x02))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
@@ -481,6 +486,7 @@ async def to_code(config):
                     options=config.get(
                         CONF_OPTIONS, list(options_map.keys())))
             cg.add(var.set_wash_other_function_select(sel))
+            cg.add(sel.set_sa_id(0x03))
             cg.add(sel.set_service_id(0x16))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
@@ -492,8 +498,9 @@ async def to_code(config):
             sel = await select.new_select(config[CONF_WASH_MODE],
                     options=config.get(
                         CONF_OPTIONS, list(options_map.keys())))
+            cg.add(var.set_wash_mode_select(sel))
+            cg.add(sel.set_sa_id(0x03))
             cg.add(sel.set_service_id(0x17))
-            cg.add(sel.set_wash_mode_select(sel))
             cg.add(taixia.register_listener(sel))
             cg.add(sel.set_taixia_parent(taixia))
 
@@ -504,6 +511,7 @@ async def to_code(config):
                     options=config.get(
                         CONF_OPTIONS, list(options_map.keys())))
             cg.add(var.set_warm_water_program_select(sel))
+            cg.add(sel.set_sa_id(0x03))
             cg.add(sel.set_service_id(0x18))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
@@ -517,6 +525,7 @@ async def to_code(config):
             sel = await select.new_select(config[CONF_OPERATING_PROGRAM],
                     options=list(options_map.keys()))
             cg.add(var.set_operating_program_select(sel))
+            cg.add(sel.set_sa_id(0x04))
             cg.add(sel.set_service_id(0x01))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
@@ -529,6 +538,7 @@ async def to_code(config):
                     options=config.get(
                         CONF_OPTIONS, list(options_map.keys())))
             cg.add(var.set_air_purfifier_select(sel))
+            cg.add(sel.set_sa_id(0x04))
             cg.add(sel.set_service_id(0x0D))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
@@ -543,6 +553,7 @@ async def to_code(config):
                     options=config.get(
                         CONF_OPTIONS, list(options_map.keys())))
             cg.add(var.set_operating_program_select(sel))
+            cg.add(sel.set_sa_id(0x08))
             cg.add(sel.set_service_id(0x01))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
@@ -556,6 +567,7 @@ async def to_code(config):
             sel = await select.new_select(config[CONF_VENTILATE_MODE],
                     options=list(options_map.keys()))
             cg.add(var.set_ventilate_mode_select(sel))
+            cg.add(sel.set_sa_id(0x0E))
             cg.add(sel.set_service_id(0x15))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
@@ -568,6 +580,7 @@ async def to_code(config):
                     options=config.get(
                         CONF_OPTIONS, list(options_map.keys())))
             cg.add(var.set_pre_heat_cool_select(sel))
+            cg.add(sel.set_sa_id(0x0E))
             cg.add(sel.set_service_id(0x16))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
@@ -582,6 +595,7 @@ async def to_code(config):
                     options=config.get(
                         CONF_OPTIONS, list(options_map.keys())))
             cg.add(var.set_operating_program_select(sel))
+            cg.add(sel.set_sa_id(0x0F))
             cg.add(sel.set_service_id(0x01))
             cg.add(sel.set_select_mappings(list(options_map.values())))
             cg.add(taixia.register_listener(sel))
