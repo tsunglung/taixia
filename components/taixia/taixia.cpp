@@ -88,8 +88,23 @@ static const uint8_t CMD_LENGTH = 6;
         this->sa_id_textsensor_->publish_state(sa_id);
       }
       // if not preset sa_id
-      if (this->sa_id_ == 0)
-        this->sa_id_ = this->buffer_[3] << 8 | this->buffer_[4];
+      if (this->sa_id_ == 0) {
+        uint16_t reported_sa_id = static_cast<uint16_t>((this->buffer_[3] << 8) | this->buffer_[4]);
+        ESP_LOGD(TAG, "Appliance reported sa_id_: 0x%4.4x", reported_sa_id);
+        if (reported_sa_id == 0xffff) {
+          ESP_LOGW(TAG, "Ignoring sa_id_ reported by appliance");
+        } else {
+          if (reported_sa_id > 0xff) {
+            ESP_LOGW(TAG, "Appliance reported a 16-bit sa_id_");
+          }
+          // we are always sending an 8-bit sa_id_ to the appliance
+          // so we will store the sa_id_ reported by the appliance as
+          // an 8-bit value by ignoring the higher order byte
+          this->sa_id_ = static_cast<uint8_t>(reported_sa_id & 0xff);
+        }
+      } else {
+        ESP_LOGD(TAG, "Not requesting sa_id_ from appliance");
+      }
     }
     this->buffer_.clear();
 
@@ -227,11 +242,24 @@ static const uint8_t CMD_LENGTH = 6;
       }
 
       // if not preset sa_id
-      if (this->sa_id_ == 0)
-        this->sa_id_ = this->buffer_[6] << 8 | this->buffer_[7];
+      if (this->sa_id_ == 0) {
+        uint16_t reported_sa_id = static_cast<uint16_t>((this->buffer_[3] << 8) | this->buffer_[4]);
+        ESP_LOGD(TAG, "Appliance reported sa_id_: 0x%4.4x", reported_sa_id);
+        if (reported_sa_id == 0xffff) {
+          ESP_LOGW(TAG, "Ignoring sa_id_ reported by appliance");
+        } else {
+          if (reported_sa_id > 0xff) {
+            ESP_LOGW(TAG, "Appliance reported a 16-bit sa_id_");
+          }
+          // we are always sending an 8-bit sa_id_ to the appliance
+          // so we will store the sa_id_ reported by the appliance as
+          // an 8-bit value by ignoring the higher order byte
+          this->sa_id_ = static_cast<uint8_t>(reported_sa_id & 0xff);
+        }
       } else {
         this->get_info_();
       }
+    }
   }
 
   bool TaiXia::set_select(uint8_t sa_id, uint8_t service_id, uint16_t selection) {
@@ -258,29 +286,7 @@ static const uint8_t CMD_LENGTH = 6;
       ESP_LOGE(TAG, "Appliance response invalid");
       return false;
     }
-    if (response[2] != command[2]) {
-      ESP_LOGE(TAG, "Unexpected acknowledge from appliance: " \
-                    "sent 0x%2.2x but " \
-                    "received ack for 0x%2.2x",
-               command[2], response[2]);
-      return false;
-    }
-    if (response[3] == 0xff && response[4] == 0xff) {
-      ESP_LOGW(TAG, "Appliance reported that the command and/or " \
-                    "selection is/are not available at the moment");
-      return false;
-    }
-    if (response[3] != command[3] || response[4] != command[4]) {
-      ESP_LOGW(TAG, "Selection overruled by appliance: " \
-                    "sent 0x%2.2x%2.2x but " \
-                    "received ack for 0x%2.2x%2.2x",
-               command[3], command[4], response[3], response[4]);
-      // TODO:
-      // we should update our value here to what the appliance did
-      // to our selection
-      return false;
-    }
-    return true;
+    return this->validate_response_(command, response, true);
   }
 
   bool TaiXia::switch_command(uint8_t sa_id, uint8_t service_id, bool onoff) {
@@ -307,80 +313,58 @@ static const uint8_t CMD_LENGTH = 6;
       ESP_LOGE(TAG, "Appliance response invalid");
       return false;
     }
-    if (response[2] != command[2]) {
-      ESP_LOGE(TAG, "Unexpected acknowledge from appliance: " \
-                    "sent 0x%2.2x but " \
-                    "received ack for 0x%2.2x",
-               command[2], response[2]);
-      return false;
-    }
-    if (response[3] == 0xff && response[4] == 0xff) {
-      ESP_LOGW(TAG, "Appliance reported that the command and/or value " \
-                    "is/are not available at the moment");
-      return false;
-    }
-    if (response[3] != command[3] || response[4] != command[4]) {
-      ESP_LOGW(TAG, "Value overruled by appliance: " \
-                    "sent 0x%2.2x%2.2x but " \
-                    "received ack for 0x%2.2x%2.2x",
-               command[3], command[4], response[3], response[4]);
-      // TODO:
-      // we should update our value here to what the appliance did
-      // to our selection
-      return false;
-    }
-    return true;
+    return this->validate_response_(command, response, true);
   }
 
   bool TaiXia::set_number(uint8_t sa_id, uint8_t service_id, float value) {
-    ESP_LOGV(TAG, "set number: %d %d %f", sa_id, service_id, value);
-    if (this->sa_id_ != sa_id)
+    if (this->sa_id_ != sa_id) {
+      ESP_LOGE(TAG, "Internal error! sa_id mismatch: " \
+                    "got 0x%2.2x, expected 0x%2.2x",
+               sa_id, this->sa_id_);
       return false;
+    }
 
+    uint8_t command[CMD_LENGTH];
     uint8_t response[RESPONSE_LENGTH];
-    uint8_t cmd[6] = {0x06, sa_id, 0x00, 0x00, 0x00, 0x00};
 
-    cmd[2] = (uint8_t)(WRITE | service_id);
-    cmd[3] = (int(value) & 0xFF00) >> 8;
-    cmd[4] = int(value) & 0xFF;
-    cmd[5] = this->checksum(cmd, 5);
-    if (!this->write_command_(cmd, response, CMD_LENGTH, CMD_LENGTH)) {
+    command[0] = (uint8_t)CMD_LENGTH;
+    command[1] = (uint8_t)sa_id;
+    command[2] = (uint8_t)(WRITE | service_id);
+    command[3] = (uint8_t)((static_cast<int16_t>(value) & 0xff00) >> 8);
+    command[4] = (uint8_t)(static_cast<int16_t>(value) & 0x00ff);
+    command[5] = (uint8_t)this->checksum(command, CMD_LENGTH - 1);
+
+    memset(response, 0x00, RESPONSE_LENGTH);
+
+    if (!this->write_command_(command, response, CMD_LENGTH, CMD_LENGTH)) {
       ESP_LOGE(TAG, "Appliance response invalid");
       return false;
     }
-    if (response[2] != cmd[2]) {
-      ESP_LOGE(TAG, "Unexpected acknowledge from appliance: " \
-                    "sent 0x%2.2x but " \
-                    "received ack for 0x%2.2x",
-               cmd[2], response[2]);
-      return false;
-    }
-    if (response[3] == 0xff && response[4] == 0xff) {
-      ESP_LOGW(TAG, "Appliance reported that the command and/or value is/are not available at the moment");
-      return false;
-    }
-    if (response[3] != cmd[3] || response[4] != cmd[4]) {
-      ESP_LOGW(TAG, "Value overruled by appliance: " \
-                    "sent 0x%2.2x%2.2x but " \
-                    "received ack for 0x%2.2x%2.2x",
-               cmd[3], cmd[4], response[3], response[4]);
-      // TODO:
-      // we should update our value here to what the appliance did
-      // to our selection
-      return false;
-    }
-    return true;
+    return this->validate_response_(command, response, true);
   }
 
   void TaiXia::get_number(uint8_t sa_id, uint8_t service_id, uint8_t *response) {
-    ESP_LOGV(TAG, "get number: %x %x %x", this->sa_id_ , sa_id, service_id);
-    if (this->sa_id_ != sa_id)
+    if (this->sa_id_ != sa_id) {
+      ESP_LOGE(TAG, "Internal error! sa_id mismatch: " \
+                    "got 0x%2.2x, expected 0x%2.2x",
+               sa_id, this->sa_id_);
       return;
+    }
 
-    uint8_t cmd[6] = {0x06, sa_id, service_id, 0xFF, 0xFF, 0x00};
-    cmd[5] = this->checksum(cmd, 5);
+    uint8_t command[CMD_LENGTH];
 
-    uint8_t ret = this->write_command_(cmd, response, CMD_LENGTH, CMD_LENGTH);
+    command[0] = (uint8_t)CMD_LENGTH;
+    command[1] = (uint8_t)sa_id;
+    command[2] = (uint8_t)service_id;
+    command[3] = (uint8_t)0xff;
+    command[4] = (uint8_t)0xff;
+    command[5] = (uint8_t)this->checksum(command, CMD_LENGTH - 1);
+
+    if (!this->write_command_(command, response, CMD_LENGTH, CMD_LENGTH)) {
+      ESP_LOGE(TAG, "Appliance response invalid");
+      return;
+    }
+    (void)this->validate_response_(command, response, false);
   }
 
   bool TaiXia::read_climate_status_() {
@@ -581,7 +565,56 @@ static const uint8_t CMD_LENGTH = 6;
     return true;
   }
 
-  void TaiXiaListener::on_response(uint16_t sa_id, std::vector<uint8_t> &response) {
+  bool TaiXia::validate_response_(uint8_t* command,
+                                 uint8_t* response,
+                                 bool confirm_write) {
+    if (response[2] != command[2]) {
+      ESP_LOGE(TAG, "Unexpected acknowledge from appliance: " \
+                    "sent 0x%2.2x but " \
+                    "received ack for 0x%2.2x",
+               command[2], response[2]);
+      return false;
+    }
+    if (response[3] == 0xff && response[4] == 0xff) {
+      ESP_LOGW(TAG, "Appliance reported that the command and/or " \
+                    "selection is/are not available at the moment");
+      return false;
+    }
+    if (confirm_write) {
+      if (response[3] != command[3] || response[4] != command[4]) {
+        ESP_LOGW(TAG, "Selection overruled by appliance: " \
+                      "sent 0x%2.2x%2.2x but " \
+                      "received ack for 0x%2.2x%2.2x",
+                 command[3], command[4], response[3], response[4]);
+        // TODO:
+        // we should update our value here to what the appliance did
+        // to our selection
+        return false;
+      }
+    }
+    return true;
+  }
+
+  void TaiXia::read_appliance_status_conditional_(void) {
+    if (!this->get_optimistic()) {
+      if (this->get_version() < 3.0) {
+        this->read_sa_status();
+      } else {
+        this->send(CMD_LENGTH,
+                   0, // "data type" or "protocol"
+                   SA_ID_ALL, // NOTE: should this not be this->sa_id_ ?
+                   SERVICE_ID_READ_STATUS,
+                   0xffff);
+      }
+    } else {
+      ESP_LOGV(TAG, "Control is %s",
+               (this->get_optimistic() ? "optimistic" :
+                                         "pessimistic"));
+      // NOTE: we can just say "optimistic" here actually
+    }
+  }
+
+  void TaiXiaListener::on_response(uint8_t sa_id, std::vector<uint8_t> &response) {
 //    if ((this->sa_id_ != 0xffff) && (this->sa_id_ != sa_id))
 //      return;
     this->handle_response(response);

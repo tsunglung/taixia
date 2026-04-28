@@ -14,25 +14,23 @@ static const char *const TAG = "taixia.switch";
   }
 
   void TaiXiaSwitch::write_state(bool state) {
-    if (this->service_id_ >= 0) {
-      bool org_state = state;
-      if (((this->sa_id_ == SA_ID_CLIMATE) && (this->service_id_ == SERVICE_ID_CLIMATE_BEEPER)) || 
-          ((this->sa_id_ == SA_ID_DEHUMIDIFIER) && (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_BEEPER))) {
-        state = !state;
-      }
-      if (this->parent_->switch_command(this->sa_id_, this->service_id_, state)) {
-        this->publish_state(org_state);
-      }
-
-      ESP_LOGV(TAG, "Control is %s", (this->parent_->get_optimistic() ? "optimistic" : "pessimistic"));
-      if (!this->parent_->get_optimistic()) {
-        if (this->parent_->get_version() < 3.0) {
-          this->parent_->read_sa_status();
-        } else {
-          this->parent_->send(6, 0, 0, SERVICE_ID_READ_STATUS, 0xffff);
+    bool publish = false;
+    switch (this->sa_id_) {
+      case SA_ID_CLIMATE:
+        if (this->service_id_ == SERVICE_ID_CLIMATE_BEEPER) {
+          publish = this->parent_->switch_command(this->sa_id_, this->service_id_, !state);
         }
-      }
+        break;
+      case SA_ID_DEHUMIDIFIER:
+        if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_BEEPER) {
+          publish = this->parent_->switch_command(this->sa_id_, this->service_id_, !state);
+        }
+        break;
     }
+    if (publish) {
+      this->publish_state(state);
+    }
+    this->parent_->read_appliance_status_conditional_();
   }
 
   void TaiXiaSwitch::handle_response(std::vector<uint8_t> &response) {

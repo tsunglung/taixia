@@ -205,13 +205,11 @@ class TaiXia;
 
 class TaiXiaListener {
  public:
-  void set_sa_id(uint16_t sa_id) { this->sa_id_ = sa_id; }
-
-  void on_response(uint16_t sa_id, std::vector<uint8_t> &response);
+  void set_sa_id(uint8_t sa_id) { this->sa_id_ = sa_id; }
+  void on_response(uint8_t sa_id, std::vector<uint8_t> &response);
 
  protected:
-  uint16_t sa_id_{0};
-
+  uint8_t sa_id_ { 0 };
   virtual void handle_response(std::vector<uint8_t> &response) = 0;
 };
 
@@ -232,13 +230,16 @@ class TaiXia : public uart::UARTDevice, public Component {
 
   uint8_t checksum(const uint8_t *data, uint8_t len);
   void readline(bool handle_response);
-  bool send(uint8_t packet_length, uint8_t date_type, uint8_t sa_id, uint8_t service_id, uint16_t data);
+  bool send(uint8_t packet_length, uint8_t data_type,
+            uint8_t sa_id, uint8_t service_id, uint16_t data);
   bool send_cmd(const uint8_t *command, uint8_t *response, uint8_t len) {
     if (this->version_ < 3.0)
       return write_command_(command, response, len, len, 60000);
     else
       return write_command_(command, response, len, len);
   }
+  void read_appliance_status_conditional_();
+
   bool set_select(uint8_t sa_id, uint8_t service_id, uint16_t selection);
   bool switch_command(uint8_t sa_id, uint8_t service_id, bool onoff);
   bool set_number(uint8_t sa_id, uint8_t service_id, float value);
@@ -346,6 +347,7 @@ class TaiXia : public uart::UARTDevice, public Component {
 
   bool write_command_(const uint8_t *command, uint8_t *response, uint8_t len, uint8_t tlen, uint32_t timeout);
   bool write_command_(const uint8_t *command, uint8_t *response, uint8_t len, uint8_t tlen);
+  bool validate_response_(uint8_t* command, uint8_t* response, bool confirm_write);
 };
 
 }  // namespace taixia
