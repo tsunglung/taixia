@@ -2,6 +2,9 @@
 #include "esphome/core/log.h"
 #include "taixia.h"
 
+#undef PING
+#define ASSERT_RESPONSE_LENGTH
+
 namespace esphome {
 namespace taixia {
 
@@ -61,40 +64,81 @@ static const uint8_t CMD_LENGTH = 6;
 
   void TaiXia::get_info_() {
     uint8_t i;
+    uint8_t crc;
+
+#if defined(PING)
+    ESP_LOGD(TAG, "%s:%s(%d)", __FILE__, __FUNCTION__, __LINE__);
+#endif // PING
+
     this->buffer_.clear();
 
-    this->send(6, 0, 0x00, SERVICE_ID_READ_VERSION, 0xFFFF);
-    this->readline(false);
+    // TODO use send_cmd instead of send+delay+readline
 
-    if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_VERSION)) {
-      if (this->version_textsensor_ != nullptr) {
-        std::string version;
-        version = format_hex_pretty(this->buffer_[3]) + "." + format_hex_pretty(this->buffer_[4]);
-        this->version_textsensor_->publish_state(version);
-      }
-    }
-    this->buffer_.clear();
-
-    this->send(6, 0, 0x00, SERVICE_ID_READ_SA_ID, 0xFFFF);
+    // TODO only request when we have a sensor to publish the response to
+    this->send(CMD_LENGTH, 0, SA_ID_ALL, SERVICE_ID_READ_VERSION, 0xffff);
     if (this->response_time_ != 0) {
       delayMicroseconds(this->response_time_);
     }
     this->readline(false);
 
-    if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_SA_ID)) {
-      if (this->sa_id_textsensor_ != nullptr) {
-        std::string sa_id;
-        sa_id = format_hex_pretty(this->buffer_[3]) + format_hex_pretty(this->buffer_[4]);
-        this->sa_id_textsensor_->publish_state(sa_id);
+#if defined(ASSERT_RESPONSE_LENGTH)
+    if (this->buffer_[0] != this->buffer_.size()) {
+      ESP_LOGE(TAG, "%s:%s(%d) Response buffer size mismatch: " \
+                    "this->buffer_[0]=%d this->buffer_.size()=%d",
+               __FILE__, __FUNCTION__, __LINE__,
+               this->buffer_[0], this->buffer_.size());
+    }
+#else // ASSERT_RESPONSE_LENGTH
+#endif // ASSERT_RESPONSE_LENGTH
+
+    if (this->buffer_[0] >= (3 + 2 + 1) &&
+        this->buffer_[1] == 0x00 &&
+        this->buffer_[2] == SERVICE_ID_READ_VERSION) {
+      if (this->version_textsensor_ != nullptr) {
+        const size_t fmtnum = 2;
+        char fmtbuffer[(fmtnum*3)+0];
+        this->version_textsensor_->publish_state(
+          format_hex_pretty_to(
+            fmtbuffer, static_cast<const uint8_t*>(&(this->buffer_[3])), fmtnum, '.'));
       }
+    }
+    this->buffer_.clear();
+
+    this->send(CMD_LENGTH, 0, SA_ID_ALL, SERVICE_ID_READ_SA_ID, 0xffff);
+    if (this->response_time_ != 0) {
+      delayMicroseconds(this->response_time_);
+    }
+    this->readline(false);
+
+#if defined(ASSERT_RESPONSE_LENGTH)
+    if (this->buffer_[0] != this->buffer_.size()) {
+      ESP_LOGE(TAG, "%s:%s(%d) Response buffer size mismatch: " \
+                    "this->buffer_[0]=%d this->buffer_.size()=%d",
+                __FILE__, __FUNCTION__, __LINE__,
+                this->buffer_[0], this->buffer_.size());
+    }
+#else // ASSERT_RESPONSE_LENGTH
+#endif // ASSERT_RESPONSE_LENGTH
+
+    if (this->buffer_[0] >= (3 + 2 + 1) &&
+        this->buffer_[1] == 0x00 &&
+        this->buffer_[2] == SERVICE_ID_READ_SA_ID) {
+      if (this->sa_id_textsensor_ != nullptr) {
+        const size_t fmtnum = 2;
+        char fmtbuffer[(fmtnum*2)+1];
+        this->sa_id_textsensor_->publish_state(
+          format_hex_pretty_to(
+            fmtbuffer, static_cast<const uint8_t*>(&(this->buffer_[3])), fmtnum, '\0'));
+      }
+
       // if not preset sa_id
       if (this->sa_id_ == 0) {
         uint16_t reported_sa_id = static_cast<uint16_t>((this->buffer_[3] << 8) | this->buffer_[4]);
         ESP_LOGD(TAG, "Appliance reported sa_id_: 0x%4.4x", reported_sa_id);
         if (reported_sa_id == 0xffff) {
-          ESP_LOGW(TAG, "Ignoring sa_id_ reported by appliance");
+          ESP_LOGW(TAG, "Appliance reported sa_id_ is unavailable");
         } else {
-          if (reported_sa_id > 0xff) {
+          if (reported_sa_id > 0x00ff) {
             ESP_LOGW(TAG, "Appliance reported a 16-bit sa_id_");
           }
           // we are always sending an 8-bit sa_id_ to the appliance
@@ -103,25 +147,34 @@ static const uint8_t CMD_LENGTH = 6;
           this->sa_id_ = static_cast<uint8_t>(reported_sa_id & 0xff);
         }
       } else {
-        ESP_LOGD(TAG, "Not requesting sa_id_ from appliance");
+        ESP_LOGD(TAG, "Not using sa_id_ reported by appliance");
       }
     }
     this->buffer_.clear();
 
-    this->send(6, 0, 0x00, SERVICE_ID_READ_BRAND, 0xFFFF);
+    // TODO only request when we have a sensor to publish the response to
+    this->send(CMD_LENGTH, 0, SA_ID_ALL, SERVICE_ID_READ_BRAND, 0xffff);
     if (this->response_time_ != 0) {
       delayMicroseconds(this->response_time_);
     }
     this->readline(false);
 
-    if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_BRAND)) {
+#if defined(ASSERT_RESPONSE_LENGTH)
+    if (this->buffer_[0] != this->buffer_.size()) {
+      ESP_LOGE(TAG, "%s:%s(%d) Response buffer size mismatch: " \
+                    "this->buffer_[0]=%d this->buffer_.size()=%d",
+               __FILE__, __FUNCTION__, __LINE__,
+               this->buffer_[0], this->buffer_.size());
+    }
+#else // ASSERT_RESPONSE_LENGTH
+#endif // ASSERT_RESPONSE_LENGTH
+
+    if (this->buffer_[0] >= (3 + 1 + 1) && // at minimum header + asciiz + checksum
+        this->buffer_[1] == 0x00 &&
+        this->buffer_[2] == SERVICE_ID_READ_BRAND) {
       std::string brand;
-      for (i = 3; i < this->buffer_[0]; i++) {
-        if (this->buffer_[i] != 0x0) {
-          brand = brand + str_sprintf("%c", this->buffer_[i]);
-        } else {
-          break;
-        }
+      for (i = 3; i < this->buffer_[0] && this->buffer_[i] != 0x00; ++i) {
+        brand = brand + str_sprintf("%c", this->buffer_[i]);
       }
       if (this->brand_textsensor_ != nullptr) {
         this->brand_textsensor_->publish_state(brand);
@@ -129,20 +182,29 @@ static const uint8_t CMD_LENGTH = 6;
     }
     this->buffer_.clear();
 
-    this->send(6, 0, 0x00, SERVICE_ID_READ_MODEL, 0xFFFF);
+    // TODO only request when we have a sensor to publish the response to
+    this->send(CMD_LENGTH, 0, SA_ID_ALL, SERVICE_ID_READ_MODEL, 0xffff);
     if (this->response_time_ != 0) {
       delayMicroseconds(this->response_time_);
     }
     this->readline(false);
 
-    if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_MODEL)) {
+#if defined(ASSERT_RESPONSE_LENGTH)
+    if (this->buffer_[0] != this->buffer_.size()) {
+      ESP_LOGE(TAG, "%s:%s(%d) Response buffer size mismatch: " \
+                    "this->buffer_[0]=%d this->buffer_.size()=%d",
+               __FILE__, __FUNCTION__, __LINE__,
+               this->buffer_[0], this->buffer_.size());
+    }
+#else // ASSERT_RESPONSE_LENGTH
+#endif // ASSERT_RESPONSE_LENGTH
+
+    if (this->buffer_[0] >= (3 + 1 + 1) && // at minimum header + asciiz + checksum
+        this->buffer_[1] == 0x00 &&
+        this->buffer_[2] == SERVICE_ID_READ_MODEL) {
       std::string model;
-      for (i = 3; i < this->buffer_[0]; i++) {
-        if (this->buffer_[i] != 0x0) {
-          model = model + str_sprintf("%c", this->buffer_[i]);
-        } else {
-          break;
-        }
+      for (i = 3; i < this->buffer_[0] && this->buffer_[i] != 0x00; ++i) {
+        model = model + str_sprintf("%c", this->buffer_[i]);
       }
       if (this->model_textsensor_ != nullptr) {
         this->model_textsensor_->publish_state(model);
@@ -150,95 +212,122 @@ static const uint8_t CMD_LENGTH = 6;
     }
     this->buffer_.clear();
 
-    this->send(6, 0, 0x00, SERVICE_ID_READ_SERVICES, 0xFFFF);
+    // TODO only request when we have a sensor to publish the response to
+    this->send(CMD_LENGTH, 0, SA_ID_ALL, SERVICE_ID_READ_SERVICES, 0xffff);
     if (this->response_time_ != 0) {
       delayMicroseconds(this->response_time_);
     }
     this->readline(false);
 
-    uint8_t len = this->buffer_[0];
-    uint8_t crc = 0;
-    if (len >= 6) {
-      uint8_t data = 0;
-      for (i = 0; i < len - 1; i++) {
-        data = this->buffer_[i];
-        crc ^= data++;
-      }
+#if defined(ASSERT_RESPONSE_LENGTH)
+    if (this->buffer_[0] != this->buffer_.size()) {
+      ESP_LOGE(TAG, "%s:%s(%d) Response buffer size mismatch: " \
+                    "this->buffer_[0]=%d this->buffer_.size()=%d",
+               __FILE__, __FUNCTION__, __LINE__,
+               this->buffer_[0], this->buffer_.size());
     }
+#else // ASSERT_RESPONSE_LENGTH
+#endif // ASSERT_RESPONSE_LENGTH
+
+    crc = this->checksum(static_cast<const uint8_t*>(&(this->buffer_[0])), this->buffer_[0] - 1);
 
     // compatible with Panasonic which do not include service id of read services in response
-    if ((this->buffer_[0] >= 0x0)
-//        && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_READ_SERVICES)
-        && crc == this->buffer_[len - 1]
-      ) {
-      std::string services;
-      uint8_t start = 1;
-      if (this->buffer_[2] == SERVICE_ID_READ_SERVICES)
-        start = 3;
-
-      for (i = start; i < this->buffer_[0]; i++) {
-        services = services + format_hex_pretty(this->buffer_[i]) + " ";
-      }
+    if (this->buffer_[0] >= (1 + 1) &&  // at minimum header + checksum in panasonic case
+        // this->buffer_[1] == 0x00 &&
+        // this->buffer_[2] == SERVICE_ID_READ_SERVICES &&
+        crc == this->buffer_[this->buffer_[0] - 1]) {
       if (this->services_textsensor_ != nullptr) {
-        this->services_textsensor_->publish_state(services);
+        const size_t fmtnum = (RESPONSE_LENGTH - 1 - 1);
+        // -1: for first (length) byte
+        // -1: for trailing (checksum) byte
+        char fmtbuffer[(fmtnum*3)+0];
+        uint8_t start = 1;
+        if (this->buffer_[1] == 0x00 &&
+            this->buffer_[2] == SERVICE_ID_READ_SERVICES) {
+          // devices other than panasonic respond including sa_id_ and service_id_
+          // so we will find out payload at index 3 and beyond
+          ESP_LOGD(TAG, "Appliance response contained sa_id_ and service_id_");
+          start = 3;
+        }
+        this->services_textsensor_->publish_state(
+          format_hex_pretty_to(
+            fmtbuffer,
+            static_cast<const uint8_t*>(&(this->buffer_[start])),
+            this->buffer_[0] - 1 - start, // -1: do not include the response checksum
+            ' '));
       }
     }
     this->buffer_.clear();
   }
 
   void TaiXia::setup() {
-    uint8_t i, j, k;
+    uint8_t buffer_size;
+    uint8_t start;
+    uint8_t i;
+
+#if defined(PING)
+    ESP_LOGD(TAG, "%s:%s(%d) ping", __FILE__, __FUNCTION__, __LINE__);
+#endif // PING
 
     if (this->version_ < 3.0)
       return;
 
-    this->send(6, 0, 0x00, SERVICE_ID_REGISTER, 0xFFFF);
+    this->send(CMD_LENGTH, 0, SA_ID_ALL, SERVICE_ID_REGISTER, 0xffff);
+    if (this->response_time_ != 0) {
+      delayMicroseconds(this->response_time_);
+    }
     this->readline(false);
 
-//    uint8_t crc = this->checksum(this->buffer_, this->buffer_[0] - 1);
-    if ((this->buffer_[0] >= 0x0) && (this->buffer_[1] == 0x0) && (this->buffer_[2] == SERVICE_ID_REGISTER)) {
+#if defined(ASSERT_RESPONSE_LENGTH)
+    if (this->buffer_[0] != this->buffer_.size()) {
+      ESP_LOGE(TAG, "%s:%s(%d) Response buffer size mismatch: " \
+                    "this->buffer_[0]=%d this->buffer_.size()=%d",
+               __FILE__, __FUNCTION__, __LINE__,
+               this->buffer_[0], this->buffer_.size());
+    }
+#else // ASSERT_RESPONSE_LENGTH
+#endif // ASSERT_RESPONSE_LENGTH
 
-      std::string brand;
-      for (i = 8; i < this->buffer_[0]; i++) {
-        if (this->buffer_[i] != 0x0) {
-          brand = brand + str_sprintf("%c", this->buffer_[i]);
-        } else {
-          break;
-        }
-      }
+    if (this->buffer_[0] > (1+1+1+1) &&
+        this->buffer_[1] == 0x00 &&
+        this->buffer_[2] == SERVICE_ID_REGISTER) {
 
-      std::string model;
-      for (j = i + 1; j < this->buffer_[0]; j++) {
-        if (this->buffer_[j] != 0x0) {
-          model = model + str_sprintf("%c", this->buffer_[j]);
-        } else {
-          break;
-        }
-      }
+      buffer_size = this->buffer_[0];
 
-      std::string services;
-      for (k = j + 1; k < this->buffer_[0]; k++) {
-        services = services + format_hex_pretty(this->buffer_[k]) + " ";
-      }
-
-      if (this->sa_id_textsensor_ != nullptr) {
-        std::string sa_id;
-        sa_id = format_hex_pretty(this->buffer_[6]) + format_hex_pretty(this->buffer_[7]);
-        this->sa_id_textsensor_->publish_state(sa_id);
-      }
-      if (this->brand_textsensor_ != nullptr) {
-        this->brand_textsensor_->publish_state(brand);
-      }
-      if (this->model_textsensor_ != nullptr) {
-        this->model_textsensor_->publish_state(model);
-      }
-      if (this->services_textsensor_ != nullptr) {
-        this->services_textsensor_->publish_state(services);
-      }
       if (this->version_textsensor_ != nullptr) {
-        std::string version;
-        version = format_hex_pretty(this->buffer_[3]) + "." + format_hex_pretty(this->buffer_[4]);
-        this->version_textsensor_->publish_state(version);
+        const size_t fmtnum = 2;
+        char fmtbuffer[(fmtnum*3)+0];
+        this->version_textsensor_->publish_state(
+          format_hex_pretty_to(
+            fmtbuffer, static_cast<const uint8_t*>(&(this->buffer_[3])), fmtnum, '.'));
+      }
+
+      // sa_id_parsing at the end as it might call get_info() which will
+      // overwrite our SERVICE_ID_REGISTER response in this->buffer_
+
+      start = 8;
+      for (i = start; i < (buffer_size - 1) && this->buffer_[i] != 0x00; ++i);
+      if (this->brand_textsensor_ != nullptr) {
+        this->brand_textsensor_->publish_state(
+          str_snprintf(
+            "%s", i - start, static_cast<unsigned char*>(&this->buffer_[start])));
+      }
+
+      start = i + 1;
+      for (i = start; i < (buffer_size - 1) && this->buffer_[i] != 0x00; ++i);
+      if (this->model_textsensor_ != nullptr) {
+        this->model_textsensor_->publish_state(
+          str_snprintf(
+            "%s", i - start, static_cast<unsigned char*>(&this->buffer_[start])));
+      }
+
+      start = i + 1;
+      for (i = start; i < (buffer_size - 1); ++i);
+      if (this->services_textsensor_ != nullptr) {
+        char fmtbuffer[RESPONSE_LENGTH*3];
+        this->services_textsensor_->publish_state(
+          format_hex_pretty_to(
+            fmtbuffer, static_cast<const uint8_t*>(&(this->buffer_[start])), i - start, ' '));
       }
 
       // if not preset sa_id
