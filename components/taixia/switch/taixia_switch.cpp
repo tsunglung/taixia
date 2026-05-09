@@ -14,20 +14,17 @@ static const char *const TAG = "taixia.switch";
   }
 
   void TaiXiaSwitch::write_state(bool state) {
-    bool publish = false;
+    bool invert = false;
     switch (this->sa_id_) {
       case SA_ID_CLIMATE:
-        if (this->service_id_ == SERVICE_ID_CLIMATE_BEEPER) {
-          publish = this->parent_->switch_command(this->sa_id_, this->service_id_, !state);
-        }
+        invert = (this->service_id_ == SERVICE_ID_CLIMATE_BEEPER);
         break;
       case SA_ID_DEHUMIDIFIER:
-        if (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_BEEPER) {
-          publish = this->parent_->switch_command(this->sa_id_, this->service_id_, !state);
-        }
+        invert = (this->service_id_ == SERVICE_ID_DEHUMIDTFIER_BEEPER);
         break;
     }
-    if (publish) {
+    if (this->parent_->switch_command(this->sa_id_, this->service_id_,
+                                      invert ? !state : state)) {
       this->publish_state(state);
     }
     this->parent_->read_appliance_status_conditional_();
@@ -35,7 +32,7 @@ static const char *const TAG = "taixia.switch";
 
   void TaiXiaSwitch::handle_response(std::vector<uint8_t> &response) {
     uint8_t i;
-    bool new_state = this->state;
+    bool new_state = this->state; // assume state is not changed
 
     for (i = 3; i < response[0] - 3; i+=3) {
       // all the logic acts only if 'this' matches the response service_id
@@ -63,7 +60,6 @@ static const char *const TAG = "taixia.switch";
       }
       break;
     }
-publish:
     if (this->state != new_state) {
       this->publish_state(new_state);
     }
