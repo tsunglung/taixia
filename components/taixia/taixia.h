@@ -332,6 +332,10 @@ class TaiXia : public uart::UARTDevice, public Component {
   bool read_climate_status_(void);
 
   std::vector<uint8_t> buffer_;
+  // Accumulation buffer for the non-blocking receiver in loop(); holds bytes
+  // that have arrived but do not yet form a complete frame.
+  std::vector<uint8_t> rx_;
+  uint32_t rx_last_byte_ms_{0};
   uint8_t protocol_;
   uint8_t sa_id_;
   float version_{4.0};
