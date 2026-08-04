@@ -52,7 +52,7 @@ class DehumidifierSensor : public TaiXiaListener, public PollingComponent {
   void set_water_full_sensor(sensor::Sensor *sensor) { this->water_full_sensor_ = sensor; }
   void set_filter_clean_sensor(sensor::Sensor *sensor) { this->filter_clean_sensor_ = sensor; }
   void set_side_air_vent_sensor(sensor::Sensor *sensor) { this->side_air_vent_sensor_ = sensor; }
-  void set_error_code_sensor_(sensor::Sensor *sensor) { this->error_code_sensor_ = sensor; }
+  void set_error_code_sensor(sensor::Sensor *sensor) { this->error_code_sensor_ = sensor; }
   void set_operating_current_sensor(sensor::Sensor *sensor) { this->operating_current_sensor_ = sensor; }
   void set_operating_voltage_sensor(sensor::Sensor *sensor) { this->operating_voltage_sensor_ = sensor; }
   void set_operating_power_sensor(sensor::Sensor *sensor) { this->operating_power_sensor_ = sensor; }

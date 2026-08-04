@@ -605,6 +605,9 @@ async def to_code(config):
         if CONF_SIDE_AIR_VENT in config:
             sens = await sensor.new_sensor(config[CONF_SIDE_AIR_VENT])
             cg.add(var.set_side_air_vent_sensor(sens))
+        if CONF_ERROR_CODE in config:
+            sens = await sensor.new_sensor(config[CONF_ERROR_CODE])
+            cg.add(var.set_error_code_sensor(sens))
         if CONF_DEFROST in config:
             sens = await sensor.new_sensor(config[CONF_DEFROST])
             cg.add(var.set_defrost_sensor(sens))
