@@ -452,9 +452,10 @@ static const uint32_t RX_STALE_MS = 250;
     const uint32_t now = millis();
     uint8_t c;
 
-    while (this->available() && this->rx_.size() < RX_BUFFER_MAX) {
-      if (!this->read_byte(&c))
+    while (this->available() && (this->rx_.size() < RX_BUFFER_MAX)) {
+      if (!this->read_byte(&c)) {
         break;
+      }
       this->rx_.push_back(c);
       this->rx_last_byte_ms_ = now;
     }
@@ -469,7 +470,10 @@ static const uint32_t RX_STALE_MS = 250;
     while (!this->rx_.empty()) {
       const uint8_t len = this->rx_[0];
 
-      // Implausible length: this byte cannot be a frame start.
+      // Implausible length: this byte cannot be a frame start. Drop only this
+      // one byte. The rest of the buffer may already hold a complete frame, so
+      // clearing it would throw away valid data and leave the stream misaligned
+      // again -- the very failure this receiver exists to avoid.
       if (len < MIN_FRAME_LENGTH || len > MAX_FRAME_LENGTH) {
         this->rx_.erase(this->rx_.begin());
         continue;
@@ -478,8 +482,9 @@ static const uint32_t RX_STALE_MS = 250;
       if (this->rx_.size() < len) {
         // Still arriving. Wait for the next loop() unless the stream has gone
         // quiet, in which case this is a truncated frame and we resynchronise.
-        if (now - this->rx_last_byte_ms_ > RX_STALE_MS)
+        if (now - this->rx_last_byte_ms_ > RX_STALE_MS) {
           this->rx_.erase(this->rx_.begin());
+        }
         break;
       }
 
