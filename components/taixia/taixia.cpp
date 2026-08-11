@@ -8,6 +8,16 @@ namespace taixia {
 static const char *const TAG = "taixia";
 static const uint8_t RESPONSE_LENGTH = 255;
 
+// Framing limits for the non-blocking receiver in loop().
+static const uint8_t MIN_FRAME_LENGTH = 6;
+static const uint8_t MAX_FRAME_LENGTH = 200;
+// Hard cap on the accumulation buffer. A full appliance status response is
+// ~115 bytes, so this leaves ample room for a partial frame plus a queued one.
+static const size_t RX_BUFFER_MAX = 512;
+// If a frame stays incomplete for this long, treat it as truncated and
+// resynchronise rather than waiting for bytes that will never arrive.
+static const uint32_t RX_STALE_MS = 250;
+
   void TaiXia::dump_config() {
     ESP_LOGCONFIG(TAG, "TaiXIA:");
     ESP_LOGCONFIG(TAG, "    SA_ID: %x", this->sa_id_);
@@ -424,12 +434,74 @@ static const uint8_t RESPONSE_LENGTH = 255;
       }
   }
 
+  // Non-blocking receiver.
+  //
+  // The previous implementation called readline() in a loop, which used
+  // read_array() to wait for a whole frame to arrive. A full status response is
+  // 115 bytes; at 9600 baud that takes ~120ms, but read_array()'s timeout is
+  // hard-coded to 100ms and consumes nothing when it expires. Every poll
+  // therefore blocked the main loop for seconds and left the stream misaligned,
+  // so the next iteration read a byte from the middle of a frame and mistook it
+  // for a length. With only a 1-byte XOR checksum, roughly 1 in 256 of those
+  // misaligned frames passed validation and fed garbage to the listeners.
+  //
+  // Instead, drain whatever the UART already holds, then parse only complete
+  // frames. An incomplete frame is left for the next loop() call rather than
+  // waited on, so this never blocks.
   void TaiXia::loop() {
-    if (!available())
-      return;
+    const uint32_t now = millis();
+    uint8_t c;
 
-    while (available()) {
-      readline(true);
+    while (this->available() && (this->rx_.size() < RX_BUFFER_MAX)) {
+      if (!this->read_byte(&c)) {
+        break;
+      }
+      this->rx_.push_back(c);
+      this->rx_last_byte_ms_ = now;
+    }
+
+    // Should not happen in practice; drop everything and resynchronise.
+    if (this->rx_.size() >= RX_BUFFER_MAX) {
+      ESP_LOGW(TAG, "RX buffer overflow, discarding %u bytes", (unsigned) this->rx_.size());
+      this->rx_.clear();
+      return;
+    }
+
+    while (!this->rx_.empty()) {
+      const uint8_t len = this->rx_[0];
+
+      // Implausible length: this byte cannot be a frame start. Drop only this
+      // one byte. The rest of the buffer may already hold a complete frame, so
+      // clearing it would throw away valid data and leave the stream misaligned
+      // again -- the very failure this receiver exists to avoid.
+      if (len < MIN_FRAME_LENGTH || len > MAX_FRAME_LENGTH) {
+        this->rx_.erase(this->rx_.begin());
+        continue;
+      }
+
+      if (this->rx_.size() < len) {
+        // Still arriving. Wait for the next loop() unless the stream has gone
+        // quiet, in which case this is a truncated frame and we resynchronise.
+        if (now - this->rx_last_byte_ms_ > RX_STALE_MS) {
+          this->rx_.erase(this->rx_.begin());
+        }
+        break;
+      }
+
+      // The checksum is the XOR of the whole frame including the length byte,
+      // i.e. XOR of the first len-1 bytes equals the last one.
+      if (this->checksum(this->rx_.data(), len - 1) == this->rx_[len - 1]) {
+        this->buffer_.assign(this->rx_.begin(), this->rx_.begin() + len);
+        for (auto &listener : this->listeners_)
+          listener->on_response(this->sa_id_, this->buffer_);
+        this->buffer_.clear();
+        this->rx_.erase(this->rx_.begin(), this->rx_.begin() + len);
+      } else {
+        // Most likely misalignment rather than corruption, so advance by a
+        // single byte. Dropping the whole candidate frame would skip past the
+        // real start of the next one.
+        this->rx_.erase(this->rx_.begin());
+      }
     }
   }
 
